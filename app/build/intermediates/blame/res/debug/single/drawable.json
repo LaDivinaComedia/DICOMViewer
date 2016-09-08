@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\gradient_color_bar.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable\\gradient_color_bar.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\gradient_inverse_bar.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable\\gradient_inverse_bar.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\gradient_bar.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable\\gradient_bar.png"
+    }
+]

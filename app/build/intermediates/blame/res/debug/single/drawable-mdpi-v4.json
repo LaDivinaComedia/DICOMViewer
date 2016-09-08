@@ -1,0 +1,70 @@
+[
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\lock.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\lock.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\config_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\config_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\unlock.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\unlock.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_normal.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_normal.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_inverse_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_inverse_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\icon.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\icon.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\config.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\config.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_rainbow_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_rainbow_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\grayscale.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\grayscale.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_rainbow.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_rainbow.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_inverse.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_inverse.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\ddv_toolbar.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\ddv_toolbar.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\ruler.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\ruler.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\grayscale_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\grayscale_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\clut_normal_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\clut_normal_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\ruler_select.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\ruler_select.png"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\ddv.png",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\drawable-mdpi\\ddv.png"
+    }
+]

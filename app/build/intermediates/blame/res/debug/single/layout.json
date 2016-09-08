@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\layout\\dicom_viewer.xml",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\layout\\dicom_viewer.xml"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\layout\\dialog_about.xml",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\layout\\dialog_about.xml"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\layout\\file_chooser_list.xml",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\layout\\file_chooser_list.xml"
+    },
+    {
+        "merged": "D:\\Android\\droid-dicom-viewer1\\app\\build\\intermediates\\res\\merged\\debug\\layout\\file_chooser_item.xml",
+        "source": "D:\\Android\\droid-dicom-viewer1\\app\\src\\main\\res\\layout\\file_chooser_item.xml"
+    }
+]
