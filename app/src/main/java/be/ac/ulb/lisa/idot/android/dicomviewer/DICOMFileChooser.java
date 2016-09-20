@@ -703,7 +703,7 @@ public class DICOMFileChooser extends ListActivity {
 				"It supports only grayscale not compressed DICOM files. " +
 				"It parses implicit and explicit (little endian and big endian) " +
 				"value representation (VR).\n\n" +
-				"2011 © Pierre Malarme")
+				"2011 Â© Pierre Malarme")
 			   .setTitle("Disclaimer")
 		       .setCancelable(false)
 		       .setPositiveButton("Decline", new DialogInterface.OnClickListener() {
