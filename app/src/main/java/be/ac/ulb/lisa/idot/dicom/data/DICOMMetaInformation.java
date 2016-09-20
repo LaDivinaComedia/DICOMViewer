@@ -82,7 +82,20 @@ public class DICOMMetaInformation {
 	 * Application Entity Title. 
 	 */
 	private String mAET = "";
-	
+
+	/**
+	* Patient birth date
+	*/
+	private String patientBirthDate = "";
+	/**
+	*  patient name
+	*/
+	private String patientName = "";
+	/**
+	* patient age
+	*/
+	private String paitentAge = "";
+
 	
 	// ---------------------------------------------------------------
 	// + CONSTRUCTOR
@@ -146,6 +159,27 @@ public class DICOMMetaInformation {
 	public String getAET() {
 		return mAET;
 	}
+
+	/* @return the Patient Birth date
+	*/
+	public String getPatientBirthDate() {
+		return patientBirthDate;
+	}
+
+	/**
+	 * @return patients name
+	 */
+	public String getPatientName() {
+		return patientName;
+	}
+
+	/**
+	 *
+	 * @return patients age
+	 */
+	public String getPaitentAge() {
+		return paitentAge;
+	}
 	
 	/**
 	 * @param mGroupLength the mGroupLength to set
@@ -194,6 +228,27 @@ public class DICOMMetaInformation {
 	 */
 	public void setAET(String mAET) {
 		this.mAET = mAET;
+	}
+
+	/**
+	* @param patientBirthDate the mImplementationPatientBirthDate to set
+	*/
+	public void setPatientBirthDate(String patientBirthDate) {
+		this.patientBirthDate = patientBirthDate;
+	}
+
+	/**
+	* @param patientName the mImplementationPatientName to set
+	*/
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
+	}
+
+	/**
+	* @param paitentAge the mImplementationPatientAge to set
+	*/
+	public void setPaitentAge(String paitentAge) {
+		this.paitentAge = paitentAge;
 	}
 
 }
