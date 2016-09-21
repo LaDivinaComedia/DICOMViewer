@@ -86,7 +86,7 @@ public class DICOMMetaInformation {
 	/**
 	* Patient birth date
 	*/
-	private String patientBirthDate = "";
+	private String paitentBirthDate = "";
 	/**
 	*  patient name
 	*/
@@ -162,14 +162,14 @@ public class DICOMMetaInformation {
 
 	/* @return the Patient Birth date
 	*/
-	public String getPatientBirthDate() {
-		return patientBirthDate;
+	public String getPaitentBirthDate() {
+		return paitentBirthDate;
 	}
 
 	/**
 	 * @return patients name
 	 */
-	public String getPatientName() {
+	public String getPaitentName() {
 		return patientName;
 	}
 
@@ -233,14 +233,14 @@ public class DICOMMetaInformation {
 	/**
 	* @param patientBirthDate the mImplementationPatientBirthDate to set
 	*/
-	public void setPatientBirthDate(String patientBirthDate) {
-		this.patientBirthDate = patientBirthDate;
+	public void setPaitentBirthDate(String patientBirthDate) {
+		this.paitentBirthDate = patientBirthDate;
 	}
 
 	/**
 	* @param patientName the mImplementationPatientName to set
 	*/
-	public void setPatientName(String patientName) {
+	public void setPaitentName(String patientName) {
 		this.patientName = patientName;
 	}
 
