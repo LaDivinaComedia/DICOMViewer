@@ -169,12 +169,6 @@
         android:layout_height="fill_parent"
         android:layout_weight="1">
 
-		<ListView
-			android:id="@+id/listMetadata"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingLeft="10dp"/>
-
 		<FrameLayout
 	   	android:layout_width="fill_parent"
         android:layout_height="fill_parent">
@@ -187,15 +181,6 @@
 
 		</FrameLayout>
 
-		<Button android:id="@+id/currentToolButton"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentLeft="true"
-			android:layout_alignParentTop="true"
-			android:onClick="showToolBar"
-			android:layout_margin="5dip"
-			android:background="@drawable/ruler" />
-			
 		<TextView android:id="@+id/rowTextView"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -277,7 +262,22 @@
 				android:onClick="nextImage" />
 			
 		</LinearLayout>
-		
+
+		<ListView
+			android:id="@+id/listMetadata"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingLeft="10dp"/>
+
+		<Button android:id="@+id/currentToolButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"
+			android:onClick="showToolBar"
+			android:layout_margin="5dip"
+			android:background="@drawable/ruler" />
+
 	</RelativeLayout>
 
 </LinearLayout>
