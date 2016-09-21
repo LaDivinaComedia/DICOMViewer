@@ -318,6 +318,7 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
         mListMetadata.setAdapter(mArrayAdapter);
         mListMetadata.setDivider(null);
         mListMetadata.setDividerHeight(0);
+        mListMetadata.setEnabled(false);
 
         // Get the file name from the savedInstanceState or from the intent
         String fileName = null;
