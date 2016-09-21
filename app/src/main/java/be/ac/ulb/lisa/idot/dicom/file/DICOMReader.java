@@ -239,9 +239,10 @@ public class DICOMReader extends DICOMBufferedInputStream {
 			mByteOffset += 4;
 			
 			// Get the FileMeta group length
-			long groupLength = readUnsignedLong();
+			long groupLength = readUnsignedLong(); // this is magic shit dunno ...
+			groupLength = 0xffffffffL;
 			mByteOffset+= 4;
-			
+
 			// Set the group length (meta information length)
 			metaInformation.setGroupLength(groupLength);
 			
@@ -813,10 +814,10 @@ public class DICOMReader extends DICOMBufferedInputStream {
 				mMetaInformation.setAET(element.getValueString());
 			//Patient birth date
 			}else if (tag == 0x00100030){
-				mMetaInformation.setPatientBirthDate(element.getValueString());
+				mMetaInformation.setPaitentBirthDate(element.getValueString());
 			//patient name
 			} else if (tag == 0x00100010 ){
-				mMetaInformation.setPatientName(element.getValueString());
+				mMetaInformation.setPaitentName(element.getValueString());
 			//patient age
 				} else if (tag == 0x00101010){
 				mMetaInformation.setPaitentAge(element.getValueString());
@@ -826,7 +827,8 @@ public class DICOMReader extends DICOMBufferedInputStream {
 
 		public boolean isRequiredElement(int tag) {
 			return (tag == 0x00020002) || (tag == 0x00020003) || (tag == 0x00020010)
-				|| (tag == 0x00020012) || (tag == 0x00020013) || (tag == 0x00020016);
+				|| (tag == 0x00020012) || (tag == 0x00020013) || (tag == 0x00020016)
+				|| (tag == 0x00100030) || (tag == 0x00100010) || (tag == 0x00101010);
 		}
 
 		public void computeImage(DICOMElement parent, DICOMValueRepresentation VR,
