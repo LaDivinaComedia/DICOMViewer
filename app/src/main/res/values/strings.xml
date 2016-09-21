@@ -31,4 +31,9 @@
  -->
 <resources>
     <string name="app_name">Droid Dicom Viewer</string>
+
+    <string name="metadata_name">Name</string>
+    <string name="metadata_birth_date">Birth Date</string>
+    <string name="metadata_age">Age</string>
+    <string name="metadata_anonymous">&lt;anonymous&gt;</string>
 </resources>
