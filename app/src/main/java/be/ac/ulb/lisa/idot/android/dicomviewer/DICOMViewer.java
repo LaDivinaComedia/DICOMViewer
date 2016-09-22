@@ -426,12 +426,14 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		mDICOMViewerData.setToolMode(ToolMode.DIMENSION);
 		mDimensionToolButton.setBackgroundResource(R.drawable.ruler_select);
 		mCurrentToolButton.setBackgroundResource(R.drawable.ruler_select);
-		mCLUTNormalButton.setVisibility(View.GONE);
 		mCLUTNormalButton.setBackgroundResource(R.drawable.clut_normal_select);
-		mCLUTInverseButton.setVisibility(View.GONE);
-		mCLUTRainbowButton.setVisibility(View.GONE);
-		mToolBar.setVisibility(View.GONE);
-		
+		//Left tool bar hided because it will be redo.
+		mCLUTNormalButton.setVisibility(View.INVISIBLE);//Removal UI
+		mCLUTInverseButton.setVisibility(View.INVISIBLE);//Removal UI
+		mCLUTRainbowButton.setVisibility(View.INVISIBLE);//Removal UI
+		mToolBar.setVisibility(View.INVISIBLE);//Removal UI
+		mCurrentToolButton.setVisibility(View.INVISIBLE);//
+
 		// Set the tool mode too the DICOMImageView and
 		// the GrayscaleWindow
 		mImageView.setDICOMViewerData(mDICOMViewerData);
@@ -1126,6 +1128,31 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		}
 		
 	}
+
+	/**
+	 * Hide navigation tool bar if it is visible.
+	 * @param view
+	 */
+	public void showNavigationBar(View view) {
+
+		if (mNavigationBar.getVisibility() == View.INVISIBLE) {
+
+			mNavigationBar.setVisibility(View.VISIBLE);
+
+			if (mMenu != null) {
+
+				MenuItem showHideNavigationBar =
+						mMenu.findItem(R.id.showHide_serieSeekBar);
+
+				if (showHideNavigationBar != null) {
+					showHideNavigationBar.setChecked(false);
+				}
+
+			}
+
+		}
+
+	}
 	
 	/**
 	 * Hide navigation tool bar if it is visible.
@@ -1345,6 +1372,7 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 				}
 				
 			}
+			showToolBar(view);
 			
 		}
 		
@@ -1676,7 +1704,7 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 			case R.id.previousImageButton:
 			case R.id.nextImageButton:
 			case R.id.serieSeekBar:
-				hideNavigationBar(view);
+//				hideNavigationBar(view);
 				return true;
 			
 			default:
