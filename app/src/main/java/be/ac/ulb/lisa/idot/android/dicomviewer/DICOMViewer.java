@@ -35,6 +35,7 @@ package be.ac.ulb.lisa.idot.android.dicomviewer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -43,21 +44,25 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import be.ac.ulb.lisa.idot.android.commons.ExternalStorage;
+import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.MetadataArrayAdapter;
 import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.CLUTMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ScaleMode;
@@ -66,7 +71,9 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.thread.DICOMImageCacher;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
+import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMFileFilter;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMImageReader;
 import be.ac.ulb.lisa.idot.image.data.LISAImageGray16Bit;
@@ -264,8 +271,17 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 	 * DICOM Viewer data.
 	 */
 	private DICOMViewerData mDICOMViewerData = null;
-	
-	
+
+	/**
+	 * List view that is used to output metadata.
+	 */
+	private ListView mListMetadata;
+
+	/**
+	 * Array adapter for metadata list.
+	 */
+	private MetadataArrayAdapter mArrayAdapter;
+
 	// ---------------------------------------------------------------
 	// # <override> FUNCTIONS
 	// ---------------------------------------------------------------
@@ -296,7 +312,15 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		mNavigationBar = (LinearLayout) findViewById(R.id.navigationToolbar);
 		mRowOrientation = (TextView) findViewById(R.id.rowTextView);
 		mColumnOrientation = (TextView) findViewById(R.id.columnTextView);
-		
+		mListMetadata = (ListView) findViewById(R.id.listMetadata);
+
+		// set adapter for a list view that is used to show metadata
+		mArrayAdapter = new MetadataArrayAdapter(this, R.layout.metadata_item);
+		mListMetadata.setAdapter(mArrayAdapter);
+		mListMetadata.setDivider(null);
+		mListMetadata.setDividerHeight(0);
+		mListMetadata.setEnabled(false);
+
 		// Get the file name from the savedInstanceState or from the intent
 		String fileName = null;
 		
@@ -1739,9 +1763,9 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);
-                        String name = metaInformation.getPatientName(),
+                        String name = metaInformation.getPaitentName(),
                                 age = metaInformation.getPaitentAge(),
-                                birthDate = metaInformation.getPatientBirthDate();
+                                birthDate = metaInformation.getPaitentBirthDate();
                         String anonymous = resources.getString(R.string.metadata_anonymous);
                         mArrayAdapter.add(new Pair<>(keyName, processAttribute(name, anonymous)));
                         mArrayAdapter.add(new Pair<>(keyAge, processAttribute(age, anonymous)));
