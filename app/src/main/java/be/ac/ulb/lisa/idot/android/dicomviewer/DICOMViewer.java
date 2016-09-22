@@ -1153,105 +1153,105 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		}
 
 	}
-	
+
 	/**
 	 * Hide navigation tool bar if it is visible.
 	 * @param view
 	 */
 	public void hideGrayscaleWindow(View view) {
-		
+
 		if (mGrayscaleWindow.getVisibility() == View.VISIBLE) {
-			
+
 			mGrayscaleWindow.setVisibility(View.INVISIBLE);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideGrayscaleWindow = 
+
+				MenuItem showHideGrayscaleWindow =
 					mMenu.findItem(R.id.showHide_grayscaleWindow);
-				
+
 				if (showHideGrayscaleWindow != null) {
 					showHideGrayscaleWindow.setChecked(false);
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Hide tool bar if it is visible.
 	 * @param view
 	 */
 	public void hideToolBar(View view) {
-		
+
 		if (mToolBar.getVisibility() == View.VISIBLE) {
-			
+
 			mToolBar.setVisibility(View.GONE);
-			
+
 			// If the tool bar is locked then the current icon
 			// is invisible too
 			if (!mLockToolBar) {
-				
+
 				mCurrentToolButton.setVisibility(View.VISIBLE);
-				
+
 			} else {
-				
+
 				if (mMenu != null) {
-					
-					MenuItem showHideToolBar = 
+
+					MenuItem showHideToolBar =
 						mMenu.findItem(R.id.showHide_toolbar);
-					
+
 					if (showHideToolBar != null) {
 						showHideToolBar.setChecked(false);
 					}
-					
+
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Hide tool bar if it is visible.
 	 * @param view
 	 */
 	public void showToolBar(View view) {
-		
+
 		if (mToolBar.getVisibility() == View.GONE) {
-			
+
 			mCurrentToolButton.setVisibility(View.INVISIBLE);
 			mToolBar.setVisibility(View.VISIBLE);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.showHide_toolbar);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(true);
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Set the CLUT mode.
 	 * @param view
 	 */
 	public synchronized void setCLUTMode(View view) {
-		
+
 		if (view == null)
 			return;
-		
+
 		switch (view.getId())
 		{
-		
+
 		case R.id.clutNormal:
 			mCLUTNormalButton.setBackgroundResource(
 					R.drawable.clut_normal_select);
@@ -1259,23 +1259,23 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 					R.drawable.clut_inverse);
 			mCLUTRainbowButton.setBackgroundResource(
 					R.drawable.clut_rainbow);
-			
+
 			mDICOMViewerData.setCLUTMode(CLUTMode.NORMAL);
-			
+
 			// Update the menu
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.show_normalLUT);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(true);
 				}
-				
+
 			}
-			
+
 			break;
-			
+
 		case R.id.clutInverse:
 			mCLUTNormalButton.setBackgroundResource(
 					R.drawable.clut_normal);
@@ -1283,22 +1283,22 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 					R.drawable.clut_inverse_select);
 			mCLUTRainbowButton.setBackgroundResource(
 					R.drawable.clut_rainbow);
-			
+
 			mDICOMViewerData.setCLUTMode(CLUTMode.INVERSE);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.show_inverseLUT);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(true);
 				}
-				
+
 			}
-			
+
 			break;
-			
+
 		case R.id.clutRainbow:
 			mCLUTNormalButton.setBackgroundResource(
 					R.drawable.clut_normal);
@@ -1306,82 +1306,82 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 					R.drawable.clut_inverse);
 			mCLUTRainbowButton.setBackgroundResource(
 					R.drawable.clut_rainbow_select);
-			
+
 			mDICOMViewerData.setCLUTMode(CLUTMode.RAINBOW);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.show_rainbowCLUT);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(true);
 				}
-				
+
 			}
-			
+
 			break;
-		
+
 		}
-		
+
 		mGrayscaleWindow.updateCLUTMode();
-		
+
 		mImageView.draw();
-		
+
 		if (!mLockToolBar)
 			hideToolBar(null);
-		
+
 	}
-	
+
 	/**
 	 * Lock/unlock the tool bar.
 	 * @param view
 	 */
 	public void lockUnlockToolBar(View view) {
-		
+
 		if (mLockToolBar) {
-			
+
 			mLockToolBar = false;
 			mLockUnlockToolBar.setBackgroundResource(R.drawable.unlock);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.lock_toolbar);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(false);
 				}
-				
+
 			}
-			
+
 			hideToolBar(view);
-			
+
 		} else {
-			
+
 			mLockToolBar = true;
 			mLockUnlockToolBar.setBackgroundResource(R.drawable.lock);
-			
+
 			if (mMenu != null) {
-				
-				MenuItem showHideToolBar = 
+
+				MenuItem showHideToolBar =
 					mMenu.findItem(R.id.lock_toolbar);
-				
+
 				if (showHideToolBar != null) {
 					showHideToolBar.setChecked(true);
 				}
-				
+
 			}
 			showToolBar(view);
-			
+
 		}
-		
+
 	}
-	
+
 	// ---------------------------------------------------------------
 	// - FUNCTIONS
 	// ---------------------------------------------------------------
-	
+
 	/**
 	 * Get the index of the file in the files array.
 	 * @param file
@@ -1389,206 +1389,206 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 	 * or -1 if the files is not in the list.
 	 */
 	private int getIndex(File file) {
-		
+
 		if (mFileArray == null)
 			throw new NullPointerException("The files array is null.");
-		
+
 		for (int i = 0; i < mFileArray.length; i++) {
-			
+
 			if (mFileArray[i].getName().equals(file.getName()))
 				return i;
-			
+
 		}
-		
+
 		return -1;
-		
+
 	}
-	
+
 	/**
 	 * Set the currentImage
-	 * 
+	 *
 	 * @param image
 	 */
 	private void setImage(LISAImageGray16Bit image) {
-		
+
 		if (image == null)
 			throw new NullPointerException("The LISA 16-Bit grayscale image " +
 					"is null");
-		
+
 		try {
-		
+
 			// Set the image
 			mImage = null;
 			mImage = image;
 			mImageView.setImage(mImage);
 			mGrayscaleWindow.setImage(mImage);
-			
+
 			setImageOrientation();
-			
+
 			// If it is not initialized, set the window width and center
 			// as the value set in the LISA 16-Bit grayscale image
 			// that comes from the DICOM image file.
 			if (!mIsInitialized) {
-				
+
 				mIsInitialized = true;
 				mDICOMViewerData.setWindowWidth(mImage.getWindowWidth());
 				mDICOMViewerData.setWindowCenter(mImage.getWindowCenter());
-				
+
 				mImageView.draw();
 				mImageView.fitIn();
-				
+
 			} else {
-				
+
 				mImageView.draw();
 			}
-			
+
 			mBusy = false;
-			
+
 		} catch (OutOfMemoryError ex) {
-			
+
 			System.gc();
-			
+
 			showExitAlertDialog("[ERROR] Out Of Memory",
 					"This series contains images that are too big" +
 					" and that cause out of memory error. The best is to don't" +
 					" use the series seek bar. If the error occurs again" +
 					" it is because this series is not adapted to your" +
 					" Android(TM) device.");
-			
+
 		} catch (ArrayIndexOutOfBoundsException ex) {
-			
+
 			showExitAlertDialog("[ERROR] Image drawing",
 					"An uncatchable error occurs while " +
 					"drawing the DICOM image.");
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Set the image orientation TextViews.
 	 */
 	private void setImageOrientation() {
-		
+
 		float[] imageOrientation = mImage.getImageOrientation();
-		
+
 		if (imageOrientation == null
 				|| imageOrientation.length != 6
 				|| imageOrientation.equals(new float[6])) // equal to a float with 6 zeros
 			return;
-		
+
 		// Displaying the row orientation
 		mRowOrientation.setText(getImageOrientationString(imageOrientation, 0));
-		
+
 		// Displaying the column orientation
 		mColumnOrientation.setText(getImageOrientationString(imageOrientation, 3));
-		
+
 	}
-	
+
 	/**
 	 * Get the image orientation String for a 3D vector of float
 	 * that is related to a direction cosine.
-	 * 
+	 *
 	 * @param imageOrientation
 	 * @param offset
 	 * @return
 	 */
 	private String getImageOrientationString(float[] imageOrientation, int offset) {
-		
+
 		String orientation = "";
-		
+
 		// The threshold is 0.25
-		
+
 		// If abs(ImageOrientation.X) < threshold
 		// and ImageOrientation.X > 0 => orientation: RL
 		if (imageOrientation[0 + offset] >= 0.25) {
-			
+
 			orientation += "R";
-			
+
 		// If abs(ImageOrientation.X) < threshold
-		// and ImageOrientation.X < 0 => orientation: LR	
+		// and ImageOrientation.X < 0 => orientation: LR
 		} else if (imageOrientation[0 + offset] <= -0.25) {
-			
+
 			orientation += "L";
-			
+
 		}
-		
+
 		// If abs(ImageOrientation.Y) < threshold
 		// and ImageOrientation.Y > 0 => orientation: AP
 		if (imageOrientation[1 + offset] >= 0.25) {
-			
+
 			orientation += "A";
-			
+
 		// If abs(ImageOrientation.Y) < threshold
-		// and ImageOrientation.Y < 0 => orientation: PA	
+		// and ImageOrientation.Y < 0 => orientation: PA
 		} else if (imageOrientation[1 + offset] <= -0.25) {
-			
+
 			orientation += "P";
-			
+
 		}
-		
+
 		// If abs(ImageOrientation.Z) < threshold
 		// and ImageOrientation.Z > 0 => orientation: FH
 		if (imageOrientation[2 + offset] >= 0.25) {
-			
+
 			orientation += "F";
-			
+
 		// If abs(ImageOrientation.Z) < threshold
-		// and ImageOrientation.Z < 0 => orientation: HF	
+		// and ImageOrientation.Z < 0 => orientation: HF
 		} else if (imageOrientation[2 + offset] <= -0.25) {
-			
+
 			orientation += "H";
-			
+
 		}
-		
+
 		return orientation;
-		
+
 	}
-	
+
 	/**
 	 * Cache of the image in the files array
 	 */
 	private void cacheImages() {
-		
+
 		try {
-			
+
 			// The handler is inside the function because
 			// normally this function is called once.
 			final Handler cacheHandler = new Handler() {
-				
+
 		        public void handleMessage(Message message) {
-		        	
+
 		            switch (message.what) {
-		            
+
 		            case ThreadState.STARTED:
 		            	cachingDialog.setMax(message.arg1);
 		            	break;
-		            	
+
 		            case ThreadState.PROGRESSION_UPDATE:
 		            	cachingDialog.setProgress(message.arg1);
 		            	break;
-		            	
+
 		            case ThreadState.FINISHED:
 		            	try {
-		            		
+
 		            		dismissDialog(PROGRESS_DIALOG_CACHE);
-		            		
+
 		            	} catch (IllegalArgumentException ex) {
 		            		// Do nothing
 		            	}
 		            	break;
-		            	
+
 		            case ThreadState.CATCHABLE_ERROR_OCCURRED:
 		            	cachingDialog.setProgress(message.arg1);
 		            	Toast.makeText(DICOMViewer.this, "[Error]: file ("
 		            			+ (String) message.obj + ") cannot be cached.", Toast.LENGTH_SHORT).show();
 		            	break;
-		            	
+
 		            case ThreadState.UNCATCHABLE_ERROR_OCCURRED:
 		            	try {
-		            		
+
 		            		dismissDialog(PROGRESS_DIALOG_CACHE);
-		            		
+
 		            	} catch (IllegalArgumentException ex) {
 		            		// Do nothing
 		            	}
@@ -1601,12 +1601,12 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		    			AlertDialog alertDialog = builder.create();
 		    			alertDialog.show();
 		    			break;
-		            	
+
 		            case ThreadState.OUT_OF_MEMORY:
 		            	try {
-		            		
+
 		            		dismissDialog(PROGRESS_DIALOG_CACHE);
-		            		
+
 		            	} catch (IllegalArgumentException ex) {
 		            		// Do nothing
 		            	}
@@ -1624,33 +1624,33 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		    			alertDialog = builder.create();
 		    			alertDialog.show();
 		    			break;
-		            	
-		            
+
+
 		            };
-		            
+
 		        }
-		        
+
 		    };
-		    
+
 		    // Show the progress dialog for caching image
 			showDialog(PROGRESS_DIALOG_CACHE);
-			
+
 		    // Start the caching thread
 			DICOMImageCacher dicomImageCacher =
 				new DICOMImageCacher(cacheHandler,
 						mFileArray[mCurrentFileIndex].getParent());
-			
+
 			dicomImageCacher.start();
-            
-			
+
+
 		} catch (FileNotFoundException e) {
-			
+
 			// TODO display an error ?
-			
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Show an alert dialog (AlertDialog) to inform
 	 * the user that the activity must finish.
@@ -1658,7 +1658,7 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 	 * @param message Message of the AlertDialog.
 	 */
 	private void showExitAlertDialog(String title, String message) {
-		
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(message)
 			   .setTitle(title)
@@ -1668,38 +1668,38 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 		               DICOMViewer.this.finish();
 		           }
 		       });
-		
+
 		AlertDialog alertDialog = builder.create();
 		alertDialog.show();
-		
+
 	}
-	
-	
+
+
 	// ---------------------------------------------------------------
 	// - <final> Class
 	// ---------------------------------------------------------------
-	
+
 	/**
 	 * The OnLongClickListener.
 	 */
 	private final View.OnLongClickListener onLongClickListener
 								= new View.OnLongClickListener() {
-		
+
 		public boolean onLongClick(View view) {
-			
+
 			if (view == null)
 				return false;
-			
+
 			switch(view.getId()) {
-			
+
 			case R.id.toolBar:
 				hideToolBar(view);
 				return true;
-				
+
 			case R.id.grayscaleImageView:
 				hideGrayscaleWindow(view);
 				return true;
-			
+
 			case R.id.navigationToolbar:
 			case R.id.previousImageButton:
 			case R.id.nextImageButton:
@@ -1710,210 +1710,263 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
 			default:
 				return false;
 
-			}
-		}
-	};
-	
-	private final Handler loadingHandler = new Handler() {
-		
-		public void handleMessage(Message message) {
-        	
-            switch (message.what) {
-            
-            case ThreadState.STARTED:
-            	showDialog(PROGRESS_DIALOG_LOAD);
-            	break;
-            	
-            case ThreadState.FINISHED:
-            	try {
-            		
-            		dismissDialog(PROGRESS_DIALOG_LOAD);
-            		
-            	} catch (IllegalArgumentException ex) {	
-            		// Do nothing		
-            	}
-            	
-            	// Set the loaded image
-            	if (message.obj instanceof LISAImageGray16Bit) {
-            		setImage((LISAImageGray16Bit) message.obj);
-            	}
-            	
-            	break;
-            	
-            case ThreadState.UNCATCHABLE_ERROR_OCCURRED:
-            	try {
-            		
-            		dismissDialog(PROGRESS_DIALOG_LOAD);
-            		
-            	} catch (IllegalArgumentException ex) {
-            		// Do nothing
-            	}
-            	
-            	// Get the error message
-            	String errorMessage;
-            	
-            	if (message.obj instanceof String)
-            		errorMessage = (String) message.obj;
-            	else
-            		errorMessage = "Unknown error";
-            	
-            	// Show an alert dialog
-            	showExitAlertDialog("[ERROR] Loading file",
-            			"An error occured during the file loading.\n\n"
-    					+ errorMessage);
-            	
-            	break;
-            	
-            case ThreadState.OUT_OF_MEMORY:
-            	try {
-            		
-            		dismissDialog(PROGRESS_DIALOG_LOAD);
-            		
-            	} catch (IllegalArgumentException ex) {
-            		// Do nothing
-            	}
-            	
-            	// Show an alert dialog
-            	showExitAlertDialog("[ERROR] Loading file",
-            			"OutOfMemoryError: During the loading of image ("
-    					+ mFileArray[mCurrentFileIndex].getName()
-    					+ "), an out of memory error occurred.\n\n"
-    					+ "Your file is too large for your Android system. You can"
-    					+ " try to cache the image in the file chooser."
-    					+ " If the error occured again, then the image cannot be displayed"
-    					+ " on your device.\n"
-    					+ "Try to use the Droid Dicom Viewer desktop file cacher software"
-    					+ " (not available yet).");
-            	
-            	break;
-            
             }
-            
-		}
-		
-	};
-	
-	
-	// ---------------------------------------------------------------
-	// - <static> CLASS
-	// ---------------------------------------------------------------
-	
-	private static final class DICOMFileLoader extends Thread {
-		
-		// The handler to send message to the parent thread
-		private final Handler mHandler;
-		
-		// The file to load
-		private final File mFile;
-		
-		public DICOMFileLoader(Handler handler, File file) {
-			
-			if (handler == null)
-				throw new NullPointerException("The handler is null while" +
-						" calling the loading thread.");
-			
-			mHandler = handler;
-			
-			if (file == null)
-				throw new NullPointerException("The file is null while" +
-						" calling the loading thread.");
-			
-			mFile = file;
-			
-			
-		}
-		
-		public void run() {
-			
-			// If the image data is null, do nothing.
-			if (!mFile.exists()) {
-				
-				Message message = mHandler.obtainMessage();
-				message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
-				message.obj = "The file doesn't exist.";
-				mHandler.sendMessage(message);
-				
-				return;
-			}
-			
-			// If image exists show image
-			try {
-				
-				LISAImageGray16BitReader reader =
-					new LISAImageGray16BitReader(mFile + ".lisa");
-				
-				LISAImageGray16Bit image = reader.parseImage();
-				reader.close();
-				
-				// Send the LISA 16-Bit grayscale image
-				Message message = mHandler.obtainMessage();
-				message.what = ThreadState.FINISHED;
-				message.obj = image;
-				mHandler.sendMessage(message);
-				
-				return;
-				
-			} catch (Exception ex) {
-				// Do nothing and create a LISA image
-			}
-			
-			// Create a LISA image and ask to show the
-			// progress dialog in spinner mode
-			mHandler.sendEmptyMessage(ThreadState.STARTED);
-			
-			try {
-				
-				DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
-				
-				DICOMImage dicomImage = dicomFileReader.parse();
-				dicomFileReader.close();
-				
-				// If the image is uncompressed, show it and cached it.
-				if (dicomImage.isUncompressed()) {
-					
-					LISAImageGray16BitWriter out =
-						new LISAImageGray16BitWriter(mFile + ".lisa");
-					
-					out.write(dicomImage.getImage());
-					out.flush();
-					out.close();
-					
-					Message message = mHandler.obtainMessage();
-					message.what = ThreadState.FINISHED;
-					message.obj = dicomImage.getImage();
-					mHandler.sendMessage(message);
-					
-					// Hint the garbage collector
-					System.gc();
-					
-				} else {
-					
-					Message message = mHandler.obtainMessage();
-					message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
-					message.obj = "The file is compressed. Compressed format are not"
-						+ " supported yet.";
-					mHandler.sendMessage(message);
-					
-				}
-				
-			} catch (OutOfMemoryError ex) {
-				
-				Message message = mHandler.obtainMessage();
-				message.what = ThreadState.OUT_OF_MEMORY;
-				message.obj = ex.getMessage();
-				mHandler.sendMessage(message);
-				
-			} catch (Exception ex) {
-				
-				Message message = mHandler.obtainMessage();
-				message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
-				message.obj = ex.getMessage();
-				mHandler.sendMessage(message);
-				
-			}
-			
-		}
-		
-	}
-	
+        }
+    };
+
+    private final Handler loadingHandler = new Handler() {
+
+        private String processAttribute(String attribute, String substitue) {
+            if (attribute == null ||
+                    attribute.trim().length() == 0)
+                return substitue;
+            return attribute;
+        }
+
+        public void handleMessage(Message message) {
+
+            switch (message.what) {
+                case ThreadState.STARTED:
+                    showDialog(PROGRESS_DIALOG_LOAD);
+                    break;
+
+                case ThreadState.PROGRESSION_UPDATE:
+                    if (message.obj instanceof DICOMMetaInformation) {
+                        mArrayAdapter.clear();
+                        // output information from metadata
+                        Resources resources = getResources();
+                        DICOMMetaInformation metaInformation = (DICOMMetaInformation) message.obj;
+                        String keyName = resources.getString(R.string.metadata_name),
+                                keyBirthDate = resources.getString(R.string.metadata_birth_date),
+                                keyAge = resources.getString(R.string.metadata_age);
+                        String name = metaInformation.getPatientName(),
+                                age = metaInformation.getPaitentAge(),
+                                birthDate = metaInformation.getPatientBirthDate();
+                        String anonymous = resources.getString(R.string.metadata_anonymous);
+                        mArrayAdapter.add(new Pair<>(keyName, processAttribute(name, anonymous)));
+                        mArrayAdapter.add(new Pair<>(keyAge, processAttribute(age, anonymous)));
+                        mArrayAdapter.add(new Pair<>(keyBirthDate, processAttribute(birthDate, anonymous)));
+                    }
+                    if (message.obj == null) {
+                        mArrayAdapter.clear();
+                        mArrayAdapter.add(new Pair<>("No metadata available", "No metadata available"));
+                    }
+                    break;
+
+                case ThreadState.FINISHED:
+                    try {
+
+                        dismissDialog(PROGRESS_DIALOG_LOAD);
+
+                    } catch (IllegalArgumentException ex) {
+                        // Do nothing
+                    }
+
+                    // Set the loaded image
+                    if (message.obj instanceof LISAImageGray16Bit) {
+                        setImage((LISAImageGray16Bit) message.obj);
+                    }
+
+                    break;
+
+                case ThreadState.UNCATCHABLE_ERROR_OCCURRED:
+                    try {
+
+                        dismissDialog(PROGRESS_DIALOG_LOAD);
+
+                    } catch (IllegalArgumentException ex) {
+                        // Do nothing
+                    }
+
+                    // Get the error message
+                    String errorMessage;
+
+                    if (message.obj instanceof String)
+                        errorMessage = (String) message.obj;
+                    else
+                        errorMessage = "Unknown error";
+
+                    // Show an alert dialog
+                    showExitAlertDialog("[ERROR] Loading file",
+                            "An error occured during the file loading.\n\n"
+                                    + errorMessage);
+
+                    break;
+
+                case ThreadState.OUT_OF_MEMORY:
+                    try {
+
+                        dismissDialog(PROGRESS_DIALOG_LOAD);
+
+                    } catch (IllegalArgumentException ex) {
+                        // Do nothing
+                    }
+
+                    // Show an alert dialog
+                    showExitAlertDialog("[ERROR] Loading file",
+                            "OutOfMemoryError: During the loading of image ("
+                                    + mFileArray[mCurrentFileIndex].getName()
+                                    + "), an out of memory error occurred.\n\n"
+                                    + "Your file is too large for your Android system. You can"
+                                    + " try to cache the image in the file chooser."
+                                    + " If the error occured again, then the image cannot be displayed"
+                                    + " on your device.\n"
+                                    + "Try to use the Droid Dicom Viewer desktop file cacher software"
+                                    + " (not available yet).");
+
+                    break;
+
+            }
+
+        }
+
+    };
+
+
+    // ---------------------------------------------------------------
+    // - <static> CLASS
+    // ---------------------------------------------------------------
+
+    private static final class DICOMFileLoader extends Thread {
+
+        // The handler to send message to the parent thread
+        private final Handler mHandler;
+
+        // The file to load
+        private final File mFile;
+
+        public DICOMFileLoader(Handler handler, File file) {
+
+            if (handler == null)
+                throw new NullPointerException("The handler is null while" +
+                        " calling the loading thread.");
+
+            mHandler = handler;
+
+            if (file == null)
+                throw new NullPointerException("The file is null while" +
+                        " calling the loading thread.");
+
+            mFile = file;
+
+
+        }
+
+        /***
+         * If there is meta information, then read it and update
+         * @param dicomFileReader
+         * @return metadata that was read from file or null in case there no metadata or error
+         *          occurred.
+         */
+        private DICOMMetaInformation readMetadata(DICOMImageReader dicomFileReader) {
+            DICOMMetaInformation metaInformation = null;
+            try {
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.PROGRESSION_UPDATE;
+                if (dicomFileReader.hasMetaInformation() == true)
+                    metaInformation = dicomFileReader.parseMetaInformation();
+                message.obj = metaInformation;
+                mHandler.sendMessage(message);
+            } catch (IOException | DICOMException e) {
+                e.printStackTrace();
+            }
+            return metaInformation;
+        }
+
+        public void run() {
+
+            // If the image data is null, do nothing.
+            if (!mFile.exists()) {
+
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
+                message.obj = "The file doesn't exist.";
+                mHandler.sendMessage(message);
+
+                return;
+            }
+
+            // If image exists show image
+            try {
+
+                LISAImageGray16BitReader reader =
+                        new LISAImageGray16BitReader(mFile + ".lisa");
+
+                LISAImageGray16Bit image = reader.parseImage();
+                reader.close();
+
+                DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
+                readMetadata(dicomFileReader);
+                dicomFileReader.close();
+
+                // Send the LISA 16-Bit grayscale image
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.FINISHED;
+                message.obj = image;
+                mHandler.sendMessage(message);
+
+                return;
+
+            } catch (Exception ex) {
+                // Do nothing and create a LISA image
+            }
+
+            // Create a LISA image and ask to show the
+            // progress dialog in spinner mode
+            mHandler.sendEmptyMessage(ThreadState.STARTED);
+
+            try {
+                DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
+                DICOMImage dicomImage = dicomFileReader.parse();
+                readMetadata(dicomFileReader);
+                dicomFileReader.close();
+
+                Message message;
+                // If the image is uncompressed, show it and cached it.
+                if (dicomImage.isUncompressed()) {
+
+                    LISAImageGray16BitWriter out =
+                            new LISAImageGray16BitWriter(mFile + ".lisa");
+
+                    out.write(dicomImage.getImage());
+                    out.flush();
+                    out.close();
+
+                    message = mHandler.obtainMessage();
+                    message.what = ThreadState.FINISHED;
+                    message.obj = dicomImage.getImage();
+                    mHandler.sendMessage(message);
+
+                    // Hint the garbage collector
+                    System.gc();
+
+                } else {
+                    message = mHandler.obtainMessage();
+                    message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
+                    message.obj = "The file is compressed. Compressed format are not"
+                            + " supported yet.";
+                    mHandler.sendMessage(message);
+
+                }
+
+            } catch (OutOfMemoryError ex) {
+
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.OUT_OF_MEMORY;
+                message.obj = ex.getMessage();
+                mHandler.sendMessage(message);
+
+            } catch (Exception ex) {
+
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
+                message.obj = ex.getMessage();
+                mHandler.sendMessage(message);
+
+            }
+
+        }
+
+    }
+
 }
