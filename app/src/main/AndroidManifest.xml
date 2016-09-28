@@ -27,32 +27,39 @@
   Released date: 17-02-2011
  
   Version: 1.2
- -->
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="be.ac.ulb.lisa.idot.android.dicomviewer"
     android:versionCode="5"
     android:versionName="1.4.2 Grymalkyn">
+
+    <uses-sdk android:minSdkVersion="14" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:theme="@style/app_theme">
         <activity
-            android:name=".DICOMViewer"
+            android:name=".DICOMViewer_old"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-
-        </activity>
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity
             android:name=".DICOMFileChooser"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DICOMViewer"
+            android:label="@string/title_activity_dicomviewer"></activity>
     </application>
-    <uses-sdk android:minSdkVersion="14" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-</manifest> 
+</manifest>

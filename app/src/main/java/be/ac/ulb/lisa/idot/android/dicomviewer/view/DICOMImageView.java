@@ -44,7 +44,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
-import be.ac.ulb.lisa.idot.android.dicomviewer.DICOMViewer;
+import be.ac.ulb.lisa.idot.android.dicomviewer.DICOMViewer_old;
 import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.CLUTMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ScaleMode;
@@ -133,7 +133,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	
 	// DICOMVIEWER DATA
 	/**
-	 * DICOMViewer data.
+	 * DICOMViewer_old data.
 	 */
 	private DICOMViewerData mDICOMViewerData = null;
 	
@@ -448,9 +448,9 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 					
 					// Show next or previous image
 					if (directionX < 0)
-						((DICOMViewer) mContext).nextImage(null);
+						((DICOMViewer_old) mContext).nextImage(null);
 					else
-						((DICOMViewer) mContext).previousImage(null);
+						((DICOMViewer_old) mContext).previousImage(null);
 						
 					// Set the touchmode to none
 					mTouchMode = TouchMode.NONE;
@@ -847,7 +847,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	}
 	
 	/**
-	 * Set the DICOMViewer data.
+	 * Set the DICOMViewer_old data.
 	 * @param data
 	 */
 	public void setDICOMViewerData(DICOMViewerData data) {
