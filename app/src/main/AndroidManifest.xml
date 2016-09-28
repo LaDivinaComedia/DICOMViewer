@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2011 Pierre Malarme
  
   Authors: Pierre Malarme <pmalarme at ulb.ac.be>
@@ -29,23 +28,31 @@
  
   Version: 1.2
  -->
-<manifest package="be.ac.ulb.lisa.idot.android.dicomviewer"
-      xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.4 Grymalkyn" android:versionCode="5">
-    <application android:icon="@drawable/icon"
-          android:label="@string/app_name">
-        <activity android:name=".DICOMViewer"
-                  android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-            
-        </activity>
-    <activity android:name=".DICOMFileChooser"
-    		  android:label="@string/app_name">
-    	<intent-filter>
-        	<action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-</application>
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="7" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="be.ac.ulb.lisa.idot.android.dicomviewer"
+    android:versionCode="5"
+    android:versionName="1.4.2 Grymalkyn">
 
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@style/app_theme">
+        <activity
+            android:name=".DICOMViewer"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
+        </activity>
+        <activity
+            android:name=".DICOMFileChooser"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+    <uses-sdk android:minSdkVersion="14" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 </manifest> 
