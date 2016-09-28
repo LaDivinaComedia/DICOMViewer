@@ -60,6 +60,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMElement;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
@@ -239,9 +241,9 @@ public class DICOMReader extends DICOMBufferedInputStream {
 			mByteOffset += 4;
 			
 			// Get the FileMeta group length
-			long groupLength = readUnsignedLong(); // this is magic shit dunno ...
-			groupLength = 0xffffffffL;
-			mByteOffset+= 4;
+			long groupLength = readUnsignedLong()*8; // this is magic shit dunno ...
+			mByteOffset += 4;
+
 
 			// Set the group length (meta information length)
 			metaInformation.setGroupLength(groupLength);
