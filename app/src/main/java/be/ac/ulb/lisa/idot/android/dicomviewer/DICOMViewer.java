@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,52 +14,76 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 public class DICOMViewer extends Activity
-        implements DICOMVIewerFragment.NavigationDrawerCallbacks {
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
-    private DICOMVIewerFragment mDICOMVIewerFragment;
-
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
+        implements DrawerFragment.NavigationDrawerCallbacks,
+        DICOMFragment.OnFragmentInteractionListener {
+    private static final String FILE_NAME = "FILE_NAME";
+    // Fragment managing the behaviors, interactions and presentation of the navigation drawer
+    private DrawerFragment mDrawerFragment;
+    // Used to store the last screen title. For use in {@link #restoreActionBar()}
     private CharSequence mTitle;
+    private String mFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dicomviewer);
 
-        mDICOMVIewerFragment = (DICOMVIewerFragment)
+        mDrawerFragment = (DrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
         // Set up the drawer.
-        mDICOMVIewerFragment.setUp(
+        mDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        // If the saved instance state is not null get the file name
+        mFileName = null;
+        if (savedInstanceState != null) {
+            mFileName = savedInstanceState.getString(FILE_NAME);
+        } else {
+            // Get the intent
+            Intent intent = getIntent();
+            if (intent != null) {
+                Bundle extras = intent.getExtras();
+                mFileName = extras == null ? null : extras.getString("DICOMFileName");
+            }
+        }
+        // update the main content by replacing fragments
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, DICOMFragment.newInstance(mFileName))
+                .commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mFileName != null)
+            outState.putString(FILE_NAME, mFileName);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        // TODO: provide interaction
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+//        FragmentManager fragmentManager = getFragmentManager();
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+//                .commit();
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.drawer_metadata);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.drawer_settings);
                 break;
         }
     }
@@ -67,6 +93,11 @@ public class DICOMViewer extends Activity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
     /**

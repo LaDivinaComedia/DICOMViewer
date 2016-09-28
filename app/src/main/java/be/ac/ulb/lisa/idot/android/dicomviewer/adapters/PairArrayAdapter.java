@@ -18,18 +18,29 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.R;
  * @author Vladyslav Vasyliev
  *         Created on 21.09.2016
  */
-public class MetadataArrayAdapter extends ArrayAdapter<Pair<String, String>> {
+public class PairArrayAdapter extends ArrayAdapter<Pair<String, String>> {
     protected Context mContext;
+    protected int mMainTextId;
+    protected int mSubTextId;
+    protected int mLayoutId;
     protected List<Pair<String, String>> mValues = new ArrayList<>();
 
-    public MetadataArrayAdapter(Context context, int resource) {
+    public PairArrayAdapter(Context context, int resource, int mainTextId, int subTextId) {
         super(context, resource);
         mContext = context;
+        mMainTextId = mainTextId;
+        mSubTextId = subTextId;
+        mLayoutId = resource;
     }
 
-    public MetadataArrayAdapter(Context context, int resource, List<Pair<String, String>> objects) {
+    public PairArrayAdapter(Context context, int resource, List<Pair<String, String>> objects,
+                            int mainTextId, int subTextId) {
         super(context, resource, objects);
         mContext = context;
+        mValues.addAll(objects);
+        mMainTextId = mainTextId;
+        mSubTextId = subTextId;
+        mLayoutId = resource;
     }
 
     @Override
@@ -66,12 +77,12 @@ public class MetadataArrayAdapter extends ArrayAdapter<Pair<String, String>> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.metadata_item, parent, false);
-        TextView textViewKey = (TextView) rowView.findViewById(R.id.metadata_tag_key);
-        TextView textViewValue = (TextView) rowView.findViewById(R.id.metadata_tag_value);
+        View rowView = inflater.inflate(mLayoutId, parent, false);
+        TextView subTextView = (TextView) rowView.findViewById(mSubTextId);
+        TextView mainTextView = (TextView) rowView.findViewById(mMainTextId);
         Pair<String, String> pair = mValues.get(position);
-        textViewKey.setText(pair.first);
-        textViewValue.setText(pair.second);
+        subTextView.setText(pair.first);
+        mainTextView.setText(pair.second);
         return rowView;
     }
 }

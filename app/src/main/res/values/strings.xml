@@ -35,16 +35,29 @@
     <string name="metadata_birth_date">Birth Date</string>
     <string name="metadata_age">Age</string>
     <string name="metadata_anonymous">&lt;anonymous&gt;</string>
+
     <string name="title_activity_dicomviewer">DICOMViewer</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="drawer_ruler">Ruler</string>
+    <string name="drawer_protractor">Protractor</string>
+    <string name="drawer_area">Area</string>
+    <string name="drawer_metadata">Metadata</string>
+    <string name="drawer_settings">Settings</string>
+
+    <string-array name="drawer_items">
+        <item>Ruler</item>
+        <item>Protractor</item>
+        <item>Area</item>
+        <item>Metadata</item>
+        <item>Settings</item>
+    </string-array>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_example">Example action</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 
-    <string name="action_settings">Settings</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
