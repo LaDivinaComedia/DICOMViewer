@@ -797,8 +797,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	
 	/**
 	 * Get the LISA 16-Bit grayscale image.
-	 * 
-	 * @param image
+	 *
 	 */
 	public LISAImageGray16Bit getImage() {
 		return mImage;

@@ -9,12 +9,14 @@
         android:id="@+id/metadata_tag_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/app_theme.metadata"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/metadata_tag_key"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/app_theme.metadata"
         android:layout_below="@+id/metadata_tag_value"
         android:textSize="10sp" />
 
