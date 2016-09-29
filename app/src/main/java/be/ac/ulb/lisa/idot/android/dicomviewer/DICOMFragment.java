@@ -9,7 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +26,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
+import be.ac.ulb.lisa.idot.dicom.file.DICOMFileFilter;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMImageReader;
 import be.ac.ulb.lisa.idot.image.data.LISAImageGray16Bit;
 import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitReader;
@@ -38,7 +41,7 @@ import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
  * Use the {@link DICOMFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DICOMFragment extends Fragment {
+public class DICOMFragment extends Fragment implements View.OnTouchListener{
     private static final String FILE_NAME = "FILE_NAME";
 
     private String mFileName;
@@ -50,8 +53,12 @@ public class DICOMFragment extends Fragment {
     private boolean mIsInitialized = false;                 //Set if the DICOM Viewer is initialized or not
 
     private OnFragmentInteractionListener mListener;
+    private boolean mBusy=false;
+    private int mCurrentFileIndex;
+    private File[] mFileArray;
 
     public DICOMFragment() {
+        gestureDetector = new GestureDetector(getActivity(),new GestureListener());
     }
 
     /**
@@ -87,7 +94,6 @@ public class DICOMFragment extends Fragment {
 
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
         mGrayscaleWindow = (GrayscaleWindowView) view.findViewById(R.id.grayscale_view);
-
         mImageView.setDICOMViewerData(mDICOMViewerData);
         mGrayscaleWindow.setDICOMViewerData(mDICOMViewerData);
         // recover file name if any
@@ -100,11 +106,16 @@ public class DICOMFragment extends Fragment {
         // load the file
         if (mFileName != null) {
             File currentFile = new File(mFileName);
+            mFileArray = currentFile.getParentFile().listFiles(new DICOMFileFilter());
             // Start the loading thread to load the DICOM image
-            mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler, currentFile);
+            mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler, mFileArray[mCurrentFileIndex++]);
             mDICOMFileLoader.start();
 //            mBusy = true;
+            // Get the files array = get the files contained
+            // in the parent of the current file
+
         }
+
         return view;
     }
 
@@ -167,6 +178,7 @@ public class DICOMFragment extends Fragment {
             mImage = null;
             mImage = image;
             mImageView.setImage(mImage);
+            mImageView.setOnTouchListener(this);
             mGrayscaleWindow.setImage(mImage);
             setImageOrientation();
             // If it is not initialized, set the window width and center
@@ -235,7 +247,203 @@ public class DICOMFragment extends Fragment {
         alertDialog.show();
 
     }
+    private GestureDetector gestureDetector;
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        mImageView.onTouch(v,event);
+        return this.gestureDetector.onTouchEvent(event);
+    }
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            //return mImageView.onTouch(null,e);
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            boolean result = false;
+            try {
+                float diffY = e2.getY() - e1.getY();
+                float diffX = e2.getX() - e1.getX();
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            onSwipeRight();
+                        } else {
+                            onSwipeLeft();
+                        }
+                    }
+                    result = true;
+                }
+                else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        onSwipeBottom();
+                    } else {
+                        onSwipeTop();
+                    }
+                }
+                result = true;
+
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            return result;
+        }
+    }
+    public void onSwipeRight() {
+        mBusy=false;
+        previousImage(null);
+    }
+
+    public void onSwipeLeft() {
+        mBusy=false;
+        nextImage(null);
+    }
+
+    public void onSwipeTop() {
+    }
+
+    public void onSwipeBottom() {
+    }
+    /**
+     * Handle touch on the previousButton.
+     *
+     * @param view
+     */
+    public synchronized void previousImage(View view) {
+
+        // If it is busy, do nothing
+        if (mBusy)
+            return;
+
+        // It is busy now
+        mBusy = true;
+
+        // Wait until the loading thread die
+        while (mDICOMFileLoader.isAlive()) {
+            try {
+                synchronized (this) {
+                    wait(10);
+                }
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+        }
+
+        // If the current file index is 0, there is
+        // no previous file in the files array
+        // We add the less or equal to zero because it is
+        // safer
+        if (mCurrentFileIndex <= 0) {
+
+            // Not necessary but safer, because we don't know
+            // how the code will be used in the future
+            mCurrentFileIndex = 0;
+
+            // If for a unknown reason the previous button is
+            // visible => hide it
+            //if (mPreviousButton.getVisibility() == View.VISIBLE)
+                //mPreviousButton.setVisibility(View.INVISIBLE);
+
+            mBusy = false;
+            return;
+
+        }
+
+        //  Decrease the file index
+        mCurrentFileIndex--;
+
+        // Start the loading thread to load the DICOM image
+        mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler,
+                mFileArray[mCurrentFileIndex]);
+
+        mDICOMFileLoader.start();
+
+        // Update the UI
+       // mIndexTextView.setText(String.valueOf(mCurrentFileIndex + 1));
+        //mIndexSeekBar.setProgress(mCurrentFileIndex);
+
+       // if (mCurrentFileIndex == 0)
+          //  mPreviousButton.setVisibility(View.INVISIBLE);
+
+        // The next button is automatically set to visible
+        // because if there is a previous image, there is
+        // a next image
+       // mNextButton.setVisibility(View.VISIBLE);
+
+    }
+    /**
+     * Handle touch on next button.
+     *
+     * @param view
+     */
+    public synchronized void nextImage(View view) {
+
+        // If it is busy, do nothing
+        if (mBusy)
+            return;
+
+        // It is busy now
+        mBusy = true;
+
+        // Wait until the loading thread die
+        while (mDICOMFileLoader.isAlive()) {
+            try {
+                synchronized (this) {
+                    wait(10);
+                }
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
+        }
+
+        // If the current file index is the last file index,
+        // there is no next file in the files array
+        // We add the greater or equal to (mFileArray.length - 1)
+        // because it is safer
+        if (mCurrentFileIndex >= (mFileArray.length - 1)) {
+
+            // Not necessary but safer, because we don't know
+            // how the code will be used in the future
+            mCurrentFileIndex = (mFileArray.length - 1);
+
+            // If for a unknown reason the previous button is
+            // visible => hide it
+            //if (mNextButton.getVisibility() == View.VISIBLE)
+                //mNextButton.setVisibility(View.INVISIBLE);
+
+            mBusy = false;
+            return;
+
+        }
+
+        //  Increase the file index
+        mCurrentFileIndex++;
+
+        // Start the loading thread to load the DICOM image
+        mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler,
+                mFileArray[mCurrentFileIndex]);
+
+        mDICOMFileLoader.start();
+
+        // Update the UI
+        //mIndexTextView.setText(String.valueOf(mCurrentFileIndex + 1));
+        //mIndexSeekBar.setProgress(mCurrentFileIndex);
+
+        //if (mCurrentFileIndex == (mFileArray.length - 1))
+            //mNextButton.setVisibility(View.INVISIBLE);
+
+        // The previous button is automatically set to visible
+        // because if there is a next image, there is
+        // a previous image
+        //mPreviousButton.setVisibility(View.VISIBLE);
+
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

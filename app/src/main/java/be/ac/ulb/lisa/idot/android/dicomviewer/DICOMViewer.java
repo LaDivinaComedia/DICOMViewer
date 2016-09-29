@@ -1,17 +1,16 @@
 package be.ac.ulb.lisa.idot.android.dicomviewer;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 
 public class DICOMViewer extends Activity
         implements DrawerFragment.NavigationDrawerCallbacks,
@@ -22,6 +21,7 @@ public class DICOMViewer extends Activity
     // Used to store the last screen title. For use in {@link #restoreActionBar()}
     private CharSequence mTitle;
     private String mFileName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
