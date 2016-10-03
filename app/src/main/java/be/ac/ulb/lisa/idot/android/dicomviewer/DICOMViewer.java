@@ -1970,20 +1970,19 @@ public class DICOMViewer extends Activity implements SeekBar.OnSeekBarChangeList
                     message.obj = "The file is compressed. Compressed format are not"
                             + " supported yet.";
                     mHandler.sendMessage(message);
+
                 }
 
             } catch (OutOfMemoryError ex) {
-				File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
-				fCleanup.delete();
+
                 Message message = mHandler.obtainMessage();
                 message.what = ThreadState.OUT_OF_MEMORY;
                 message.obj = ex.getMessage();
                 mHandler.sendMessage(message);
 
             } catch (Exception ex) {
-				File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
-				fCleanup.delete();
-				Message message = mHandler.obtainMessage();
+
+                Message message = mHandler.obtainMessage();
                 message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
                 message.obj = ex.getMessage();
                 mHandler.sendMessage(message);
