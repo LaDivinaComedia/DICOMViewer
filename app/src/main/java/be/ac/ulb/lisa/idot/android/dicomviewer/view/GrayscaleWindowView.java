@@ -61,7 +61,7 @@ public class GrayscaleWindowView extends ImageView {
 	private LISAImageGray16Bit mImage = null;
 	
 	/**
-	 * DICOMViewer data.
+	 * DICOMViewer_old data.
 	 */
 	private DICOMViewerData mDICOMViewerData = null;
 	
@@ -300,7 +300,7 @@ public class GrayscaleWindowView extends ImageView {
 	}
 	
 	/**
-	 * Set the DICOMViewer data.
+	 * Set the DICOMViewer_old data.
 	 * 
 	 * @param data
 	 */

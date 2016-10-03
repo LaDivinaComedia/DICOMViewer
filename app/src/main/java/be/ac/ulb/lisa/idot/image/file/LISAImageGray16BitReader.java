@@ -99,6 +99,7 @@ public class LISAImageGray16BitReader extends FileInputStream {
 			int byteOffset = 0;
 			
 			// Image Width
+			int width = ((buffer[byteOffset + 0] & 0xff) << 8 | (buffer[byteOffset + 1] & 0xff));
 			image.setWidth((short) ((buffer[byteOffset + 0] & 0xff) << 8 | (buffer[byteOffset + 1] & 0xff)));
 			byteOffset += 2;
 

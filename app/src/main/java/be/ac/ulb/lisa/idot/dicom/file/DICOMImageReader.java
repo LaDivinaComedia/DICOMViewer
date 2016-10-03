@@ -108,8 +108,6 @@ public class DICOMImageReader extends DICOMReader {
 	 * @throws DICOMException 
 	 */
 	public final DICOMImage parse() throws IOException, EOFException, DICOMException {
-		
-		
 		// Variables declaration
 		DICOMMetaInformation metaInformation;
 		boolean isExplicit;
