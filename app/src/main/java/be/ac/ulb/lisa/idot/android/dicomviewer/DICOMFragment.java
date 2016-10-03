@@ -608,11 +608,15 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
                     mHandler.sendMessage(message);
                 }
             } catch (OutOfMemoryError ex) {
+                File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
+                fCleanup.delete();
                 Message message = mHandler.obtainMessage();
                 message.what = ThreadState.OUT_OF_MEMORY;
                 message.obj = ex.getMessage();
                 mHandler.sendMessage(message);
             } catch (Exception ex) {
+                File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
+                fCleanup.delete();
                 Message message = mHandler.obtainMessage();
                 message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
                 message.obj = ex.getMessage();
