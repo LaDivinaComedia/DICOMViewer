@@ -42,9 +42,11 @@ import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
  * Use the {@link DICOMFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+@SuppressWarnings("WrongConstant")
 public class DICOMFragment extends Fragment implements View.OnTouchListener{
-    private static final String FILE_NAME = "FILE_NAME";
-    private static final String META_VISIBILITY = "META_VISIBILITY";
+    public static final String FILE_NAME = "FILE_NAME";
+    public static final String META_VISIBILITY = "META_VISIBILITY";
+    public static final String FILE_INDEX = "FILE_INDEX";
 
     private String mFileName;
     private GrayscaleWindowView mGrayscaleWindow;
@@ -56,8 +58,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     private ListView mListMetadata;                         // List view that is used to output metadata
     private PairArrayAdapter mArrayAdapter;                 // Array adapter for metadata list
 
-    private boolean mBusy=false;
-    private int mCurrentFileIndex;
+    private boolean mBusy = false;
+    private int mCurrentFileIndex = 0;
     private File[] mFileArray;
     private GestureDetector mGestureDetector;
     private int mMetadataVisibility;
@@ -70,11 +72,12 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
      *
      * @return A new instance of fragment DICOMFragment.
      */
-    public static DICOMFragment newInstance(String fileName, int metadataVisibility) {
+    public static DICOMFragment newInstance(String fileName) {
         DICOMFragment fragment = new DICOMFragment();
         Bundle args = new Bundle();
         args.putString(FILE_NAME, fileName);
-        args.putInt(META_VISIBILITY, metadataVisibility);
+        args.putInt(META_VISIBILITY, View.INVISIBLE);
+        args.putInt(FILE_INDEX, 0);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,8 +86,12 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mGestureDetector = new GestureDetector(getActivity(),new GestureListener());
-        if (getArguments() != null) {
-            mFileName = getArguments().getString(FILE_NAME);
+        // recover file name if any
+        Bundle args = savedInstanceState == null ? getArguments() : savedInstanceState;
+        if (args != null) {
+            mFileName = args.getString(FILE_NAME);
+            mMetadataVisibility = args.getInt(META_VISIBILITY);
+            mCurrentFileIndex = args.getInt(FILE_INDEX);
         }
     }
 
@@ -99,12 +106,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
         mListMetadata = (ListView) view.findViewById(R.id.list_metadata);
         // recover file name if any
         if (savedInstanceState != null) {
-            String fileName;
-            fileName = savedInstanceState.getString(FILE_NAME);
-            if (fileName != null)
-                mFileName = fileName;
+            mFileName = savedInstanceState.getString(FILE_NAME);
             mMetadataVisibility = savedInstanceState.getInt(META_VISIBILITY);
+            mCurrentFileIndex = savedInstanceState.getInt(FILE_INDEX);
         }
+        mListMetadata.setVisibility(mMetadataVisibility);
         return view;
     }
 
@@ -114,7 +120,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             File currentFile = new File(mFileName);
             mFileArray = currentFile.getParentFile().listFiles(new DICOMFileFilter());
             // Start the loading thread to load the DICOM image
-            mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler, mFileArray[mCurrentFileIndex++]);
+            mDICOMFileLoader = new DICOMFileLoader(mLoadingHandler, mFileArray[mCurrentFileIndex]);
             mDICOMFileLoader.start();
             mBusy = true;
         }
@@ -123,9 +129,9 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mFileName != null)
-            outState.putString(FILE_NAME, mFileName);
+        outState.putString(FILE_NAME, mFileName);
         outState.putInt(META_VISIBILITY, mMetadataVisibility);
+        outState.putInt(FILE_INDEX, mCurrentFileIndex);
     }
 
     @Override
@@ -145,7 +151,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     @Override
     public void onResume() {
         super.onResume();
-        //noinspection WrongConstant
         mListMetadata.setVisibility(mMetadataVisibility);
         // load the file
         initFileLoader();
