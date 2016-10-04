@@ -62,6 +62,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMElement;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
@@ -240,7 +241,8 @@ public class DICOMReader extends DICOMBufferedInputStream {
             mByteOffset += 4;
 
             // Get the FileMeta group length
-            long groupLength = readUnsignedLong() * 8; // this is magic shit dunno ...
+            long groupLength = readUnsignedLong(); // this is magic shit dunno ...
+            groupLength = 0xffffffffL;
             mByteOffset += 4;
 
 
@@ -773,6 +775,13 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 //patient age
             } else if (tag == 0x00101010) {
                 mMetaInformation.setPaitentAge(element.getValueString());
+                // pixel spacing
+            } else if (tag == 0x00280030){
+                String o = (String)element.getValue();
+                double[] ps = new double[2];
+                ps[0] = Double.valueOf(o.substring(0,o.indexOf("\\")));
+                ps[1] = Double.valueOf(o.substring(o.indexOf("\\") + 1));
+                mMetaInformation.setPixelSpacing(ps);
             }
 
         }
@@ -780,7 +789,7 @@ public class DICOMReader extends DICOMBufferedInputStream {
         public boolean isRequiredElement(int tag) {
             return (tag == 0x00020002) || (tag == 0x00020003) || (tag == 0x00020010)
                     || (tag == 0x00020012) || (tag == 0x00020013) || (tag == 0x00020016)
-                    || (tag == 0x00100030) || (tag == 0x00100010) || (tag == 0x00101010);
+                    || (tag == 0x00100030) || (tag == 0x00100010) || (tag == 0x00101010) || (tag == 0x00280030);
         }
 
         public void computeImage(DICOMElement parent, DICOMValueRepresentation VR,
