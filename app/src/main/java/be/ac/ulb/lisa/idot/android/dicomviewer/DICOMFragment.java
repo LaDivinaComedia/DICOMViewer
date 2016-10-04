@@ -1,12 +1,10 @@
 package be.ac.ulb.lisa.idot.android.dicomviewer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,7 +59,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     private File[] mFileArray;
     private GestureDetector mGestureDetector;
     private int mMetadataVisibility;
-
     public DICOMFragment() { }
 
     /**
@@ -453,6 +450,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
                         // output information from metadata
                         Resources resources = getResources();
                         DICOMMetaInformation metaInformation = (DICOMMetaInformation) message.obj;
+                        mImageView.setPixelSpacing(metaInformation.getPixelSpacing());
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);

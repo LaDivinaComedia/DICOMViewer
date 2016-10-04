@@ -142,7 +142,8 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	 * Context.
 	 */
 	private Context mContext;
-	
+
+	private double[] mPixelSpacing;
 	
 	// ---------------------------------------------------------------
 	// + CONSTRUCTORS
@@ -236,7 +237,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	// ---------------------------------------------------------------
 	
 	public boolean onTouch(View v, MotionEvent event) {
-		
+
 		if (mImage == null
 				|| mDICOMViewerData == null)
 			return false;
@@ -302,7 +303,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 			
 			// Check if there is two pointers
 			if (event.getPointerCount() == 2) {
-				
+
 				// Set mTouchMode to TouchMode.TWO_FINGERS
 				mTouchMode = TouchMode.TWO_FINGERS;
 				
@@ -614,8 +615,24 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 		
 		return true; // Do not draw
 	}
-	
-	
+
+	public Double getRealDistance(Double[] points){
+		Double[] unScaledCoordinates = new Double[points.length];
+		for(int i=0;i<points.length;i++)
+			unScaledCoordinates[i]=Double.valueOf(points[i]);
+		Double distance  = Math.sqrt(Math.pow(unScaledCoordinates[0]-unScaledCoordinates[2],2)+Math.pow(unScaledCoordinates[1]-unScaledCoordinates[3],2))/mScaleFactor;
+        double lenght = Math.sqrt(Math.pow(mPixelSpacing[0],2)+Math.pow(mPixelSpacing[1],2));
+        Double result = distance*lenght;
+        return result;
+		//Log.d("EUCLEDIAN_DISTANCE", String.valueOf(distance));
+	}
+
+	public void setPixelSpacing(double[] pixelSpacing){
+		this.mPixelSpacing = pixelSpacing;
+	}
+	public double[] getPixelSpacing(){
+		return mPixelSpacing;
+	}
 	// ---------------------------------------------------------------
 	// + FUNCTIONS
 	// ---------------------------------------------------------------
@@ -624,8 +641,8 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	 * Draw the image. 
 	 */
 	public void draw() {
-		
-		// Declaration output pixels vector
+
+        // Declaration output pixels vector
 		int[] outputPixels = new int[mImage.getDataLength()];
 		
 		// Get the gray scale window width
@@ -946,7 +963,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	 * Compute the RGB image using a rainbow CLUT.
 	 * 
 	 * @param windowWidth
-	 * @param windowOffset
+	 * @param windowMin
 	 * @param outputPixels
 	 */
 	private void computeRainbowRGBImage(int windowWidth, int windowMin, int[] outputPixels) {	
