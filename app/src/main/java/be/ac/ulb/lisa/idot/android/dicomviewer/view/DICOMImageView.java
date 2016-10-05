@@ -616,10 +616,12 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 		return true; // Do not draw
 	}
 
-	public Double getRealDistance(Double[] points){
-		Double[] unScaledCoordinates = new Double[points.length];
-		for(int i=0;i<points.length;i++)
-			unScaledCoordinates[i]=Double.valueOf(points[i]);
+	public Double getRealDistance(PointF[] points){
+		Double[] unScaledCoordinates = new Double[points.length*2];
+		for(int i=0;i<points.length;i++){
+			unScaledCoordinates[2*i]=Double.valueOf(points[i].x);
+			unScaledCoordinates[2*i+1]=Double.valueOf(points[i].y);
+		}
 		Double distance  = Math.sqrt(Math.pow(unScaledCoordinates[0]-unScaledCoordinates[2],2)+Math.pow(unScaledCoordinates[1]-unScaledCoordinates[3],2))/mScaleFactor;
         double lenght = Math.sqrt(Math.pow(mPixelSpacing[0],2)+Math.pow(mPixelSpacing[1],2));
         Double result = distance*lenght;
@@ -641,7 +643,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 	 * Draw the image. 
 	 */
 	public void draw() {
-
+		this.getRealDistance(new PointF[]{new PointF(0.0f,0.0f),new PointF(1.0f, 1.0f)});
         // Declaration output pixels vector
 		int[] outputPixels = new int[mImage.getDataLength()];
 		
