@@ -1,12 +1,10 @@
 package be.ac.ulb.lisa.idot.android.dicomviewer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,6 +25,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
@@ -43,14 +42,21 @@ import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
  * create an instance of this fragment.
  */
 @SuppressWarnings("WrongConstant")
-public class DICOMFragment extends Fragment implements View.OnTouchListener{
-    public static final String FILE_NAME = "FILE_NAME";
-    public static final String META_VISIBILITY = "META_VISIBILITY";
-    public static final String FILE_INDEX = "FILE_INDEX";
+public class DICOMFragment extends Fragment implements View.OnTouchListener {
+    public static final int NONE        = 0;
+    public static final int RULER       = 1;
+    public static final int PROTRACTOR  = 2;
+    public static final int AREA        = 3;
+
+    private static final String FILE_NAME = "FILE_NAME";
+    private static final String META_VISIBILITY = "META_VISIBILITY";
+    private static final String FILE_INDEX = "FILE_INDEX";
 
     private String mFileName;
     private GrayscaleWindowView mGrayscaleWindow;
-    private DICOMImageView mImageView;                      // The image view
+    private View.OnTouchListener mTouchListener;            // Current view that is interacting with user
+    private RulerView mRulerView;                           // The image view without any decorators
+    private DICOMImageView mImageView;                      // The image view with decorators (tools)
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
     private LISAImageGray16Bit mImage = null;               // The LISA 16-Bit image
@@ -63,8 +69,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     private File[] mFileArray;
     private GestureDetector mGestureDetector;
     private int mMetadataVisibility;
+    private int mCurrentTool;
 
-    public DICOMFragment() { }
+    public DICOMFragment() {
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -85,7 +93,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mGestureDetector = new GestureDetector(getActivity(),new GestureListener());
+        mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
         // recover file name if any
         Bundle args = savedInstanceState == null ? getArguments() : savedInstanceState;
         if (args != null) {
@@ -101,7 +109,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dicom, container, false);
 
+        mRulerView = (RulerView) view.findViewById(R.id.ruler_view);
+        mRulerView.setVisibility(View.GONE);
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
+        mTouchListener = mImageView;
         mGrayscaleWindow = (GrayscaleWindowView) view.findViewById(R.id.grayscale_view);
         mListMetadata = (ListView) view.findViewById(R.id.list_metadata);
         // recover file name if any
@@ -111,6 +122,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             mCurrentFileIndex = savedInstanceState.getInt(FILE_INDEX);
         }
         mListMetadata.setVisibility(mMetadataVisibility);
+        mCurrentTool = NONE;
         return view;
     }
 
@@ -182,6 +194,29 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
     public int getMetadataVisibility() {
         return mMetadataVisibility;
     }
+
+    public void setTool(int tool) {
+        mCurrentTool = tool;
+        mRulerView.setVisibility(View.GONE);
+        switch (tool) {
+            case RULER:
+                mTouchListener = mRulerView;
+                mRulerView.setVisibility(View.VISIBLE);
+                break;
+            case PROTRACTOR:
+                break;
+            case AREA:
+                break;
+            default:
+                mTouchListener = mImageView;
+                break;
+        }
+    }
+
+    public int getTool() {
+        return mCurrentTool;
+    }
+
 
     /**
      * Set the currentImage
@@ -264,13 +299,15 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
         alertDialog.show();
     }
 
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        mImageView.onTouch(v,event);
+        boolean res = mTouchListener.onTouch(v, event);
+        if (mTouchListener != mImageView)
+            return res;
         return this.mGestureDetector.onTouchEvent(event);
     }
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
@@ -296,8 +333,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
                         }
                     }
                     result = true;
-                }
-                else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                } else if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                     if (diffY > 0) {
                         onSwipeBottom();
                     } else {
@@ -312,13 +348,14 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             return result;
         }
     }
+
     public void onSwipeRight() {
-        mBusy=false;
+        mBusy = false;
         previousImage(null);
     }
 
     public void onSwipeLeft() {
-        mBusy=false;
+        mBusy = false;
         nextImage(null);
     }
 
@@ -361,7 +398,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             // If for a unknown reason the previous button is
             // visible => hide it
             //if (mPreviousButton.getVisibility() == View.VISIBLE)
-                //mPreviousButton.setVisibility(View.INVISIBLE);
+            //mPreviousButton.setVisibility(View.INVISIBLE);
             mBusy = false;
             return;
         }
@@ -372,17 +409,18 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
                 mFileArray[mCurrentFileIndex]);
         mDICOMFileLoader.start();
         // Update the UI
-       // mIndexTextView.setText(String.valueOf(mCurrentFileIndex + 1));
+        // mIndexTextView.setText(String.valueOf(mCurrentFileIndex + 1));
         //mIndexSeekBar.setProgress(mCurrentFileIndex);
 
-       // if (mCurrentFileIndex == 0)
-          //  mPreviousButton.setVisibility(View.INVISIBLE);
+        // if (mCurrentFileIndex == 0)
+        //  mPreviousButton.setVisibility(View.INVISIBLE);
 
         // The next button is automatically set to visible
         // because if there is a previous image, there is
         // a next image
-       // mNextButton.setVisibility(View.VISIBLE);
+        // mNextButton.setVisibility(View.VISIBLE);
     }
+
     /**
      * Handle touch on next button.
      *
@@ -415,7 +453,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             // If for a unknown reason the previous button is
             // visible => hide it
             //if (mNextButton.getVisibility() == View.VISIBLE)
-                //mNextButton.setVisibility(View.INVISIBLE);
+            //mNextButton.setVisibility(View.INVISIBLE);
             mBusy = false;
             return;
         }
@@ -429,7 +467,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
         //mIndexTextView.setText(String.valueOf(mCurrentFileIndex + 1));
         //mIndexSeekBar.setProgress(mCurrentFileIndex);
         //if (mCurrentFileIndex == (mFileArray.length - 1))
-            //mNextButton.setVisibility(View.INVISIBLE);
+        //mNextButton.setVisibility(View.INVISIBLE);
         // The previous button is automatically set to visible
         // because if there is a next image, there is
         // a previous image
@@ -509,7 +547,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
         }
 
     };
-
 
     private static final class DICOMFileLoader extends Thread {
 
@@ -629,4 +666,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener{
             }
         }
     }
+
+
 }
