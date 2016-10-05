@@ -73,8 +73,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
     private int mMetadataVisibility;
     private int mCurrentTool;
 
-    public DICOMFragment() {
-    }
+    public DICOMFragment() { }
 
     /**
      * Use this factory method to create a new instance of
@@ -582,22 +581,17 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
         /***
          * If there is meta information, then read it and update
          *
-         * @param dicomFileReader
          * @return metadata that was read from file or null in case there no metadata or error
          * occurred.
          */
-        private DICOMMetaInformation readMetadata(DICOMImageReader dicomFileReader) {
+        private DICOMMetaInformation readMetadata(DICOMImage image) {
             DICOMMetaInformation metaInformation = null;
-            try {
-                Message message = mHandler.obtainMessage();
-                message.what = ThreadState.PROGRESSION_UPDATE;
-                if (dicomFileReader.hasMetaInformation())
-                    metaInformation = dicomFileReader.parseMetaInformation();
-                message.obj = metaInformation;
-                mHandler.sendMessage(message);
-            } catch (IOException | DICOMException e) {
-                e.printStackTrace();
-            }
+            Message message = mHandler.obtainMessage();
+            message.what = ThreadState.PROGRESSION_UPDATE;
+            if (image.hasMetaInformation())
+                metaInformation = image.getMetaInformation();
+            message.obj = metaInformation;
+            mHandler.sendMessage(message);
             return metaInformation;
         }
 
@@ -618,7 +612,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
                 LISAImageGray16Bit image = reader.parseImage();
                 reader.close();
                 DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
-                readMetadata(dicomFileReader);
+                DICOMImage dicomImage = dicomFileReader.parse();
+                readMetadata(dicomImage);
                 dicomFileReader.close();
                 // Send the LISA 16-Bit grayscale image
                 Message message = mHandler.obtainMessage();
@@ -635,7 +630,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
             try {
                 DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
                 DICOMImage dicomImage = dicomFileReader.parse();
-                readMetadata(dicomFileReader);
+                readMetadata(dicomImage);
                 dicomFileReader.close();
 
                 Message message;

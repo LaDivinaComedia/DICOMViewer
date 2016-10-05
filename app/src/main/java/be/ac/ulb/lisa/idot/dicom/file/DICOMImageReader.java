@@ -162,7 +162,7 @@ public class DICOMImageReader extends DICOMReader {
 		
 		// Parse the body
 		DICOMImageReaderFunctions dicomReaderFunctions =
-			new DICOMImageReaderFunctions(isExplicit, compressionStatus);
+			new DICOMImageReaderFunctions(isExplicit, compressionStatus,metaInformation);
 		
 		parse(null, 0xffffffffL, isExplicit, dicomReaderFunctions, true);
 		
@@ -181,7 +181,8 @@ public class DICOMImageReader extends DICOMReader {
 	// ---------------------------------------------------------------
 	
 	protected class DICOMImageReaderFunctions implements DICOMReaderFunctions {
-		
+		private DICOMMetaInformation mMetadataInformation;
+
 		// TODO support encapsulated PixelData ? or throw an error
 		
 		DICOMBody mBody;
@@ -196,6 +197,14 @@ public class DICOMImageReader extends DICOMReader {
 			mIsExplicit = isExplicit;
 			mCompressionStatus = compressionStatus;
 			
+		}
+
+		public DICOMImageReaderFunctions(boolean isExplicit, short compressionStatus, DICOMMetaInformation metaInformation) {
+			mBody = new DICOMBody();
+			mImage = new LISAImageGray16Bit();
+			mIsExplicit = isExplicit;
+			mCompressionStatus = compressionStatus;
+			mMetadataInformation = metaInformation;
 		}
 
 		public void addDICOMElement(DICOMElement parent, DICOMElement element) {
@@ -260,6 +269,21 @@ public class DICOMImageReader extends DICOMReader {
 			} else if (tag == 0x00281051) {
 				mImage.setWindowWidth(getIntFromStringArray(element));
 					
+			}else if (tag == 0x00100030) {
+				mMetadataInformation.setPaitentBirthDate(element.getValueString());
+				//patient name
+			} else if (tag == 0x00100010) {
+				mMetadataInformation.setPaitentName(element.getValueString());
+				//patient age
+			} else if (tag == 0x00101010) {
+				mMetadataInformation.setPaitentAge(element.getValueString());
+				// pixel spacing
+			} else if (tag == 0x00280030){
+				String o = (String)element.getValue();
+				double[] ps = new double[2];
+				ps[0] = Double.valueOf(o.substring(0,o.indexOf("\\")));
+				ps[1] = Double.valueOf(o.substring(o.indexOf("\\") + 1));
+				mMetadataInformation.setPixelSpacing(ps);
 			}
 			
 		}
@@ -269,7 +293,8 @@ public class DICOMImageReader extends DICOMReader {
 			return (tag == 0x00080005) || (tag == 0x00080008) || (tag == 0x00200037)
 			|| (tag == 0x00280002) || (tag == 0x00280010) || (tag == 0x00280011)
 			|| (tag == 0x00280100) || (tag == 0x00280101) || (tag == 0x00280102)
-			|| (tag == 0x00280103) || (tag == 0x00281050) || (tag == 0x00281051);
+			|| (tag == 0x00280103) || (tag == 0x00281050) || (tag == 0x00281051)
+			|| (tag == 0x00100030) || (tag == 0x00100010) || (tag == 0x00101010) || (tag == 0x00280030);
 			
 		}
 
@@ -351,7 +376,6 @@ public class DICOMImageReader extends DICOMReader {
 		/**
 		 * Compute an
 		 * 
-		 * @param bitsAllocated
 		 * @param valueLength
 		 * @throws IOException
 		 * @throws EOFException
