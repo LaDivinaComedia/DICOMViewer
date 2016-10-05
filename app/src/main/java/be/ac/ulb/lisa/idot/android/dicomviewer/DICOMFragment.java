@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,7 +43,8 @@ import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
  * create an instance of this fragment.
  */
 @SuppressWarnings("WrongConstant")
-public class DICOMFragment extends Fragment implements View.OnTouchListener {
+public class DICOMFragment extends Fragment implements View.OnTouchListener,
+        RulerView.OnRulerMovedListener {
     public static final int NONE        = 0;
     public static final int RULER       = 1;
     public static final int PROTRACTOR  = 2;
@@ -111,6 +113,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
         mRulerView = (RulerView) view.findViewById(R.id.ruler_view);
         mRulerView.setVisibility(View.GONE);
+        mRulerView.setRulerMovedListener(this);
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
         mTouchListener = mImageView;
         mGrayscaleWindow = (GrayscaleWindowView) view.findViewById(R.id.grayscale_view);
@@ -201,6 +204,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         switch (tool) {
             case RULER:
                 mTouchListener = mRulerView;
+                mRulerView.reset();
                 mRulerView.setVisibility(View.VISIBLE);
                 break;
             case PROTRACTOR:
@@ -307,6 +311,14 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         return this.mGestureDetector.onTouchEvent(event);
     }
 
+    @Override
+    public void onRulerMoved(PointF start, PointF end) {
+        if (start != null && end != null) {
+            float distance = mImageView.getRealDistance(new PointF[]{start, end});
+            mRulerView.setDistance(distance);
+        }
+    }
+
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private static final int SWIPE_THRESHOLD = 100;
         private static final int SWIPE_VELOCITY_THRESHOLD = 100;
@@ -371,7 +383,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
      * @param view
      */
     public synchronized void previousImage(View view) {
-
         // If it is busy, do nothing
         if (mBusy)
             return;

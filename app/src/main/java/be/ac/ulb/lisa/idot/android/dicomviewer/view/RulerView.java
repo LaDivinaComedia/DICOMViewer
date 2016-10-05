@@ -10,6 +10,8 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.view.View;
 
+import be.ac.ulb.lisa.idot.android.dicomviewer.R;
+
 /**
  * @author Vladyslav Vasyliev
  *         Created on 04.10.2016
@@ -17,11 +19,12 @@ import android.view.View;
 public class RulerView extends ImageView implements View.OnTouchListener {
     private float mThresholdDistance = 70;
     private float mRadius;      // Radius of the end points
+    private float mDistance;    // Label with the value of the ruler
     private PointF mStart;      // Start point of the ruler line
     private PointF mEnd;        // End point of the ruler line
     private PointF mCurrent;    // Currently selected ending of the ruler line
     private Paint mPaint;       // Paint that is used to draw the ruler line
-    private boolean mEndPoint;   // Shows whether a new line is drawn
+    private OnRulerMovedListener changedListener;
 
     public RulerView(Context context) {
         super(context);
@@ -39,11 +42,11 @@ public class RulerView extends ImageView implements View.OnTouchListener {
     }
 
     private void init() {
-        mEndPoint = false;
         mRadius = 10;
         mCurrent = mStart = mEnd = null;
         mPaint = new Paint();
         mPaint.setColor(Color.GREEN);
+        mPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
         mPaint.setStrokeWidth(5);
         mPaint.setAntiAlias(true);
         mPaint.setStyle(Paint.Style.FILL);
@@ -67,12 +70,25 @@ public class RulerView extends ImageView implements View.OnTouchListener {
         this.mPaint = mPaint;
     }
 
-    public float getmThresholdDistance() {
+    public float getThresholdDistance() {
         return mThresholdDistance;
     }
 
-    public void setmThresholdDistance(float mThresholdDistance) {
+    public void setThresholdDistance(float mThresholdDistance) {
         this.mThresholdDistance = mThresholdDistance;
+    }
+
+    public void setRulerMovedListener(OnRulerMovedListener changedListener) {
+        this.changedListener = changedListener;
+    }
+
+    public void setDistance(float distance) {
+        mDistance = distance;
+    }
+
+    public void reset() {
+        mDistance = 0;
+        mStart = mEnd = mCurrent = null;
     }
 
     private boolean pointIsSelected(MotionEvent event, PointF point) {
@@ -89,14 +105,19 @@ public class RulerView extends ImageView implements View.OnTouchListener {
             case MotionEvent.ACTION_DOWN:
                 if (mStart == null || pointIsSelected(event, mStart))
                     mCurrent = mStart = new PointF(event.getX(), event.getY());
-                else if (mEnd == null || pointIsSelected(event, mEnd))
+                else if (mEnd == null || pointIsSelected(event, mEnd)) {
                     mCurrent = mEnd = new PointF(event.getX(), event.getY());
+                    if (changedListener != null)
+                        changedListener.onRulerMoved(mStart, mEnd);
+                }
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mCurrent != null) {
                     mCurrent.x = event.getX();
                     mCurrent.y = event.getY();
+                    if (changedListener != null)
+                        changedListener.onRulerMoved(mStart, mEnd);
                     this.invalidate();
                 }
                 break;
@@ -116,7 +137,13 @@ public class RulerView extends ImageView implements View.OnTouchListener {
             if (mEnd != null) {
                 canvas.drawCircle(mEnd.x, mEnd.y, mRadius, mPaint);
                 canvas.drawLine(mStart.x, mStart.y, mEnd.x, mEnd.y, mPaint);
+                canvas.drawText(Float.toString(mDistance), 50, 50, mPaint);
             }
         }
     }
+
+    public interface OnRulerMovedListener {
+        void onRulerMoved(PointF start, PointF end);
+    }
+
 }
