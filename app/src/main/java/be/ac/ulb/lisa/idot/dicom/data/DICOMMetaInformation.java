@@ -95,8 +95,9 @@ public class DICOMMetaInformation {
 	* patient age
 	*/
 	private String paitentAge = "";
+	private double[] pixelSpacing;
 
-	
+
 	// ---------------------------------------------------------------
 	// + CONSTRUCTOR
 	// ---------------------------------------------------------------
@@ -251,4 +252,11 @@ public class DICOMMetaInformation {
 		this.paitentAge = paitentAge;
 	}
 
+	public void setPixelSpacing(double[] pixelSpacing) {
+		this.pixelSpacing = pixelSpacing;
+	}
+
+	public double[] getPixelSpacing() {
+		return pixelSpacing;
+	}
 }
