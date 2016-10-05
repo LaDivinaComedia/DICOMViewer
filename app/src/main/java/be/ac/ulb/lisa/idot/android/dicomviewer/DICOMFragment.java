@@ -496,6 +496,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                         // output information from metadata
                         Resources resources = getResources();
                         DICOMMetaInformation metaInformation = (DICOMMetaInformation) message.obj;
+                        mImageView.setPixelSpacing(metaInformation.getPixelSpacing());
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);
@@ -666,6 +667,4 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             }
         }
     }
-
-
 }
