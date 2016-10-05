@@ -800,7 +800,6 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 ps[1] = Double.valueOf(o.substring(o.indexOf("\\") + 1));
                 mMetaInformation.setPixelSpacing(ps);
             }
-
         }
 
         public boolean isRequiredElement(int tag) {

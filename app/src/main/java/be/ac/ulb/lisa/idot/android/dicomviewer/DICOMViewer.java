@@ -51,9 +51,8 @@ public class DICOMViewer extends Activity
             fragmentManager.beginTransaction()
                     .replace(R.id.container, mDICOMFragment, DRAWER_FRAGMENT)
                     .commit();
-        } else {
+        } else
             mDICOMFragment = (DICOMFragment) fragmentManager.findFragmentByTag(DRAWER_FRAGMENT);
-        }
     }
 
     @Override
@@ -80,10 +79,22 @@ public class DICOMViewer extends Activity
             return;
         switch (position) {
             case 0: // Ruler
+                if (mDICOMFragment.getTool() != DICOMFragment.RULER)
+                    mDICOMFragment.setTool(DICOMFragment.RULER);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 1: // Protractor
+                if (mDICOMFragment.getTool() != DICOMFragment.PROTRACTOR)
+                    mDICOMFragment.setTool(DICOMFragment.PROTRACTOR);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 2: // Area
+                if (mDICOMFragment.getTool() != DICOMFragment.AREA)
+                    mDICOMFragment.setTool(DICOMFragment.AREA);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 3: // Metadata
                 int visibility = mDICOMFragment.getMetadataVisibility();
