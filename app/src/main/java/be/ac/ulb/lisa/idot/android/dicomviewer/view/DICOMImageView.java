@@ -612,7 +612,6 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
         float distanceX = (float) (Math.abs(points[0].x - points[1].x) * mPixelSpacing[0]);
         float distanceY = (float) (Math.abs(points[0].y - points[1].y) * mPixelSpacing[1]);
         float distance = (float) Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2)) / mScaleFactor;
-        //Log.d("EUCLEDIAN_DISTANCE", String.valueOf(distance));
         return distance;
     }
 

@@ -99,26 +99,40 @@ public class RulerView extends ImageView implements View.OnTouchListener {
         return dist <= mThresholdDistance;
     }
 
+    private boolean checkBounds(PointF point) {
+        int width = this.getWidth();
+        int height = this.getHeight();
+        return point.x >= 0 && point.y >= 0 && point.x < width && point.y < height;
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if (mStart == null || pointIsSelected(event, mStart))
-                    mCurrent = mStart = new PointF(event.getX(), event.getY());
+                PointF point = new PointF(event.getX(), event.getY());
+                if (mStart == null || pointIsSelected(event, mStart)) {
+                    if (checkBounds(point))
+                        mCurrent = mStart = point;
+                }
                 else if (mEnd == null || pointIsSelected(event, mEnd)) {
-                    mCurrent = mEnd = new PointF(event.getX(), event.getY());
-                    if (changedListener != null)
-                        changedListener.onRulerMoved(mStart, mEnd);
+                    if (checkBounds(point)) {
+                        mCurrent = mEnd = new PointF(event.getX(), event.getY());
+                        if (changedListener != null)
+                            changedListener.onRulerMoved(mStart, mEnd);
+                    }
                 }
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mCurrent != null) {
-                    mCurrent.x = event.getX();
-                    mCurrent.y = event.getY();
-                    if (changedListener != null)
-                        changedListener.onRulerMoved(mStart, mEnd);
-                    this.invalidate();
+                    point = new PointF(event.getX(), event.getY());
+                    if (checkBounds(point)) {
+                        mCurrent.x = event.getX();
+                        mCurrent.y = event.getY();
+                        if (changedListener != null)
+                            changedListener.onRulerMoved(mStart, mEnd);
+                        this.invalidate();
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
