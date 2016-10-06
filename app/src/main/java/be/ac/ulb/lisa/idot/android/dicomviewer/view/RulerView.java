@@ -137,7 +137,9 @@ public class RulerView extends ImageView implements View.OnTouchListener {
             if (mEnd != null) {
                 canvas.drawCircle(mEnd.x, mEnd.y, mRadius, mPaint);
                 canvas.drawLine(mStart.x, mStart.y, mEnd.x, mEnd.y, mPaint);
-                canvas.drawText(Float.toString(mDistance), 50, 50, mPaint);
+                float margin = 50;
+                float height = canvas.getHeight() - mPaint.getTextSize() - margin;
+                canvas.drawText(String.format("%.2f mm", mDistance), margin, height, mPaint);
             }
         }
     }
