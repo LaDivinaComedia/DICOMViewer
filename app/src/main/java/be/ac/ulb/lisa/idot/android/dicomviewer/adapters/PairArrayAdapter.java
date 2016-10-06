@@ -46,11 +46,13 @@ public class PairArrayAdapter extends ArrayAdapter<Pair<String, String>> {
     @Override
     public void add(Pair<String, String> object) {
         mValues.add(object);
+        notifyDataSetChanged();
     }
 
     @Override
     public void addAll(Collection<? extends Pair<String, String>> collection) {
         mValues.addAll(collection);
+        notifyDataSetChanged();
     }
 
     @Override
