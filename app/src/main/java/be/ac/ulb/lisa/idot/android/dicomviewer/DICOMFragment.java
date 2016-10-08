@@ -19,17 +19,18 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.PairArrayAdapter;
 import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.CalculusView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.Interfaces.PointsMovedListener;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
-import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMFileFilter;
@@ -46,11 +47,11 @@ import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
  */
 @SuppressWarnings("WrongConstant")
 public class DICOMFragment extends Fragment implements View.OnTouchListener,
-        RulerView.OnRulerMovedListener {
-    public static final int NONE        = 0;
-    public static final int RULER       = 1;
-    public static final int PROTRACTOR  = 2;
-    public static final int AREA        = 3;
+        PointsMovedListener {
+    public static final int NONE = 0;
+    public static final int RULER = 1;
+    public static final int PROTRACTOR = 2;
+    public static final int AREA = 3;
 
     private static final String FILE_NAME = "FILE_NAME";
     private static final String META_VISIBILITY = "META_VISIBILITY";
@@ -62,6 +63,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
     private GrayscaleWindowView mGrayscaleWindow;
     private View.OnTouchListener mTouchListener;            // Current view that is interacting with user
     private RulerView mRulerView;                           // The image view without any decorators
+    private ProtractorView mProtractorView;                 // The image view without any decorators with protractor functionality
     private DICOMImageView mImageView;                      // The image view with decorators (tools)
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
@@ -117,6 +119,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
         mRulerView = (RulerView) view.findViewById(R.id.ruler_view);
         mRulerView.setVisibility(View.GONE);
         mRulerView.setRulerMovedListener(this);
+
+        mProtractorView = (ProtractorView) view.findViewById(R.id.protractor_view);
+        mProtractorView.setVisibility(View.GONE);
+
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
         mTouchListener = mImageView;
         mGrayscaleWindow = (GrayscaleWindowView) view.findViewById(R.id.grayscale_view);
@@ -218,6 +224,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
         else
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         mRulerView.setVisibility(View.GONE);
+        mProtractorView.setVisibility(View.GONE);
         switch (tool) {
             case RULER:
                 mTouchListener = mRulerView;
@@ -225,6 +232,9 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
                 mRulerView.setVisibility(View.VISIBLE);
                 break;
             case PROTRACTOR:
+                mTouchListener = mProtractorView;
+                mProtractorView.reset();
+                mProtractorView.setVisibility(View.VISIBLE);
                 break;
             case AREA:
                 break;
@@ -329,10 +339,18 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
     }
 
     @Override
-    public void onRulerMoved(PointF start, PointF end) {
-        if (start != null && end != null) {
-            float distance = mImageView.getRealDistance(new PointF[]{start, end});
-            mRulerView.setDistance(distance);
+    public void onPointsMoved(PointF[] points) {
+        switch (mCurrentTool) {
+            case RULER:
+                PointF p1 = points[0];
+                PointF p2 = points[1];
+                if (points.length == 2 && p1 != null && p2 != null) {
+                    double[] ps = mImageView.getPixelSpacing();
+                    float distance = CalculusView.getRealDistance(new PointF[]{p1, p2}
+                            , (float) ps[0], (float) ps[1], mScaleFactor);
+                    mRulerView.setDistance(distance);
+                }
+                break;
         }
     }
 
@@ -525,6 +543,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener,
                         Resources resources = getResources();
                         DICOMMetaInformation metaInformation = (DICOMMetaInformation) message.obj;
                         mImageView.setPixelSpacing(metaInformation.getPixelSpacing());
+                        mProtractorView.setMetaInformation((DICOMMetaInformation) message.obj);
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);

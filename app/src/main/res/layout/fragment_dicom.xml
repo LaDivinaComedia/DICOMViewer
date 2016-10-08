@@ -16,6 +16,11 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
+    <be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView
+        android:id="@+id/protractor_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
     <be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView
         android:id="@+id/grayscale_view"
         android:layout_width="wrap_content"

@@ -606,15 +606,6 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
         return true; // Do not draw
     }
 
-    public float getRealDistance(PointF[] points) {
-        if (mPixelSpacing == null)
-            return 0.0f;
-        float distanceX = (float) (Math.abs(points[0].x - points[1].x) * mPixelSpacing[0]);
-        float distanceY = (float) (Math.abs(points[0].y - points[1].y) * mPixelSpacing[1]);
-        float distance = (float) Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2)) / mScaleFactor;
-        return distance;
-    }
-
     public void setPixelSpacing(double[] pixelSpacing) {
         this.mPixelSpacing = pixelSpacing;
     }
@@ -630,7 +621,6 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      * Draw the image.
      */
     public void draw() {
-        this.getRealDistance(new PointF[]{new PointF(0.0f, 0.0f), new PointF(1.0f, 1.0f)});
         // Declaration output pixels vector
         int[] outputPixels = new int[mImage.getDataLength()];
 

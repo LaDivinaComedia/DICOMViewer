@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.view.View;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.R;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.Interfaces.PointsMovedListener;
 
 /**
  * @author Vladyslav Vasyliev
@@ -24,7 +25,7 @@ public class RulerView extends ImageView implements View.OnTouchListener {
     private PointF mEnd;        // End point of the ruler line
     private PointF mCurrent;    // Currently selected ending of the ruler line
     private Paint mPaint;       // Paint that is used to draw the ruler line
-    private OnRulerMovedListener changedListener;
+    private PointsMovedListener changedListener;
 
     public RulerView(Context context) {
         super(context);
@@ -78,7 +79,7 @@ public class RulerView extends ImageView implements View.OnTouchListener {
         this.mThresholdDistance = mThresholdDistance;
     }
 
-    public void setRulerMovedListener(OnRulerMovedListener changedListener) {
+    public void setRulerMovedListener(PointsMovedListener changedListener) {
         this.changedListener = changedListener;
     }
 
@@ -117,8 +118,12 @@ public class RulerView extends ImageView implements View.OnTouchListener {
                 else if (mEnd == null || pointIsSelected(event, mEnd)) {
                     if (checkBounds(point)) {
                         mCurrent = mEnd = new PointF(event.getX(), event.getY());
-                        if (changedListener != null)
-                            changedListener.onRulerMoved(mStart, mEnd);
+                        if (changedListener != null){
+                            PointF[] pts = new PointF[3];
+                            pts[0] = mStart;
+                            pts[1] = mEnd;
+                            changedListener.onPointsMoved(pts);
+                        }
                     }
                 }
                 this.invalidate();
@@ -129,8 +134,12 @@ public class RulerView extends ImageView implements View.OnTouchListener {
                     if (checkBounds(point)) {
                         mCurrent.x = event.getX();
                         mCurrent.y = event.getY();
-                        if (changedListener != null)
-                            changedListener.onRulerMoved(mStart, mEnd);
+                        if (changedListener != null){
+                            PointF[] pts = new PointF[3];
+                            pts[0] = mStart;
+                            pts[1] = mEnd;
+                            changedListener.onPointsMoved(pts);
+                        }
                         this.invalidate();
                     }
                 }
@@ -157,9 +166,4 @@ public class RulerView extends ImageView implements View.OnTouchListener {
             }
         }
     }
-
-    public interface OnRulerMovedListener {
-        void onRulerMoved(PointF start, PointF end);
-    }
-
 }
