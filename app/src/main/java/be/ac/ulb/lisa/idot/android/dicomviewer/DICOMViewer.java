@@ -2,35 +2,31 @@ package be.ac.ulb.lisa.idot.android.dicomviewer;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 public class DICOMViewer extends Activity
         implements DrawerFragment.NavigationDrawerCallbacks {
-    private static final String FILE_NAME = "FILE_NAME";
-    private static final String META_VISIBILITY = "META_VISIBILITY";
+    private static final String WAS_INITIALIZED = "WAS_INITIALIZED";
+    private static final String DRAWER_FRAGMENT = "DRAWER_FRAGMENT";
 
     // Fragment managing the behaviors, interactions and presentation of the navigation drawer
     private DrawerFragment mDrawerFragment;
     private DICOMFragment mDICOMFragment;
     // Used to store the last screen title. For use in {@link #restoreActionBar()}
     private CharSequence mTitle;
-
-    private String mFileName;
-    private int mMetadataVisibility;
-
+    private Boolean mInitialized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dicomviewer);
+        mInitialized = false;
+        if (savedInstanceState != null)
+            mInitialized = savedInstanceState.getBoolean(WAS_INITIALIZED);
 
         mDrawerFragment = (DrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -41,41 +37,22 @@ public class DICOMViewer extends Activity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
         // If the saved instance state is not null get the file name
-        if (savedInstanceState != null) {
-            mFileName = savedInstanceState.getString(FILE_NAME);
-            mMetadataVisibility = savedInstanceState.getInt(META_VISIBILITY);
-        } else {
-            // Get the intent
-            Intent intent = getIntent();
-            if (intent != null) {
-                Bundle extras = intent.getExtras();
-                mFileName = extras == null ? null : extras.getString("DICOMFileName");
-            }
+        // Get the intent
+        String fileName = null;
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            fileName = extras == null ? null : extras.getString("DICOMFileName");
         }
         // update the main content by replacing fragments
-        mDICOMFragment = DICOMFragment.newInstance(mFileName, mMetadataVisibility);
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, mDICOMFragment)
-                .commit();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mFileName != null)
-            outState.putString(FILE_NAME, mFileName);
-        outState.putInt(META_VISIBILITY, mDICOMFragment.getMetadataVisibility());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null) {
-            mFileName = savedInstanceState.getString(FILE_NAME);
-            mMetadataVisibility = savedInstanceState.getInt(META_VISIBILITY);
-            mDICOMFragment.setMetadataVisibility(mMetadataVisibility);
-        }
+        if (!mInitialized) {
+            mDICOMFragment = DICOMFragment.newInstance(fileName);
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, mDICOMFragment, DRAWER_FRAGMENT)
+                    .commit();
+        } else
+            mDICOMFragment = (DICOMFragment) fragmentManager.findFragmentByTag(DRAWER_FRAGMENT);
     }
 
     @Override
@@ -85,15 +62,39 @@ public class DICOMViewer extends Activity
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mInitialized = savedInstanceState.getBoolean(WAS_INITIALIZED);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(WAS_INITIALIZED, true);
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         if (mDICOMFragment == null)
             return;
         switch (position) {
             case 0: // Ruler
+                if (mDICOMFragment.getTool() != DICOMFragment.RULER)
+                    mDICOMFragment.setTool(DICOMFragment.RULER);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 1: // Protractor
+                if (mDICOMFragment.getTool() != DICOMFragment.PROTRACTOR)
+                    mDICOMFragment.setTool(DICOMFragment.PROTRACTOR);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 2: // Area
+                if (mDICOMFragment.getTool() != DICOMFragment.AREA)
+                    mDICOMFragment.setTool(DICOMFragment.AREA);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.NONE);
                 break;
             case 3: // Metadata
                 int visibility = mDICOMFragment.getMetadataVisibility();

@@ -784,7 +784,6 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 mMetaInformation.setAET(element.getValueString());
                 //Patient birth date
             }
-
         }
 
         public boolean isRequiredElement(int tag) {

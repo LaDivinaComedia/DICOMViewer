@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FF777777"
     tools:context="be.ac.ulb.lisa.idot.android.dicomviewer.DICOMFragment">
 
     <be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView
@@ -9,6 +10,11 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:scaleType="matrix" />
+
+    <be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView
+        android:id="@+id/ruler_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
     <be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView
         android:id="@+id/grayscale_view"
@@ -22,6 +28,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:paddingLeft="10dp"/>
+        android:paddingLeft="10dp" />
 
 </FrameLayout>
