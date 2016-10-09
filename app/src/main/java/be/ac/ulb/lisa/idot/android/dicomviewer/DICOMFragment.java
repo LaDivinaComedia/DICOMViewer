@@ -26,6 +26,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.FigureDrawingView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
@@ -70,6 +71,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     private RulerView mRulerView;                           // The image view without any decorators
     private ProtractorView mProtractorView;                 // The image view without any decorators with protractor functionality
     private DICOMImageView mImageView;                      // The image view with decorators (tools)
+    private FigureDrawingView mFigureView;                  // the image view with drawing the figure
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
     private LISAImageGray16Bit mImage = null;               // The LISA 16-Bit image
@@ -126,7 +128,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
         mProtractorView = (ProtractorView) view.findViewById(R.id.protractor_view);
         mProtractorView.setVisibility(View.GONE);
-
+        mFigureView = (FigureDrawingView) view.findViewById(R.id.figure_view);
+        mFigureView.setVisibility(View.GONE);
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
         mTouchListener = mImageView;
         // set adapter for a list view that is used to show metadata
@@ -290,6 +293,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mProtractorView.setVisibility(View.VISIBLE);
                 break;
             case Tool.AREA:
+                mTouchListener = mFigureView;
+                mFigureView.reset();
+                mFigureView.setVisibility(View.VISIBLE);
+                mFigureView.setScaleFactor(mImageView.getScaleFactor());
                 break;
             default:
                 mTouchListener = mImageView;
@@ -573,7 +580,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
                         mRulerView.setPixelSpacing(pixelSpasing);
                         mProtractorView.setPixelSpacing(pixelSpasing);
-
+                        mFigureView.setPixelSpacing(pixelSpasing);
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);

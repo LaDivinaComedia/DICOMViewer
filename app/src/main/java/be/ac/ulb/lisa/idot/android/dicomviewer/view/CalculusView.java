@@ -27,8 +27,10 @@ public class CalculusView {
         return distance;
     }
 
-    public static float getRealSquare() {
-        return 0.0f;
+    public static float getRealSquare(int amountOfPixels, double mScaleFactor, float mPixelSpacingX, float mPixelSpacingY) {
+        float y = mPixelSpacingY;
+        float result = (float) (amountOfPixels*mPixelSpacingX*mPixelSpacingY/mScaleFactor);
+        return result;
     }
 
     /**
