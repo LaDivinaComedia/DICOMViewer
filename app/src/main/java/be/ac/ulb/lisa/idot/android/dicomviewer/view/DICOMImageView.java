@@ -661,20 +661,14 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      * mScaleMode variable.
      */
     public void resetSize() {
-
         switch (mDICOMViewerData.getScaleMode()) {
-
             case ScaleMode.FITIN:
                 fitIn();
                 break;
-
             case ScaleMode.REALSIZE:
                 realSize();
                 break;
-
         }
-        ;
-
     }
 
     /**

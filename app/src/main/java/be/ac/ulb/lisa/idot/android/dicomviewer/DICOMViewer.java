@@ -79,22 +79,22 @@ public class DICOMViewer extends Activity
             return;
         switch (position) {
             case 0: // Ruler
-                if (mDICOMFragment.getTool() != DICOMFragment.RULER)
-                    mDICOMFragment.setTool(DICOMFragment.RULER);
+                if (mDICOMFragment.getTool() != DICOMFragment.Tool.RULER)
+                    mDICOMFragment.setTool(DICOMFragment.Tool.RULER);
                 else
-                    mDICOMFragment.setTool(DICOMFragment.NONE);
+                    mDICOMFragment.setTool(DICOMFragment.Tool.NONE);
                 break;
             case 1: // Protractor
-                if (mDICOMFragment.getTool() != DICOMFragment.PROTRACTOR)
-                    mDICOMFragment.setTool(DICOMFragment.PROTRACTOR);
+                if (mDICOMFragment.getTool() != DICOMFragment.Tool.PROTRACTOR)
+                    mDICOMFragment.setTool(DICOMFragment.Tool.PROTRACTOR);
                 else
-                    mDICOMFragment.setTool(DICOMFragment.NONE);
+                    mDICOMFragment.setTool(DICOMFragment.Tool.NONE);
                 break;
             case 2: // Area
-                if (mDICOMFragment.getTool() != DICOMFragment.AREA)
-                    mDICOMFragment.setTool(DICOMFragment.AREA);
+                if (mDICOMFragment.getTool() != DICOMFragment.Tool.AREA)
+                    mDICOMFragment.setTool(DICOMFragment.Tool.AREA);
                 else
-                    mDICOMFragment.setTool(DICOMFragment.NONE);
+                    mDICOMFragment.setTool(DICOMFragment.Tool.NONE);
                 break;
             case 3: // Metadata
                 int visibility = mDICOMFragment.getMetadataVisibility();

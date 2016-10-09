@@ -16,44 +16,23 @@ import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 /**
  * Created by Iggytoto on 08.10.2016.
  */
-
-public class ProtractorView extends ImageView implements View.OnTouchListener {
-
-
+public class ProtractorView extends ToolView implements View.OnTouchListener {
     private float mAngle = 0; // Angle label
     private PointF mPointA = null;
     private PointF mPointB = null;
     private PointF mPointC = null;
     private PointF mSelectedPoint = null;
-    private float mThresholdDistance = 70;
-    private float mRadius = 10;      // Radius of the end points
-    private DICOMMetaInformation metaInformation;
-    private Paint mPaint;
 
     public ProtractorView(Context context) {
         super(context);
-        initPaint();
     }
 
     public ProtractorView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initPaint();
     }
 
     public ProtractorView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initPaint();
-    }
-
-    private void initPaint() {
-        mPaint = new Paint();
-        mPaint.setColor(Color.GREEN);
-        mPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
-        mPaint.setStrokeWidth(5);
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     public void reset() {
@@ -61,10 +40,6 @@ public class ProtractorView extends ImageView implements View.OnTouchListener {
         mPointA = null;
         mPointB = null;
         mPointC = null;
-    }
-
-    public void setMetaInformation(DICOMMetaInformation metaInformation) {
-        this.metaInformation = metaInformation;
     }
 
     @Override
@@ -127,21 +102,7 @@ public class ProtractorView extends ImageView implements View.OnTouchListener {
     private void updateAngle() {
         if (mPointA != null && mPointB != null && mPointC != null)
             mAngle = CalculusView.getRealAngle(new PointF[]{mPointA, mPointB, mPointC},
-                    (float) metaInformation.getPixelSpacing()[0], (float) metaInformation.getPixelSpacing()[1]);
-    }
-
-    private boolean pointIsSelected(MotionEvent event, PointF point) {
-        if (point == null)
-            return false;
-        float x = event.getX(), y = event.getY();
-        float dist = (float) Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2.0));
-        return dist <= mThresholdDistance;
-    }
-
-    private boolean checkBounds(PointF point) {
-        int width = this.getWidth();
-        int height = this.getHeight();
-        return point.x >= 0 && point.y >= 0 && point.x < width && point.y < height;
+                    mPixelSpacing[0], mPixelSpacing[1]);
     }
 
 }

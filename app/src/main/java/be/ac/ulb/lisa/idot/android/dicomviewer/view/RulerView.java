@@ -2,150 +2,90 @@ package be.ac.ulb.lisa.idot.android.dicomviewer.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 import android.view.View;
-
-import be.ac.ulb.lisa.idot.android.dicomviewer.R;
-import be.ac.ulb.lisa.idot.android.dicomviewer.view.Interfaces.PointsMovedListener;
 
 /**
  * @author Vladyslav Vasyliev
  *         Created on 04.10.2016
  */
-public class RulerView extends ImageView implements View.OnTouchListener {
-    private float mThresholdDistance = 70;
-    private float mRadius;      // Radius of the end points
-    private float mDistance;    // Label with the value of the ruler
-    private PointF mStart;      // Start point of the ruler line
-    private PointF mEnd;        // End point of the ruler line
-    private PointF mCurrent;    // Currently selected ending of the ruler line
-    private Paint mPaint;       // Paint that is used to draw the ruler line
-    private PointsMovedListener changedListener;
+public class RulerView extends ToolView implements View.OnTouchListener {
+    // Start and end points of the ruler line are contained in mPoints array
+    private PointF mCurrent;    // Currently selected end point of the ruler
+    private float mScaleFactor; // Scale factor of the current image
 
     public RulerView(Context context) {
         super(context);
-        init();
+        reset();
     }
 
     public RulerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        reset();
     }
 
     public RulerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    private void init() {
-        mRadius = 10;
-        mCurrent = mStart = mEnd = null;
-        mPaint = new Paint();
-        mPaint.setColor(Color.GREEN);
-        mPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
-        mPaint.setStrokeWidth(5);
-        mPaint.setAntiAlias(true);
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-    }
-
-    public float getRadius() {
-        return mRadius;
-    }
-
-    public void setRadius(float mRadius) {
-        this.mRadius = mRadius;
-    }
-
-    public Paint getPaint() {
-        return mPaint;
-    }
-
-    public void setPaint(Paint mPaint) {
-        this.mPaint = mPaint;
-    }
-
-    public float getThresholdDistance() {
-        return mThresholdDistance;
-    }
-
-    public void setThresholdDistance(float mThresholdDistance) {
-        this.mThresholdDistance = mThresholdDistance;
-    }
-
-    public void setRulerMovedListener(PointsMovedListener changedListener) {
-        this.changedListener = changedListener;
-    }
-
-    public void setDistance(float distance) {
-        mDistance = distance;
+        reset();
     }
 
     public void reset() {
         mDistance = 0;
-        mStart = mEnd = mCurrent = null;
+        mCurrent = null;
+        mPoints = new PointF[2];
     }
 
-    private boolean pointIsSelected(MotionEvent event, PointF point) {
-        if (point == null)
-            return false;
-        float x = event.getX(), y = event.getY();
-        float dist = (float) Math.sqrt(Math.pow(x - point.x, 2) + Math.pow(y - point.y, 2.0));
-        return dist <= mThresholdDistance;
+    public float getScaleFactor() {
+        return mScaleFactor;
     }
 
-    private boolean checkBounds(PointF point) {
-        int width = this.getWidth();
-        int height = this.getHeight();
-        return point.x >= 0 && point.y >= 0 && point.x < width && point.y < height;
+    public void setScaleFactor(float mScaleFactor) {
+        this.mScaleFactor = mScaleFactor;
+    }
+
+    private void calculateRealDistance() {
+        if (mPoints[0] != null && mPoints[1] != null)
+            mDistance = CalculusView.getRealDistance(mPoints,
+                    mPixelSpacing[0], mPixelSpacing[1], mScaleFactor);
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        PointF point = new PointF(event.getX(), event.getY());
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                PointF point = new PointF(event.getX(), event.getY());
-                if (mStart == null || pointIsSelected(event, mStart)) {
+                if (mPoints[0] == null || pointIsSelected(event, mPoints[0])) {
                     if (checkBounds(point))
-                        mCurrent = mStart = point;
-                }
-                else if (mEnd == null || pointIsSelected(event, mEnd)) {
+                        mCurrent = mPoints[0] = point;
+                } else if (mPoints[1] == null || pointIsSelected(event, mPoints[1])) {
                     if (checkBounds(point)) {
-                        mCurrent = mEnd = new PointF(event.getX(), event.getY());
-                        if (changedListener != null){
-                            PointF[] pts = new PointF[3];
-                            pts[0] = mStart;
-                            pts[1] = mEnd;
-                            changedListener.onPointsMoved(pts);
-                        }
+                        mCurrent = mPoints[1] = point;
+                        calculateRealDistance();
                     }
                 }
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mCurrent != null) {
-                    point = new PointF(event.getX(), event.getY());
                     if (checkBounds(point)) {
                         mCurrent.x = event.getX();
                         mCurrent.y = event.getY();
-                        if (changedListener != null){
-                            PointF[] pts = new PointF[3];
-                            pts[0] = mStart;
-                            pts[1] = mEnd;
-                            changedListener.onPointsMoved(pts);
-                        }
+                        calculateRealDistance();
                         this.invalidate();
                     }
+                } else if (mTouchPoint == null) {
+                    mTouchPoint = point;
+                } else {
+                    translatePoints(mPoints, event.getX() - mTouchPoint.x,
+                            event.getY() - mTouchPoint.y);
+                    mTouchPoint = point;
+                    this.invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                mCurrent = null;
+                mTouchPoint = mCurrent = null;
                 this.invalidate();
                 break;
         }
@@ -155,11 +95,11 @@ public class RulerView extends ImageView implements View.OnTouchListener {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (mStart != null) {
-            canvas.drawCircle(mStart.x, mStart.y, mRadius, mPaint);
-            if (mEnd != null) {
-                canvas.drawCircle(mEnd.x, mEnd.y, mRadius, mPaint);
-                canvas.drawLine(mStart.x, mStart.y, mEnd.x, mEnd.y, mPaint);
+        if (mPoints[0] != null) {
+            canvas.drawCircle(mPoints[0].x, mPoints[0].y, mRadius, mPaint);
+            if (mPoints[1] != null) {
+                canvas.drawCircle(mPoints[1].x, mPoints[1].y, mRadius, mPaint);
+                canvas.drawLine(mPoints[0].x, mPoints[0].y, mPoints[1].x, mPoints[1].y, mPaint);
                 float margin = 50;
                 float height = canvas.getHeight() - mPaint.getTextSize() - margin;
                 canvas.drawText(String.format("%.2f mm", mDistance), margin, height, mPaint);
