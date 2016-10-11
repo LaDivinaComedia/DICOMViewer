@@ -21,6 +21,7 @@ public abstract class ToolView extends ImageView {
     protected float[] mPixelSpacing;    // Pixel spacing of the image. 0 - x axis, 1 - y axis
     protected Paint mPaint;             // Paint that is used to draw the ruler line
     protected PointF mTouchPoint; // Current touch point
+    protected PointF mCurrent;    // Currently selected end point of the ruler
     protected PointF[] mPoints;         // Key points of the tool
 
     public ToolView(Context context) {

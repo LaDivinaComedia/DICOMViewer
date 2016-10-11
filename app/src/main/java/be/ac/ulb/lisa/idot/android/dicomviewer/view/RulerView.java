@@ -13,7 +13,6 @@ import android.view.View;
  */
 public class RulerView extends ToolView implements View.OnTouchListener {
     // Start and end points of the ruler line are contained in mPoints array
-    private PointF mCurrent;    // Currently selected end point of the ruler
     private float mScaleFactor; // Scale factor of the current image
 
     public RulerView(Context context) {
