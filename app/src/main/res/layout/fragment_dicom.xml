@@ -20,6 +20,10 @@
         android:id="@+id/protractor_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
+    <be.ac.ulb.lisa.idot.android.dicomviewer.view.FigureDrawingView
+        android:id="@+id/figure_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
     <ListView
         android:id="@+id/list_metadata"
