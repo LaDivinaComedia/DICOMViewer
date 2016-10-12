@@ -28,6 +28,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
     private PointF mEnd;        // End point of the ruler line
     private PointF mCurrent;    // Currently selected ending of the ruler line
     private Paint mPaint;       // Paint that is used to draw the line
+    private Paint mPaintText;   // Paint that is used to draw the text of measurement
     private Path mPath;         // Path that is contained path from start point to current
     private ArrayList<PointF> path = new ArrayList<PointF>();
     private Bitmap mBitmap;     // Bitmap with filled area.
@@ -114,7 +115,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         if(mEnd!=null){
             float margin = 50;
             float height = canvas.getHeight() - mPaint.getTextSize() - margin;
-            canvas.drawText(String.format("%.2f mm2", mSquare), margin, height, mPaint);
+            canvas.drawText(String.format("%.2f mm2", mSquare), margin, height, mPaintText);
         }
     }
     private void getSquare(){
@@ -145,10 +146,14 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         mRadius = 10;
         mCurrent = mStart = mEnd = null;
         mPaint = new Paint();
+        mPaintText = new Paint();
+        mPaintText.setColor(Color.GREEN);
         mPaint.setColor(Color.GREEN);
-        mPaint.setTextSize(getResources().getDimension(R.dimen.text_size));
+        mPaintText.setTextSize(getResources().getDimension(R.dimen.text_size));
         mPaint.setStrokeWidth(5);
+        mPaintText.setStrokeWidth(4);
         mPaint.setAntiAlias(true);
+        mPaintText.setStyle(Paint.Style.FILL);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mPaint.setAlpha(100);
     }
