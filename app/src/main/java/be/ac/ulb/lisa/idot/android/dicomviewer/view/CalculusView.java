@@ -29,7 +29,7 @@ public class CalculusView {
 
     public static float getRealSquare(int amountOfPixels, double mScaleFactor, float mPixelSpacingX, float mPixelSpacingY) {
         float y = mPixelSpacingY;
-        float result = (float) (amountOfPixels*mPixelSpacingX*mPixelSpacingY/mScaleFactor);
+        float result = (float) (amountOfPixels*mPixelSpacingX*mPixelSpacingY/(mScaleFactor*mScaleFactor));
         return result;
     }
 

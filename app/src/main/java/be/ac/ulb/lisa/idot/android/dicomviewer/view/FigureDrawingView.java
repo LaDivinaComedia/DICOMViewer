@@ -128,7 +128,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         if(mBitmap!=null){
             for(int i=starty;i<endy && i<mBitmap.getHeight();i++){
                 for(int j=startx;j<endx && j<mBitmap.getWidth();j++){
-                    if(mBitmap.getPixel(j,i)!= mPaint.getColor()){
+                    if(mBitmap.getPixel(j,i)== mPaint.getColor()){
                         count2++;
                     }
                 }
