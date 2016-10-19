@@ -226,12 +226,12 @@ public class DICOMReader extends DICOMBufferedInputStream {
             byte[] ASCIIbyte = new byte[PREFIX.length()];
             read(ASCIIbyte);
             // To avoid the null char : ASCII(0)
-            String toReturnString = new String(ASCIIbyte, "ASCII");
-            for (int i = 0; i < PREFIX.length(); i++)
-                if (ASCIIbyte[i] == 0x00)
-                    throw new DICOMException("This is not a DICOM file");
-            if (!PREFIX.equals(toReturnString))
-                throw new DICOMException("This is not a DICOM file");
+//            String toReturnString = new String(ASCIIbyte, "ASCII");
+//            for (int i = 0; i < PREFIX.length(); i++)
+//                if (ASCIIbyte[i] == 0x00)
+//                    throw new DICOMException("This is not a DICOM file");
+//            if (!PREFIX.equals(toReturnString))
+//                throw new DICOMException("This is not a DICOM file");
             if(!(ASCIIbyte[0] == PREFIX_D &&
                     ASCIIbyte[1] == PREFIX_I &&
                     ASCIIbyte[2] == PREFIX_C &&
