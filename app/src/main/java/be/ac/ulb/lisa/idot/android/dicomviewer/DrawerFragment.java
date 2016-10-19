@@ -85,7 +85,7 @@ public class DrawerFragment extends Fragment {
 
         getActionBar().hide();
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition,-1);
+        selectItem(mCurrentSelectedPosition,null);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class DrawerFragment extends Fragment {
 
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                selectItem(groupPosition,-1);
+                selectItem(groupPosition,0);
                 return false;
             }
         });
@@ -237,7 +237,7 @@ public class DrawerFragment extends Fragment {
 
     }
 
-    private void selectItem(int position,int value) {
+    private void selectItem(int position,Integer value) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -246,20 +246,17 @@ public class DrawerFragment extends Fragment {
             if(listDataHeader.indexOf("Presets")!=position)
                 mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null) {
-            if(value!=-1){
-                if(value!=0)
-                    mCallbacks.onNavigationDrawerItemSelected(position,
+        if (mCallbacks != null && value !=null) {
+            if(value!=0)
+                mCallbacks.onNavigationDrawerItemSelected(position,
                             getResources().getIntArray(R.array.presets_numbers_center)[value-1],
                             getResources().getIntArray(R.array.presets_numbers_width)[value-1]
-                    );
-                else
-                    mCallbacks.onNavigationDrawerItemSelected(position,
-                            -2,
-                            -2
-                    );
-
-            }
+                 );
+            else
+                mCallbacks.onNavigationDrawerItemSelected(position,
+                       -2,
+                       -2
+                );
         }
     }
 
