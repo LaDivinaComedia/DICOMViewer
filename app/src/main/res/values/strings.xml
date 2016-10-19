@@ -49,9 +49,23 @@
         <item>Protractor</item>
         <item>Area</item>
         <item>Metadata</item>
-        <item>Settings</item>
+        <item>Presets</item>
     </string-array>
-
+    <string-array name="child_items">
+        <item>Air</item>
+        <item>Lung</item>
+        <item>Fat</item>
+        <item>Water</item>
+        <item>CSF</item>
+        <item>Kidney</item>
+        <item>Blood</item>
+        <item>Muscle</item>
+        <item>Grey matter</item>
+        <item>White matter</item>
+        <item>Liver</item>
+        <item>Soft Tissue, Contrast</item>
+        <item>Bone</item>
+    </string-array>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
