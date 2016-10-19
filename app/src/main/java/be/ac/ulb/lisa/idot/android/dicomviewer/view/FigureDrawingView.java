@@ -115,7 +115,14 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         if(mEnd!=null){
             float margin = 50;
             float height = canvas.getHeight() - mPaint.getTextSize() - margin;
-            canvas.drawText(String.format("%.2f mm2", mSquare), margin, height, mPaintText);
+            String format;
+            if (mSquare > 1000){
+                format = String.format("%.2f cm2", mSquare / 100);
+            }
+            else{
+                format = String.format("%.2f mm2", mSquare);
+            }
+            canvas.drawText(format, margin, height, mPaintText);
         }
     }
     private void getSquare(){
