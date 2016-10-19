@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 
@@ -86,7 +85,7 @@ public class DrawerFragment extends Fragment {
 
         getActionBar().hide();
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
+        selectItem(mCurrentSelectedPosition,-1);
     }
 
     @Override
@@ -120,7 +119,7 @@ public class DrawerFragment extends Fragment {
                 for(int i=0;i<listDataHeader.size();i++){
                     if(listDataHeader.indexOf("Presets")==groupPosition){
                         System.out.println(getResources().getIntArray(R.array.presets_numbers)[childPosition]);
-                        selectItem(groupPosition);
+                        selectItem(groupPosition,getResources().getIntArray(R.array.presets_numbers)[childPosition]);
                         break;
                     }
                 }
@@ -129,17 +128,17 @@ public class DrawerFragment extends Fragment {
             }
 
         });
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
             }
-        });
+        });*/
         mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener(){
 
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                selectItem(groupPosition);
+                selectItem(groupPosition,-1);
                 return false;
             }
         });
@@ -239,7 +238,7 @@ public class DrawerFragment extends Fragment {
 
     }
 
-    private void selectItem(int position) {
+    private void selectItem(int position,int value) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -248,7 +247,7 @@ public class DrawerFragment extends Fragment {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            mCallbacks.onNavigationDrawerItemSelected(position,value);
         }
     }
 
@@ -314,7 +313,7 @@ public class DrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerItemSelected(int position, int value);
     }
 
 }
