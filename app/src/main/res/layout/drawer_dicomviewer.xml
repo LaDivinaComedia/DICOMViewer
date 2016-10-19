@@ -7,6 +7,9 @@
     android:layout_gravity="left"
     android:focusableInTouchMode="true"
     android:background="#cccc"
+    android:divider="@android:color/transparent"
+    android:dividerHeight="1dp"
+    android:choiceMode="singleChoice"
 ></ExpandableListView>
 
 

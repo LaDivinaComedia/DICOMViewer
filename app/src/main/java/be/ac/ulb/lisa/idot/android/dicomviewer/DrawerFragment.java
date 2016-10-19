@@ -118,8 +118,7 @@ public class DrawerFragment extends Fragment {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 for(int i=0;i<listDataHeader.size();i++){
                     if(listDataHeader.indexOf("Presets")==groupPosition){
-                        System.out.println(getResources().getIntArray(R.array.presets_numbers)[childPosition]);
-                        selectItem(groupPosition,getResources().getIntArray(R.array.presets_numbers)[childPosition]);
+                        selectItem(groupPosition,childPosition);
                         break;
                     }
                 }
@@ -244,10 +243,23 @@ public class DrawerFragment extends Fragment {
             mDrawerListView.setItemChecked(position, true);
         }
         if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
+            if(listDataHeader.indexOf("Presets")!=position)
+                mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position,value);
+            if(value!=-1){
+                if(value!=0)
+                    mCallbacks.onNavigationDrawerItemSelected(position,
+                            getResources().getIntArray(R.array.presets_numbers_center)[value-1],
+                            getResources().getIntArray(R.array.presets_numbers_width)[value-1]
+                    );
+                else
+                    mCallbacks.onNavigationDrawerItemSelected(position,
+                            -2,
+                            -2
+                    );
+
+            }
         }
     }
 
@@ -313,7 +325,7 @@ public class DrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position, int value);
+        void onNavigationDrawerItemSelected(int position, int valueCenter, int valueWidth);
     }
 
 }

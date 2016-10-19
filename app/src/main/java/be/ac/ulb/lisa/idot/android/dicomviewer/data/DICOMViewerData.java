@@ -77,6 +77,47 @@ public class DICOMViewerData {
 	private int mWindowCenter = -1;
 
 	/**
+	 * Grayscale default window width
+	 */
+	private int mDefaultWidth = -1;
+
+	/**
+	 * Grayscale default window center
+	 */
+	private int mDefaultCenter = -1;
+
+	/**
+	 * Default value grayscale window width
+	 * @return <code>int</code>
+     */
+	public int getDefaultWidth(){
+		return this.mDefaultWidth;
+	}
+
+	/**
+	 * Setup the default value grayscale window width
+	 * @param defaultWidth
+     */
+	public void setDefaultWidth(int defaultWidth){
+		this.mDefaultWidth = defaultWidth;
+	}
+
+	/**
+	 * Grayscale default window size
+	 * @return mDefaultCenter
+     */
+	public int getDefaultCenter(){
+		return this.mDefaultCenter;
+	}
+
+	/**
+	 * Default value center grayscale window which calculate at beginning
+	 * @param defaultCenter default value
+     */
+	public void setDefaultCenter(int defaultCenter){
+		this.mDefaultCenter = defaultCenter;
+	}
+	/**
 	 * @return the mToolMode
 	 */
 	public short getToolMode() {

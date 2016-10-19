@@ -336,6 +336,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mIsInitialized = true;
                 mDICOMViewerData.setWindowWidth(mImage.getWindowWidth());
                 mDICOMViewerData.setWindowCenter(mImage.getWindowCenter());
+                mDICOMViewerData.setDefaultCenter(mImage.getWindowCenter());
+                mDICOMViewerData.setDefaultWidth(mImage.getWindowWidth());
                 mImageView.draw();
                 mImageView.fitIn();
             } else
@@ -634,8 +636,19 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
     };
 
-    public void setImageCenter(int value){
-        this.mDICOMViewerData.setWindowCenter(value);
+    /**
+     *
+     * @param valueCenter
+     * @param valueWidth
+     */
+    public void setImageCenter(int valueCenter, int valueWidth){
+        if(valueCenter==-2 && valueWidth==-2){
+            this.mDICOMViewerData.setWindowCenter(mDICOMViewerData.getDefaultCenter());
+            this.mDICOMViewerData.setWindowWidth(mDICOMViewerData.getDefaultWidth());
+        }else{
+            this.mDICOMViewerData.setWindowCenter(valueCenter);
+            this.mDICOMViewerData.setWindowWidth(valueWidth);
+        }
         this.mImageView.draw();
     }
 
@@ -754,3 +767,4 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         }
     }
 }
+
