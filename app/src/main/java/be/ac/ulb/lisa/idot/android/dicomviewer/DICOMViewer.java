@@ -74,7 +74,7 @@ public class DICOMViewer extends Activity
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(int position,int value) {
         if (mDICOMFragment == null)
             return;
         switch (position) {
@@ -103,7 +103,9 @@ public class DICOMViewer extends Activity
                 else
                     mDICOMFragment.setMetadataVisibility(View.VISIBLE);
                 break;
-            case 4: // Settings
+            case 4: // Presets
+                if(value!=-1)
+                    mDICOMFragment.setImageCenter(value);
                 break;
         }
     }

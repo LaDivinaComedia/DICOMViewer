@@ -1,25 +1,29 @@
 package be.ac.ulb.lisa.idot.android.dicomviewer;
 
 
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.ExpandableListAdapter;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -50,12 +54,17 @@ public class DrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    private ExpandableListView mDrawerListView;
     private View mFragmentContainerView;
+    private ExpandableListView mExpListView;
+    private ExpandableListAdapter mExpListAdapter;
+    HashMap<String, List<String>> listDataChild;
+    List<String> listDataHeader;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+
 
     public DrawerFragment() {
     }
@@ -76,7 +85,7 @@ public class DrawerFragment extends Fragment {
 
         getActionBar().hide();
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
+        selectItem(mCurrentSelectedPosition,-1);
     }
 
     @Override
@@ -89,13 +98,10 @@ public class DrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(R.layout.drawer_dicomviewer, container, false);
-        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
+        mDrawerListView = (ExpandableListView) inflater.inflate(R.layout.drawer_dicomviewer, container, false);
+        preparingData();
+        mExpListAdapter = new ExpandableListAdapter(inflater.getContext(),listDataHeader,listDataChild);
+        mDrawerListView.setAdapter(mExpListAdapter);
         // load values for navigation drawer from resources
         String[] list = getResources().getStringArray(R.array.drawer_items);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
@@ -103,13 +109,59 @@ public class DrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
                 list);
-        mDrawerListView.setAdapter(arrayAdapter);
+        /*mDrawerListView.setAdapter(arrayAdapter);
         mDrawerListView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+        */
+        mDrawerListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                for(int i=0;i<listDataHeader.size();i++){
+                    if(listDataHeader.indexOf("Presets")==groupPosition){
+                        System.out.println(getResources().getIntArray(R.array.presets_numbers)[childPosition]);
+                        selectItem(groupPosition,getResources().getIntArray(R.array.presets_numbers)[childPosition]);
+                        break;
+                    }
+                }
 
+                return false;
+            }
+
+        });
+        /*mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItem(position);
+            }
+        });*/
+        mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener(){
+
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                selectItem(groupPosition,-1);
+                return false;
+            }
+        });
         return mDrawerListView;
     }
+    private void preparingData(){
+        String[] headers = getResources().getStringArray(R.array.drawer_items);
+        String[] child = getResources().getStringArray(R.array.child_items);
+        this.listDataHeader = new ArrayList<String>();
+        for(int i=0;i<headers.length;i++)
+            this.listDataHeader.add(headers[i]);
+        ArrayList<String> childs = new ArrayList<String>();
+        for(String s: child)
+            childs.add(s);
+        this.listDataChild = new HashMap<String,List<String>>();
+        for(int i=0;i<this.listDataHeader.size();i++){
+            if(listDataHeader.get(i).toLowerCase().equals("presets"))
+                this.listDataChild.put(listDataHeader.get(i), childs);
+            else
+                this.listDataChild.put(listDataHeader.get(i), new ArrayList<String>());
+        }
 
+    }
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
@@ -183,9 +235,10 @@ public class DrawerFragment extends Fragment {
         });
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
     }
 
-    private void selectItem(int position) {
+    private void selectItem(int position,int value) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
@@ -194,7 +247,7 @@ public class DrawerFragment extends Fragment {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            mCallbacks.onNavigationDrawerItemSelected(position,value);
         }
     }
 
@@ -260,7 +313,7 @@ public class DrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerItemSelected(int position, int value);
     }
 
 }

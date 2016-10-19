@@ -634,6 +634,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
     };
 
+    public void setImageCenter(int value){
+        this.mDICOMViewerData.setWindowCenter(value);
+        this.mImageView.draw();
+    }
+
     private static final class DICOMFileLoader extends Thread {
 
         // The handler to send message to the parent thread
