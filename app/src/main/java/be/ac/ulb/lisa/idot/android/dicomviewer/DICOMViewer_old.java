@@ -1774,9 +1774,9 @@ public class DICOMViewer_old extends Activity implements SeekBar.OnSeekBarChange
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);
-                        String name = metaInformation.getPaitentName(),
-                                age = metaInformation.getPaitentAge(),
-                                birthDate = metaInformation.getPaitentBirthDate();
+                        String name = metaInformation.getPatientName(),
+                                age = metaInformation.getPatientAge(),
+                                birthDate = metaInformation.getPatientBirthDate();
                         String anonymous = resources.getString(R.string.metadata_anonymous);
                         mArrayAdapter.add(new Pair<>(keyName, processAttribute(name, anonymous)));
                         mArrayAdapter.add(new Pair<>(keyAge, processAttribute(age, anonymous)));
