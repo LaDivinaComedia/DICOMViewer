@@ -103,7 +103,13 @@ public class DICOMViewer extends Activity
                 else
                     mDICOMFragment.setMetadataVisibility(View.VISIBLE);
                 break;
-            case 4: // Presets
+            case 4://Annotations
+                if (mDICOMFragment.getTool() != DICOMFragment.Tool.ANNOTATIONS)
+                    mDICOMFragment.setTool(DICOMFragment.Tool.ANNOTATIONS);
+                else
+                    mDICOMFragment.setTool(DICOMFragment.Tool.NONE);
+                break;
+            case 5: // Presets
                 if(valueCenter!=-1){
                     mDICOMFragment.setImageCenter(valueCenter,valueWidth);
                 }
