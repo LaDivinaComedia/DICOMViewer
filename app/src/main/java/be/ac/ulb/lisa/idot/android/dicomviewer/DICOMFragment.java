@@ -309,6 +309,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mTouchListener = mAnnotationView;
                 mAnnotationView.setVisibility(View.VISIBLE);
                 mAnnotationView.reset();
+                mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor());
                 break;
             default:
                 mTouchListener = mImageView;

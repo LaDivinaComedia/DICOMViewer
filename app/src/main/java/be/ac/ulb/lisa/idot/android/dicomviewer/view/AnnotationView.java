@@ -17,40 +17,74 @@ import java.util.ArrayList;
  */
 
 public class AnnotationView extends ToolView implements View.OnTouchListener {
-    private ArrayList<Paint> mPaints = new ArrayList<Paint>();
+//    private ArrayList<Paint> mPaints = new ArrayList<Paint>();
     private ArrayList<CustomPath> mCustomPaths = new ArrayList<CustomPath>();
+    private ArrayList<Paint> mPaints;
     private CustomPath mCurrentPath;
-
+    private float mScaleFactor;
+    private int mImageWidth;
+    private int mImageHeight;
+    private boolean inbound = true;
     public AnnotationView(Context context) {
         super(context);
         init();
+        mCustomPaths = new ArrayList<CustomPath>();
+        mPaints = new ArrayList<Paint>();
     }
 
     public AnnotationView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+        mCustomPaths = new ArrayList<CustomPath>();
+        mPaints = new ArrayList<Paint>();
     }
 
     public AnnotationView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+        mCustomPaths = new ArrayList<CustomPath>();
+        mPaints = new ArrayList<Paint>();
     }
     @Override
     protected void init(){
         mCurrentPath = new CustomPath();
-        initPaint();
+        //initPaint();
+        if(mPaints==null)
+            mPaints = new ArrayList<Paint>();
+        mPaints.add(initPaint());
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        switch (event.getAction()) {
+        float centerX = this.getWidth()/2;
+        float centerY = this.getHeight()/2;
+        if((centerX-this.mImageWidth*this.mScaleFactor/2)>x || (centerX+this.mImageWidth*this.mScaleFactor/2)<x
+                ||
+                (centerY-this.mImageHeight*this.mScaleFactor/2)>y || (centerY+this.mImageHeight*this.mScaleFactor/2)<y
+                ){
+            //inbound=false;
+            if((centerX-this.mImageWidth*this.mScaleFactor/2)>x)
+                x=centerX-this.mImageWidth*this.mScaleFactor/2;
+            else if((centerX+this.mImageWidth*this.mScaleFactor/2)<x)
+                x=(centerX+this.mImageWidth*this.mScaleFactor/2);
+            if((centerY-this.mImageHeight*this.mScaleFactor/2)>y)
+                y=(centerY-this.mImageHeight*this.mScaleFactor/2);
+            else if((centerY+this.mImageHeight*this.mScaleFactor/2)<y)
+                y=(centerY+this.mImageHeight*this.mScaleFactor/2);
+        }
+        switch (event.getAction()& MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 touch_start(x, y);
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
+                if(!inbound){
+                    inbound=true;
+                    init();
+                    touch_start(x,y);
+                }
                 touch_move(x, y);
                 this.invalidate();
                 break;
@@ -59,6 +93,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
                 this.invalidate();
                 this.mCustomPaths.add(this.mCurrentPath);
+                init();
                 break;
         }
         return true;
@@ -76,7 +111,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
     }
 
     private void touch_start(float x, float y) {
-        mPaints.add(initPaint());
         mCurrentPath.mPath.reset();
         mCurrentPath.mPath.moveTo(x,y);
         mCurrentPath.mStart = new PointF(x,y);
@@ -97,12 +131,25 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
         canvas.drawPath(mCurrentPath.mPath,mPaint);
+        if(this.mCustomPaths.size()>0){
+            for(int i=0;i<this.mCustomPaths.size();i++){
+                canvas.drawPath(this.mCustomPaths.get(i).mPath,mPaints.get(i));
+            }
+        }
     }
 
     public void reset(){
-        this.initPaint();
+        //TODO loading data from tag of annotation if it exists for new image.
+        mCustomPaths = new ArrayList<CustomPath>();
+        mPaints = new ArrayList<Paint>();
+        mPaints.add(initPaint());
     }
+    public void setBounds(int imageWidth, int imageHeight, float scaleFactor){
+        this.mImageWidth = imageWidth;
+        this.mImageHeight = imageHeight;
+        this.mScaleFactor = scaleFactor;
 
+    }
     private class CustomPath{
         public PointF mStart;
         public PointF mEnd;
