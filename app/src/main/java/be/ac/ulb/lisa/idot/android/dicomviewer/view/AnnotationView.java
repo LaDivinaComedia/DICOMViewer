@@ -64,7 +64,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 ||
                 (centerY-this.mImageHeight*this.mScaleFactor/2)>y || (centerY+this.mImageHeight*this.mScaleFactor/2)<y
                 ){
-            //inbound=false;
             if((centerX-this.mImageWidth*this.mScaleFactor/2)>x)
                 x=centerX-this.mImageWidth*this.mScaleFactor/2;
             else if((centerX+this.mImageWidth*this.mScaleFactor/2)<x)
