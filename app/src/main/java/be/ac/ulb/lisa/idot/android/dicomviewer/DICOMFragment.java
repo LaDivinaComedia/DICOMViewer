@@ -27,6 +27,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.PairArrayAdapter;
 import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.AnnotationView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.FigureDrawingView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
@@ -68,6 +69,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         int RULER = 1;
         int PROTRACTOR = 2;
         int AREA = 3;
+        int ANNOTATIONS = 4;
     }
 
     private String mFileName;
@@ -77,6 +79,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     private ProtractorView mProtractorView;                 // The image view without any decorators with protractor functionality
     private DICOMImageView mImageView;                      // The image view with decorators (tools)
     private FigureDrawingView mFigureView;                  // the image view with drawing the figure
+    private AnnotationView mAnnotationView;                 // the annotation view with drawing figure with text for annotations
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
     DICOMPresentationState mPresentationState = null;        // Presentation State of the file (Contains annotations)
@@ -136,6 +139,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         mProtractorView.setVisibility(View.GONE);
         mFigureView = (FigureDrawingView) view.findViewById(R.id.figure_view);
         mFigureView.setVisibility(View.GONE);
+        mAnnotationView = (AnnotationView) view.findViewById(R.id.annotation_view);
+        mAnnotationView.setVisibility(View.GONE);
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
         mTouchListener = mImageView;
         // set adapter for a list view that is used to show metadata
@@ -287,6 +292,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         mRulerView.setVisibility(View.GONE);
         mProtractorView.setVisibility(View.GONE);
         mFigureView.setVisibility(View.GONE);
+        mAnnotationView.setVisibility(View.GONE);
         switch (tool) {
             case Tool.RULER:
                 mTouchListener = mRulerView;
@@ -304,6 +310,12 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mFigureView.reset();
                 mFigureView.setVisibility(View.VISIBLE);
                 mFigureView.setScaleFactor(mImageView.getScaleFactor());
+                break;
+            case Tool.ANNOTATIONS:
+                mTouchListener = mAnnotationView;
+                mAnnotationView.setVisibility(View.VISIBLE);
+                mAnnotationView.reset();
+                mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor());
                 break;
             default:
                 mTouchListener = mImageView;
