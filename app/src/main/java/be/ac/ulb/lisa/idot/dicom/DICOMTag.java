@@ -4,81 +4,80 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * DICOM tag.
+ * DICOM tags
  *
  * @author Vladyslav Vasyliev
  * @author Pierre Malarme
  * @version 1.2
  */
 public class DICOMTag {
-    public static final int FileMetaInformationGroupLength      = 0x00020000;
-    public static final int FileMetaInformationVersion          = 0x00020001;
-    public static final int MediaStorageSOPClassUID             = 0x00020002;
-    public static final int MediaStorageSOPInstanceUID          = 0x00020003;
-    public static final int TransferSyntaxUID                   = 0x00020010;
-    public static final int ImplementationClassUID              = 0x00020012;
-    public static final int ImplementationVersionName           = 0x00020013;
-    public static final int SourceApplicationEntity             = 0x00020016;
-    public static final int PrivateInformationCreatorUID        = 0x00020100;
-    public static final int PrivateInformation                  = 0x00020102;
+    public static final int FileMetaInformationGroupLength      = 0x0002_0000;
+    public static final int FileMetaInformationVersion          = 0x0002_0001;
+    public static final int MediaStorageSOPClassUID             = 0x0002_0002;
+    public static final int MediaStorageSOPInstanceUID          = 0x0002_0003;
+    public static final int TransferSyntaxUID                   = 0x0002_0010;
+    public static final int ImplementationClassUID              = 0x0002_0012;
+    public static final int ImplementationVersionName           = 0x0002_0013;
+    public static final int SourceApplicationEntity             = 0x0002_0016;
+    public static final int PrivateInformationCreatorUID        = 0x0002_0100;
+    public static final int PrivateInformation                  = 0x0002_0102;
 
-    public static final int SpecificCharacterSet                = 0x00080005;
-    public static final int ImageType                           = 0x00080008;
-    public static final int Modality                            = 0x00080060;
-    public static final int CodingSchemeName                    = 0x00080115;
-    public static final int ReferencedSeriesSequence            = 0x00081115;
-    public static final int ReferencedImageSequence             = 0x00081140;
+    public static final int SpecificCharacterSet                = 0x0008_0005;
+    public static final int ImageType                           = 0x0008_0008;
+    public static final int Modality                            = 0x0008_0060;
+    public static final int CodingSchemeName                    = 0x0008_0115;
+    public static final int ReferencedSeriesSequence            = 0x0008_1115;
+    public static final int ReferencedImageSequence             = 0x0008_1140;
 
-    public static final int PatientsName                        = 0x00100010;
-    public static final int PatientsBirthDate                   = 0x00100030;
-    public static final int PatientsAge                         = 0x00101010;
+    public static final int PatientsName                        = 0x0010_0010;
+    public static final int PatientsBirthDate                   = 0x0010_0030;
+    public static final int PatientsAge                         = 0x0010_1010;
 
-    public static final int ImageOrientationPatient             = 0x00200037;
+    public static final int ImageOrientationPatient             = 0x0020_0037;
 
-    public static final int SamplesPerPixel                     = 0x00280002;
-    public static final int Rows                                = 0x00280010;
-    public static final int Columns                             = 0x00280011;
-    public static final int PixelSpacing                        = 0x00280030;
-    public static final int BitsAllocated                       = 0x00280100;
-    public static final int BitsStored                          = 0x00280101;
-    public static final int HighBit                             = 0x00280102;
-    public static final int PixelRepresentation                 = 0x00280103;
-    public static final int WindowCenter                        = 0x00281050;
-    public static final int WindowWidth                         = 0x00281051;
+    public static final int SamplesPerPixel                     = 0x0028_0002;
+    public static final int Rows                                = 0x0028_0010;
+    public static final int Columns                             = 0x0028_0011;
+    public static final int PixelSpacing                        = 0x0028_0030;
+    public static final int BitsAllocated                       = 0x0028_0100;
+    public static final int BitsStored                          = 0x0028_0101;
+    public static final int HighBit                             = 0x0028_0102;
+    public static final int PixelRepresentation                 = 0x0028_0103;
+    public static final int WindowCenter                        = 0x0028_1050;
+    public static final int WindowWidth                         = 0x0028_1051;
 
-    public static final int GraphicAnnotationSequence           = 0x00700001;
+    public static final int GraphicAnnotationSequence           = 0x0070_0001;
+    public static final int GraphicLayer                        = 0x0070_0002;
+    public static final int GraphicAnnotationUnits              = 0x0070_0005;
+    public static final int UnformattedTextValue                = 0x0070_0006;
+    public static final int TextObjectSequence                  = 0x0070_0008;
+    public static final int GraphicObjectSequence               = 0x0070_0009;
+    public static final int AnchorPoint                         = 0x0070_0014;
+    public static final int AnchorPointVisibility               = 0x0070_0015;
+    public static final int GraphicDimensions                   = 0x0070_0020;
+    public static final int NumberOfGraphicPoints               = 0x0070_0021;
+    public static final int GraphicData                         = 0x0070_0022;
+    public static final int GraphicType                         = 0x0070_0023;
+    public static final int GraphicFilled                       = 0x0070_0024;
+    public static final int GraphicLayerSequence                = 0x0070_0060;
+    public static final int GraphicLayerOrder                   = 0x0070_0062;
+    public static final int GraphicLayerDescription             = 0x0070_0068;
+    public static final int ContentDescription                  = 0x0070_0081;
+    public static final int PresentationCreationDate            = 0x0070_0082;
+    public static final int PresentationCreationTime            = 0x0070_0083;
+    public static final int ContentCreatorsName                 = 0x0070_0084;
+    public static final int LineStyleSequence                   = 0x0070_0232;
+    public static final int PatternOnColorCIELabValue           = 0x0070_0251;
+    public static final int LineThickness                       = 0x0070_0253;
+    public static final int GraphicLayerRecommendedDisplayCIELabValue = 0x0070_0401;
 
-    public static final int GraphicLayer                        = 0x00700002;
-    public static final int GraphicAnnotationUnits              = 0x00700005;
-    public static final int TextObjectSequence                  = 0x00700008;
-    public static final int GraphicObjectSequence               = 0x00700009;
-    public static final int AnchorPoint                         = 0x00700014;
-    public static final int GraphicDimensions                   = 0x00700020;
-    public static final int NumberOfGraphicPoints               = 0x00700021;
-    public static final int GraphicData                         = 0x00700022;
-    public static final int GraphicType                         = 0x00700023;
-    public static final int GraphicFilled                       = 0x00700024;
-    public static final int GraphicLayerSequence                = 0x00700060;
-    public static final int GraphicLayerOrder                   = 0x00700062;
-    public static final int GraphicLayerDescription             = 0x00700068;
-    public static final int ContentDescription                  = 0x00700081;
-    public static final int PresentationCreationDate            = 0x00700082;
-    public static final int PresentationCreationTime            = 0x00700083;
-    public static final int ContentCreatorsName                 = 0x00700084;
-    public static final int LineStyleSequence                   = 0x00700232;
-    public static final int PatternOnColorCIELabValue           = 0x00700251;
-    public static final int LineThickness                       = 0x00700253;
-    public static final int GraphicLayerRecommendedDisplayCIELabValue = 0x00700401;
+    public static final int PixelData                           = 0x7fe0_0010;
 
-    public static final int PixelData                           = 0x7fe00010;
+    public static final int Item                                = 0xfffe_e000;
+    public static final int ItemDelimitationTag                 = 0xfffe_e00d;
+    public static final int SequenceDelimitationTag             = 0xfffe_e0dd;
 
-    public static final int Item                                = 0xfffee000;
-    public static final int ItemDelimitationTag                 = 0xfffee00d;
-    public static final int SequenceDelimitationTag             = 0xfffee0dd;
-
-    /**
-     * Map of defined tag.
-     */
+    // Map of defined tag.
     public static final Map<Integer, DICOMTag> c = new HashMap<Integer, DICOMTag>() {
         {
             put(FileMetaInformationGroupLength, new DICOMTag(FileMetaInformationGroupLength,
@@ -196,6 +195,9 @@ public class DICOMTag {
             put(GraphicAnnotationUnits, new DICOMTag(GraphicAnnotationUnits,
                     "Graphic Annotation Units",
                     DICOMValueRepresentation.c.get("CS")));
+            put(UnformattedTextValue, new DICOMTag(UnformattedTextValue,
+                    "Unformatted Text Value",
+                    DICOMValueRepresentation.c.get("ST")));
             put(TextObjectSequence, new DICOMTag(TextObjectSequence,
                     "Text Object Sequence",
                     DICOMValueRepresentation.c.get("SQ")));
@@ -205,6 +207,9 @@ public class DICOMTag {
             put(AnchorPoint, new DICOMTag(AnchorPoint,
                     "Anchor Point",
                     DICOMValueRepresentation.c.get("FL")));
+            put(AnchorPointVisibility, new DICOMTag(AnchorPointVisibility,
+                    "Anchor Point Visibility",
+                    DICOMValueRepresentation.c.get("CS")));
             put(GraphicDimensions, new DICOMTag(GraphicDimensions,
                     "Graphic Dimensions",
                     DICOMValueRepresentation.c.get("US")));
@@ -255,9 +260,7 @@ public class DICOMTag {
                     DICOMValueRepresentation.c.get("US")));
         }
     };
-    // ---------------------------------------------------------------
-    // - VARIABLES
-    // ---------------------------------------------------------------
+
     /**
      * Tag integer value.
      */
@@ -270,15 +273,12 @@ public class DICOMTag {
      * Tag value representation.
      */
     private final DICOMValueRepresentation mVR;
-    // ---------------------------------------------------------------
-    // + <static> FUNCTIONS
-    // ---------------------------------------------------------------
 
     /**
      * Create a DICOM tag using a tag integer value.
      *
      * @param tag Tag integer value
-     * @return
+     * @return DICOMTag
      */
     public static final DICOMTag createDICOMTag(int tag) {
         // If the tag is known by Droid Dicom Viewer
@@ -300,7 +300,7 @@ public class DICOMTag {
      *
      * @param tag Tag integer value
      * @param VR  Value representation.
-     * @return
+     * @return DICOMTag
      */
     public static final DICOMTag createDICOMTag(int tag, DICOMValueRepresentation VR) {
         String name;
@@ -318,36 +318,24 @@ public class DICOMTag {
         }
         return new DICOMTag(tag, name, VR);
     }
-    // ---------------------------------------------------------------
-    // + CONSTRUCTOR
-    // ---------------------------------------------------------------
 
     public DICOMTag(int tag, String name, DICOMValueRepresentation VR) {
         mTag = tag;
         mName = name;
         mVR = VR;
     }
-    // ---------------------------------------------------------------
-    // + FUNCTIONS
-    // ---------------------------------------------------------------
 
-    /**
-     * @return the mTag
-     */
+    // @return the mTag
     public int getTag() {
         return mTag;
     }
 
-    /**
-     * @return Tag UID as a String (group + element).
-     */
+    // @return Tag UID as a String (group + element).
     public String toString() {
         return getGroup() + getElement();
     }
 
-    /**
-     * @return Tag group as a String.
-     */
+    // @return Tag group as a String.
     public String getGroup() {
         String toReturn = Integer.toHexString((mTag >> 16) & 0xffff);
         while (toReturn.length() < 4)
@@ -355,9 +343,7 @@ public class DICOMTag {
         return toReturn;
     }
 
-    /**
-     * @return Tag element as a String.
-     */
+    // @return Tag element as a String.
     public String getElement() {
         String toReturn = Integer.toHexString((mTag) & 0xffff);
         while (toReturn.length() < 4)
@@ -365,16 +351,12 @@ public class DICOMTag {
         return toReturn;
     }
 
-    /**
-     * @return Tag description.
-     */
+    //@return Tag description.
     public String getName() {
         return mName;
     }
 
-    /**
-     * @return Value representation.
-     */
+    // @return Value representation.
     public DICOMValueRepresentation getValueRepresentation() {
         return mVR;
     }
