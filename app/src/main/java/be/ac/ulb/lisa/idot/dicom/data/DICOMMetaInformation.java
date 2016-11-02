@@ -1,13 +1,5 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
-/**
- * DICOM Meta Information.
- *
- * @author Pierre Malarme
- * @author Zhuravlev Aleksey
- * @author Vladyslav Vasyliev
- * @version 1.2
- */
 public class DICOMMetaInformation {
     private long mGroupLength = -1;
     private String mSOPClassUID = "";
@@ -18,9 +10,8 @@ public class DICOMMetaInformation {
     private String mAET = "";                            // Application Entity Title.
     private String mPatientBirthDate = "";
     private String mPatientName = "";
-    private String mPaitentAge = "";
-    private String mModality = "";
-    private double[] mPixelSpacing;
+    private String mPatientAge = "";
+    private double[] pixelSpacing;
 
     /**
      * @return the mGroupLength
@@ -88,15 +79,7 @@ public class DICOMMetaInformation {
      * @return patients age
      */
     public String getPatientAge() {
-        return mPaitentAge;
-    }
-
-    public String getModality() {
-        return mModality;
-    }
-
-    public void setModality(String modality) {
-        this.mModality = modality;
+        return mPatientAge;
     }
 
     /**
@@ -149,10 +132,10 @@ public class DICOMMetaInformation {
     }
 
     /**
-     * @param patientBirthDate the mImplementationPatientBirthDate to set
+     * @param mPatientBirthDate the mImplementationPatientBirthDate to set
      */
-    public void setPatientBirthDate(String patientBirthDate) {
-        this.mPatientBirthDate = patientBirthDate;
+    public void setmPatientBirthDate(String mPatientBirthDate) {
+        this.mPatientBirthDate = mPatientBirthDate;
     }
 
     /**
@@ -163,17 +146,17 @@ public class DICOMMetaInformation {
     }
 
     /**
-     * @param patientAge the mImplementationPatientAge to set
+     * @param patientName the mImplementationPatientAge to set
      */
-    public void setPatientAge(String patientAge) {
-        this.mPaitentAge = patientAge;
+    public void setPatientAge(String patientName) {
+        this.mPatientAge = patientName;
     }
 
     public void setPixelSpacing(double[] pixelSpacing) {
-        this.mPixelSpacing = pixelSpacing;
+        this.pixelSpacing = pixelSpacing;
     }
 
     public double[] getPixelSpacing() {
-        return mPixelSpacing;
+        return pixelSpacing;
     }
 }

@@ -41,7 +41,8 @@ public class DICOMGraphicObject {
             mPoints = new ArrayList<>();
         else
             mPoints.clear();
-        for (int i = 0; i < mNumberOfGraphicPoints; ++i)
+
+        for (int i = 0; i < mNumberOfGraphicPoints * 2; i += 2)
             mPoints.add(new PointF(points[i], points[i + 1]));
     }
 
