@@ -145,9 +145,10 @@ public class DICOMImageReader extends DICOMReader {
                     mImage.setWindowWidth(getIntFromStringArray(element));
                     break;
                 case DICOMTag.PatientsBirthDate:
-                    mMetadataInformation.setPatientBirthDate(element.getValueString());
+                    mMetadataInformation.setmPatientBirthDate(element.getValueString());
                     break;
                 case DICOMTag.PatientsName:
+                    mBody.setPatientName(element.getValueString());
                     mMetadataInformation.setPatientName(element.getValueString());
                     break;
                 case DICOMTag.PatientsAge:
@@ -161,7 +162,7 @@ public class DICOMImageReader extends DICOMReader {
                     mMetadataInformation.setPixelSpacing(ps);
                     break;
                 case DICOMTag.Modality:
-                    mMetadataInformation.setModality(element.getValueString());
+                    mBody.setModality(element.getValueString());
                     break;
             }
         }

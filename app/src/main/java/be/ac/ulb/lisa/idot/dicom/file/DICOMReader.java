@@ -28,16 +28,16 @@ public class DICOMReader extends DICOMBufferedInputStream {
     /**
      * Length of the preamble.
      */
-    private static final int PREAMBLE_LENGTH = 128;
+    protected static final int PREAMBLE_LENGTH = 128;
 
     /**
      * Prefix of DICOM file.
      */
-    private static final String PREFIX = "DICM";
-    private static final byte PREFIX_D = 68;
-    private static final byte PREFIX_I = 73;
-    private static final byte PREFIX_C = 67;
-    private static final byte PREFIX_M = 77;
+    protected static final String PREFIX = "DICM";
+    protected static final byte PREFIX_D = 68;
+    protected static final byte PREFIX_I = 73;
+    protected static final byte PREFIX_C = 67;
+    protected static final byte PREFIX_M = 77;
 
     // mModality of the image. Used in order to distinct presentation state files
     private String mModality = "";
@@ -213,9 +213,6 @@ public class DICOMReader extends DICOMBufferedInputStream {
         return toReturn;
     }
 
-    public final void parseAnnotations() {
-    }
-
     /**
      * Parse meta information.
      *
@@ -364,11 +361,6 @@ public class DICOMReader extends DICOMBufferedInputStream {
                     valueLength = readUnsignedLong();
                     mByteOffset += 4;
                 }
-//                String msg = String.format("(%04X,%04X) '%s' %s %s",                              // TODO: debug message
-//                        (tag & 0xffff0000) >>> 16, tag & 0xffff,
-//                        dicomTag.getName(),
-//                        vr.getVR(), vr.getName());
-//                System.out.println(msg);
                 valueLength = valueLength & 0xffffffffL;
                 // Get the value. If it is a sequence, read a new sequence
                 if (vr.equals("SQ") || vr.equals("UN") && valueLength == 0xffffffffL) {
@@ -376,8 +368,13 @@ public class DICOMReader extends DICOMBufferedInputStream {
                     if (!skipSequence || valueLength == 0xffffffffL) {
                         // Parse the sequence
                         element = new DICOMSequence(dicomTag);
+                        if ("PR".equals(mModality))
+                            // notify the reader function about the entry into the sequence
+                            dicomReaderFunctions.addDICOMElement(parentElement, element);
                         parseSequence((DICOMSequence) element, valueLength, isExplicit,
                                 dicomReaderFunctions, skipSequence);
+                        if ("PR".equals(mModality))
+                            element.setDICOMTag(DICOMTag.createDICOMTag(DICOMTag.SequenceDelimitationTag));
                     } else {
                         // Skip the value length
                         skip(valueLength);
@@ -389,11 +386,6 @@ public class DICOMReader extends DICOMBufferedInputStream {
                     dicomReaderFunctions.computeImage(parentElement, vr, valueLength);
                     continue; // Return to the while begin
                 } else if (valueLength != 0xffffffffL) {
-                    if (tag == DICOMTag.Modality) {
-                        mModality = readASCII((int) valueLength);
-                        mByteOffset += valueLength;
-                        continue;
-                    }
                     // If it's not a required element, skip it
                     if ((parentElement != null || !dicomReaderFunctions.isRequiredElement(tag))
                             && !"PR".equals(mModality)) {
@@ -442,9 +434,11 @@ public class DICOMReader extends DICOMBufferedInputStream {
                             || vr.equals("ST") || vr.equals("UT")) {
                         value = readString((int) valueLength, mSpecificCharset);
                         mByteOffset += valueLength;
-                        // Else interpreted as ASCII String
+                        // else interpreted as ASCII String
                     } else {
                         value = readASCII((int) valueLength);
+                        if (tag == DICOMTag.Modality)
+                            mModality = (String) value;
                         mByteOffset += valueLength;
                     }
                     // Create the element
@@ -484,7 +478,7 @@ public class DICOMReader extends DICOMBufferedInputStream {
      */
     protected void parseSequence(DICOMSequence sequence, long length, boolean isExplicit,
                                  DICOMReaderFunctions dicomReaderFunctions, boolean skipSequence)
-            throws IOException, EOFException, DICOMException {
+            throws IOException, DICOMException {
         if (sequence == null) {
             throw new NullPointerException("Null Sequence");
         }
@@ -500,22 +494,15 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 mByteOffset += 4;
                 long valueLength = readUnsignedLong();
                 mByteOffset += 4;
-//                String msg = String.format("SQ (%04X,%04X)",                                      // TODO: debug message
-//                        (tag & 0xffff0000) >>> 16, tag & 0xffff);
-//                System.out.println(msg);
                 // If the tag is an Item
                 if (tag == DICOMTag.SequenceDelimitationTag) {
-//                    System.out.println("Sequence Delimitation Item");                             // TODO: debug message
                     break;
                 } else if (tag == DICOMTag.Item) {
                     DICOMItem item = new DICOMItem();
-//                    System.out.println("--- Nested sequence ---");                                // TODO: debug message
                     parse(item, valueLength, isExplicit,
                             dicomReaderFunctions, skipSequence);
-//                    System.out.println("--- End of nested sequence ---");                         // TODO: debug message
                     sequence.addChild(item);
-                    // else if the tag is different that end
-                    // of sequence, this is not a sequence item
+                    // else if the tag is different that end of sequence, this is not a sequence item
                 } else {
                     throw new DICOMException("Error Sequence: unknown tag" + (tag >> 16) + (tag & 0xffff));
                 }
@@ -571,7 +558,7 @@ public class DICOMReader extends DICOMBufferedInputStream {
             if (parent != null)
                 return;
             int tag = element.getDICOMTag().getTag();
-            switch (tag){
+            switch (tag) {
                 case DICOMTag.MediaStorageSOPClassUID:
                     mMetaInformation.setSOPClassUID(element.getValueString());
                     break;
@@ -607,4 +594,5 @@ public class DICOMReader extends DICOMBufferedInputStream {
             throw new IOException("PixelData in Meta Information.");
         }
     }
+
 }
