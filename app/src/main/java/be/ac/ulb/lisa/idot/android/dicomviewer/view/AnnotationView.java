@@ -37,6 +37,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     private boolean lateStart = true;
     private int mIndexToDelete;
     private GestureDetector mGestureDetector = new GestureDetector(this.getContext(),new GestureListener());
+    private boolean mDoubleTap = false;
     public AnnotationView(Context context) {
         super(context);
         init();
@@ -111,18 +112,18 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 break;
             case MotionEvent.ACTION_UP:
                 double distnce= Math.sqrt(Math.pow(startPoint.x-x,2)+Math.sqrt(Math.pow(startPoint.y-y,2)));
-                if(distnce>10){
+                if(distnce>10 && mCurrentPath.paths.size()>5){
                     touch_up();
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
                     askForAnnotationText();
                     this.invalidate();
                     this.mCustomPaths.add(this.mCurrentPath);
                     init();
-                }else{
+                }//else{
                     //trassByLight(startPoint);//pointInPolygonProblem(startPoint);
                     //invalidate();
 
-                }
+                //}
                 startPoint=null;
                 break;
         }
@@ -237,8 +238,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     mIndexToDelete=i;
                     //selected =mCustomPaths.remove(mIndexToDelete);
                     //mPaints.remove(mIndexToDelete+1);
-                    agrementToDelete();
-                    return selected;
+                    return selected = mCustomPaths.get(i);
                 }
             }
         }
@@ -295,11 +295,40 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         } );
         builder.show();
     }
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
 
+    private void showtingText(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setTitle(getResources().getString(R.string.title_for_double_tap_aler_dialog));
+        final TextView textView = new TextView(this.getContext());
+        textView.setText(mCurrentPath.text);
+        builder.setView(textView);
+        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mDoubleTap=false;
+                drawIt();
+                dialog.cancel();
+            }
+        } );
+        builder.show();
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent event){
+            if(!mDoubleTap){
+                mCurrentPath = trassByLight(new PointF(event.getX(),event.getY()));
+                showtingText();
+                mDoubleTap=true;
+            }
+
+            return true;
+        }
         @Override
         public void onLongPress(MotionEvent e){
             trassByLight(startPoint);//pointInPolygonProblem(startPoint);
+            agrementToDelete();
             invalidate();
         }
     }
