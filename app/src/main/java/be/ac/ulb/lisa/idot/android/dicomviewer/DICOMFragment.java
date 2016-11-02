@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
+import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,10 +32,13 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.view.FigureDrawingView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
+import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMFileFilter;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMImageReader;
+import be.ac.ulb.lisa.idot.dicom.file.DICOMPresentationStateReader;
 import be.ac.ulb.lisa.idot.image.data.LISAImageGray16Bit;
 import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitReader;
 import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
@@ -75,6 +79,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     private FigureDrawingView mFigureView;                  // the image view with drawing the figure
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
+    DICOMPresentationState mPresentationState = null;        // Presentation State of the file (Contains annotations)
     private LISAImageGray16Bit mImage = null;               // The LISA 16-Bit image
     private boolean mIsInitialized = false;                 //Set if the DICOM Viewer is initialized or not
     private ListView mListMetadata;                         // List view that is used to output metadata
@@ -571,6 +576,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 //                    showDialog(PROGRESS_DIALOG_LOAD);
                     break;
                 case ThreadState.PROGRESSION_UPDATE:
+                    if (message.obj == null) {
+                        mArrayAdapter.clear();
+                        mArrayAdapter.add(new Pair<>("No metadata available", "No metadata available"));
+                    }
                     if (message.obj instanceof DICOMMetaInformation) {
                         mArrayAdapter.clear();
                         // output information from metadata
@@ -593,10 +602,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                         mArrayAdapter.add(new Pair<>(keyName, processAttribute(name, anonymous)));
                         mArrayAdapter.add(new Pair<>(keyAge, processAttribute(age, anonymous)));
                         mArrayAdapter.add(new Pair<>(keyBirthDate, processAttribute(birthDate, anonymous)));
-                    }
-                    if (message.obj == null) {
-                        mArrayAdapter.clear();
-                        mArrayAdapter.add(new Pair<>("No metadata available", "No metadata available"));
+                    } else if (message.obj instanceof DICOMPresentationState) {
+                        mPresentationState = (DICOMPresentationState) message.obj;
                     }
                     break;
                 case ThreadState.FINISHED:
@@ -680,11 +687,31 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mHandler.sendMessage(message);
                 return;
             }
+            // This part of the code reads presentations state information of the
+            // DICOM file. It includes annotations.
+            DICOMPresentationState presentationState = null;
             try {
-                File presentationFile = new File(mFile.getCanonicalPath() + ".ps");     // TODO
-            } catch (IOException e) {
-                e.printStackTrace();
+                File presentationFile = new File(mFile.getCanonicalPath() + ".ps");
+                if (presentationFile.exists()) {
+                    DICOMPresentationStateReader stateReader;
+                    stateReader = new DICOMPresentationStateReader(presentationFile);
+                    presentationState = stateReader.parse();
+                    stateReader.close();
+                }
+            } catch (IOException | DICOMException  ex) {
+                Message message = mHandler.obtainMessage();
+                message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
+                message.obj = ex.getMessage();
+                mHandler.sendMessage(message);
             }
+            Message message;
+            message = mHandler.obtainMessage();
+            message.what = ThreadState.PROGRESSION_UPDATE;
+            message.obj = presentationState;
+            mHandler.sendMessage(message);
+
+            DICOMImage dicomImage;
+            DICOMImageReader dicomFileReader;
             // If image exists show image
             try {
                 LISAImageGray16BitReader reader =
@@ -692,12 +719,12 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
                 LISAImageGray16Bit image = reader.parseImage();
                 reader.close();
-                DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
-                DICOMImage dicomImage = dicomFileReader.parse();
+                dicomFileReader = new DICOMImageReader(mFile);
+                dicomImage = dicomFileReader.parse();
                 readMetadata(dicomImage);
                 dicomFileReader.close();
                 // Send the LISA 16-Bit grayscale image
-                Message message = mHandler.obtainMessage();
+                message = mHandler.obtainMessage();
                 message.what = ThreadState.FINISHED;
                 message.obj = image;
                 mHandler.sendMessage(message);
@@ -709,12 +736,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             // progress dialog in spinner mode
             mHandler.sendEmptyMessage(ThreadState.STARTED);
             try {
-                DICOMImageReader dicomFileReader = new DICOMImageReader(mFile);
-                DICOMImage dicomImage = dicomFileReader.parse();
+                dicomFileReader = new DICOMImageReader(mFile);
+                dicomImage = dicomFileReader.parse();
                 readMetadata(dicomImage);
                 dicomFileReader.close();
 
-                Message message;
                 // If the image is uncompressed, show it and cached it.
                 if (dicomImage.isUncompressed()) {
                     LISAImageGray16BitWriter out =
@@ -740,14 +766,14 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             } catch (OutOfMemoryError ex) {
                 File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
                 fCleanup.delete();
-                Message message = mHandler.obtainMessage();
+                message = mHandler.obtainMessage();
                 message.what = ThreadState.OUT_OF_MEMORY;
                 message.obj = ex.getMessage();
                 mHandler.sendMessage(message);
             } catch (Exception ex) {
                 File fCleanup = new File(mFile.getAbsolutePath() + ".lisa");
                 fCleanup.delete();
-                Message message = mHandler.obtainMessage();
+                message = mHandler.obtainMessage();
                 message.what = ThreadState.UNCATCHABLE_ERROR_OCCURRED;
                 message.obj = ex.getMessage();
                 mHandler.sendMessage(message);

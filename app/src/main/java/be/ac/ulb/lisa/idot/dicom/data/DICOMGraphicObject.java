@@ -5,9 +5,12 @@ import android.graphics.PointF;
 import java.util.*;
 
 /**
- * Created by vlad on 02.11.2016.
+ * This class represent one graphical object of the DICOM's graphical annotation.
+ *
+ * @author Vladyslav Vasyliev
  */
 public class DICOMGraphicObject {
+    // Possible types of the graphical object
     public interface GraphicTypes {
         String POINT = "POINT";
         String POLYLINE = "POLYLINE";
@@ -17,10 +20,15 @@ public class DICOMGraphicObject {
 
         Set<String> TYPES = new HashSet<>(Arrays.asList(POINT, POLYLINE, INTERPOLATED, CIRCLE, ELLIPSE));
     }
-    // graphic part of the annotation
+
+    // Number of points associated with this annotation.
     private int mNumberOfGraphicPoints;
+    // Points of the graphical object. Specified in term of DICOM pixels.
     private List<PointF> mPoints;
+    // Type of the graphical object. Possible types specified in GraphicTypes interface.
     private String mGraphicType;
+    // If this flag is set then the graphical object should be filled with a color,
+    // otherwise it should not.
     private boolean mGraphicFilled;
 
     public int getNumberOfGraphicPoints() {

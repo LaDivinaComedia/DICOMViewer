@@ -11,6 +11,10 @@ import java.io.IOException;
 
 
 /**
+ * This file implements reader functions for the DICOMBody entity.
+ * This is a common part of the DICOM files.
+ * All other DICOM reader functions should be inherited from this class.
+ *
  * @author Vladyslav Vasyliev
  * @version 1.0
  */

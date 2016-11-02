@@ -1,6 +1,8 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
 /**
+ * DICOM Presentation State Meta Information.
+ *
  * @author Vladyslav Vasyliev
  */
 public class DICOMMetaInformationPS extends DICOMMetaInformation {

@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by vlad on 02.11.2016.
+ * DICOM Presentation State File Eeader.
+ *
+ * @author Vladyslav Vasyliev
  */
 public class DICOMPresentationStateReader extends DICOMReader {
     public DICOMPresentationStateReader(File file) throws FileNotFoundException {

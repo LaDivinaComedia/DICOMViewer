@@ -1,7 +1,7 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
 /**
- * DICOM tags
+ * DICOM Meta Information.
  *
  * @author Pierre Malarme
  * @author Vladyslav Vasyliev
