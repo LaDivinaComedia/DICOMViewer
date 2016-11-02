@@ -1,6 +1,8 @@
 package be.ac.ulb.lisa.idot.android.dicomviewer.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
  * Created by vvanichkov on 24.10.2016.
  */
 
-public class AnnotationView extends ToolView implements View.OnTouchListener {
+public class AnnotationView extends ToolView implements View.OnTouchListener,View.OnLongClickListener{
 //    private ArrayList<Paint> mPaints = new ArrayList<Paint>();
     private ArrayList<CustomPath> mCustomPaths = new ArrayList<CustomPath>();
     private ArrayList<Paint> mPaints;
@@ -25,6 +27,10 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
     private int mImageWidth;
     private int mImageHeight;
     private boolean inbound = true;
+    private PointF startPoint = null;
+    private boolean lateStart = true;
+    private boolean mDeleteAnnotation = false;
+    private int mIndexToDelete;
     public AnnotationView(Context context) {
         super(context);
         init();
@@ -53,7 +59,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
             mPaints = new ArrayList<Paint>();
         mPaints.add(initPaint());
     }
+    @Override
+    public boolean onLongClick(View v) {
 
+        return true;
+    }
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
@@ -73,26 +83,45 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
             else if((centerY+this.mImageHeight*this.mScaleFactor/2)<y)
                 y=(centerY+this.mImageHeight*this.mScaleFactor/2);
         }
+
         switch (event.getAction()& MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                touch_start(x, y);
-                this.invalidate();
+                if(this.startPoint==null)
+                    startPoint = new PointF(event.getX(),event.getY());
+                if(!lateStart){
+                    touch_start(x, y);
+                    this.invalidate();
+                }
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(!inbound){
                     inbound=true;
-                    init();
+                    //init();
                     touch_start(x,y);
+                }
+                if(lateStart){
+                    touch_start(x, y);
+                    lateStart = false;
                 }
                 touch_move(x, y);
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                touch_up();
-                mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
-                this.invalidate();
-                this.mCustomPaths.add(this.mCurrentPath);
-                init();
+                double distnce= Math.sqrt(Math.pow(startPoint.x-x,2)+Math.sqrt(Math.pow(startPoint.y-y,2)));
+                if(distnce>10){
+                    touch_up();
+                    mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
+                    this.invalidate();
+                    this.mCustomPaths.add(this.mCurrentPath);
+                    init();
+                }else{
+                    if(event.getDownTime()>1000){
+                        trassByLight(startPoint);//pointInPolygonProblem(startPoint);
+                        invalidate();
+                    }
+                }
+                startPoint=null;
                 break;
         }
         return true;
@@ -142,6 +171,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
         mCustomPaths = new ArrayList<CustomPath>();
         mPaints = new ArrayList<Paint>();
         mPaints.add(initPaint());
+        //setOnLongClickListener(this);
     }
     public void setBounds(int imageWidth, int imageHeight, float scaleFactor){
         this.mImageWidth = imageWidth;
@@ -149,6 +179,93 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
         this.mScaleFactor = scaleFactor;
 
     }
+    private void drawIt(){
+        invalidate();
+    }
+    private CustomPath pointInPolygonProblem(PointF currentPoint){
+        CustomPath selected = null;
+        double epsilon=0.1;
+        for(int i=this.mCustomPaths.size()-1;i>=0;i--){
+            float sums = 0;
+            for(int j=1;j<mCustomPaths.get(i).paths.size();j++){
+                float[] vector_i_1 = new float[2];
+                float[] vector_i = new float[2];
+                vector_i_1[0] = mCustomPaths.get(i).paths.get(j-1).x-currentPoint.x;
+                vector_i[0] = mCustomPaths.get(i).paths.get(j).x-currentPoint.x;
+                vector_i_1[1] = mCustomPaths.get(i).paths.get(j-1).y-currentPoint.y;
+                vector_i[1] = mCustomPaths.get(i).paths.get(j).y-currentPoint.y;
+                double zn = vector_i_1[0]*vector_i[1]-vector_i_1[1]*vector_i[0];
+                double t1 = Math.sqrt(Math.pow(vector_i[0],2)+Math.pow(vector_i[1],2));
+                double t2 = Math.sqrt(Math.pow(vector_i_1[0],2)+Math.pow(vector_i_1[1],2));
+                double result = zn/(t1*t2);
+                if ((result-1)<=epsilon && result>=0){
+                    result = 1;
+                }else if((result-1)>0.2){
+                    return null;
+                }
+                double arccos = Math.acos(result);
+                double det = vector_i_1[0]*vector_i[1]-vector_i[0]*vector_i_1[1];
+                sums+=arccos*Math.signum(det);
+            }
+            if(sums<epsilon && sums>-epsilon){
+                selected = this.mCustomPaths.remove(i);
+                mPaints.remove(i+1);
+
+                break;
+            }
+        }
+        return selected;
+    }
+
+    private CustomPath trassByLight(PointF current){
+        CustomPath selected = null;
+        for(int i=this.mCustomPaths.size()-1;i>=0;i--){
+            ArrayList<PointF> path = mCustomPaths.get(i).paths;
+            for(int j=1;j<path.size();j++){
+                float x_i = path.get(j).x;
+                float y_i = path.get(j).y;
+                float x_i_1 = path.get(j-1).x;
+                float y_i_1 = path.get(j-1).y;
+                if(
+                        ((y_i<=current.y && current.y <y_i_1) || (y_i_1<=current.y && current.y<y_i))
+                        &&
+                         (current.x>(x_i_1-x_i)*(current.y-y_i)/(y_i_1-y_i)+x_i)
+                  ){
+                    mIndexToDelete=i;
+                    //selected =mCustomPaths.remove(mIndexToDelete);
+                    //mPaints.remove(mIndexToDelete+1);
+                    agrementToDelete();
+                    return selected;
+                }
+            }
+        }
+        return selected;
+    }
+    private void agrementToDelete(){
+        AlertDialog.Builder buil = new AlertDialog.Builder(this.getContext());
+        buil.setTitle("Are you agree to delete this Annotaion?");
+        //final EditText input = new EditText(this.getContext());
+        //input.setInputType(InputType.TYPE_CLASS_TEXT);
+        buil.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mDeleteAnnotation = true;
+                mCustomPaths.remove(mIndexToDelete);
+                mPaints.remove(mIndexToDelete+1);
+                drawIt();
+            }
+        });
+        buil.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mDeleteAnnotation = false;
+                dialog.cancel();
+
+            }
+        });
+        buil.show();
+    }
+
     private class CustomPath{
         public PointF mStart;
         public PointF mEnd;
