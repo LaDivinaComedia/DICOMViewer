@@ -8,17 +8,23 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.text.InputType;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import be.ac.ulb.lisa.idot.android.dicomviewer.R;
 
 /**
  * Created by vvanichkov on 24.10.2016.
  */
 
-public class AnnotationView extends ToolView implements View.OnTouchListener,View.OnLongClickListener{
+public class AnnotationView extends ToolView implements View.OnTouchListener{
 //    private ArrayList<Paint> mPaints = new ArrayList<Paint>();
     private ArrayList<CustomPath> mCustomPaths = new ArrayList<CustomPath>();
     private ArrayList<Paint> mPaints;
@@ -29,8 +35,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
     private boolean inbound = true;
     private PointF startPoint = null;
     private boolean lateStart = true;
-    private boolean mDeleteAnnotation = false;
     private int mIndexToDelete;
+    private GestureDetector mGestureDetector = new GestureDetector(this.getContext(),new GestureListener());
     public AnnotationView(Context context) {
         super(context);
         init();
@@ -60,11 +66,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
         mPaints.add(initPaint());
     }
     @Override
-    public boolean onLongClick(View v) {
-
-        return true;
-    }
-    @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
@@ -86,8 +87,9 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
 
         switch (event.getAction()& MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if(this.startPoint==null)
+                if(this.startPoint==null){
                     startPoint = new PointF(event.getX(),event.getY());
+                }
                 if(!lateStart){
                     touch_start(x, y);
                     this.invalidate();
@@ -112,18 +114,19 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
                 if(distnce>10){
                     touch_up();
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
+                    askForAnnotationText();
                     this.invalidate();
                     this.mCustomPaths.add(this.mCurrentPath);
                     init();
                 }else{
-                    if(event.getDownTime()>1000){
-                        trassByLight(startPoint);//pointInPolygonProblem(startPoint);
-                        invalidate();
-                    }
+                    //trassByLight(startPoint);//pointInPolygonProblem(startPoint);
+                    //invalidate();
+
                 }
                 startPoint=null;
                 break;
         }
+        mGestureDetector.onTouchEvent(event);
         return true;
     }
 
@@ -243,13 +246,14 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
     }
     private void agrementToDelete(){
         AlertDialog.Builder buil = new AlertDialog.Builder(this.getContext());
-        buil.setTitle("Are you agree to delete this Annotaion?");
-        //final EditText input = new EditText(this.getContext());
-        //input.setInputType(InputType.TYPE_CLASS_TEXT);
-        buil.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        final TextView textView = new TextView(this.getContext());
+        buil.setTitle(getResources().getString(R.string.title_for_delete_alert_dialog));
+        textView.setText("Annotation:\r\n"+mCustomPaths.get(mIndexToDelete).text);
+        textView.setTextSize(12);
+        buil.setView(textView);
+        buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mDeleteAnnotation = true;
                 mCustomPaths.remove(mIndexToDelete);
                 mPaints.remove(mIndexToDelete+1);
                 drawIt();
@@ -258,7 +262,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
         buil.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mDeleteAnnotation = false;
                 dialog.cancel();
 
             }
@@ -266,11 +269,46 @@ public class AnnotationView extends ToolView implements View.OnTouchListener,Vie
         buil.show();
     }
 
+    private void askForAnnotationText(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setTitle(getResources().getString(R.string.title_for_asking_aler_dialog));
+        final EditText input = new EditText(this.getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mCustomPaths.get(mCustomPaths.size()-1).text = input.getText().toString();
+                System.out.println(input.getText().toString());
+            }
+        });
+        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mCustomPaths.remove(mCustomPaths.size()-1);
+                mPaints.remove(mCustomPaths.size());
+                drawIt();
+                dialog.cancel();
+            }
+        } );
+        builder.show();
+    }
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
+
+        @Override
+        public void onLongPress(MotionEvent e){
+            trassByLight(startPoint);//pointInPolygonProblem(startPoint);
+            invalidate();
+        }
+    }
     private class CustomPath{
         public PointF mStart;
         public PointF mEnd;
         public PointF mCurrent;
         public Path mPath = new Path();
+        public String text;
         private ArrayList<PointF> paths = new ArrayList<>();
 
         public void addToPath(PointF point) {

@@ -65,7 +65,8 @@
     </string-array>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
+    <string name="title_for_delete_alert_dialog">Are you agree to delete this Annotation?</string>
+    <string name="title_for_asking_aler_dialog">Save annotatin?\r\nInput text annotation</string>
     <string name="on">On</string>
     <string name="off">Off</string>
 
