@@ -3,9 +3,7 @@ package be.ac.ulb.lisa.idot.dicom.file;
 import android.graphics.PointF;
 
 import be.ac.ulb.lisa.idot.dicom.*;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMGraphicObject;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMTextObject;
+import be.ac.ulb.lisa.idot.dicom.data.*;
 
 import java.io.*;
 import java.util.*;
@@ -15,14 +13,16 @@ import java.util.*;
  *
  * @author Vladyslav Vasyliev
  */
-public class DICOMAnnotationFunctions implements DICOMReaderFunctions {
+public class DICOMPresentationStateFunctions implements DICOMReaderFunctions {
+    private DICOMMetaInformationPS mMetaInformation;
     private DICOMAnnotation mAnnotation;
     private DICOMTextObject mTextObject;
     private DICOMGraphicObject mGraphicObject;
     private Dictionary<String, DICOMAnnotation> mAnnotations;
 
-    public DICOMAnnotationFunctions() {
+    public DICOMPresentationStateFunctions(DICOMMetaInformationPS metaInformation) {
         mAnnotations = new Hashtable<>();
+        mMetaInformation = metaInformation;
     }
 
     public Enumeration<DICOMAnnotation> getAnnotations() {
@@ -106,6 +106,23 @@ public class DICOMAnnotationFunctions implements DICOMReaderFunctions {
                 mAnnotation.setLayerOrder(layerOrder);
                 break;
 
+            // Presentation State Description
+            case DICOMTag.ContentLabel:
+                mMetaInformation.setContentLabel(element.getValueString());
+                break;
+            case DICOMTag.ContentDescription:
+                mMetaInformation.setContentDescription(element.getValueString());
+                break;
+            case DICOMTag.PresentationCreationDate:
+                mMetaInformation.setPresentationCreationDate(element.getValueString());
+                break;
+            case DICOMTag.PresentationCreationTime:
+                mMetaInformation.setPresentationCreationTime(element.getValueString());
+                break;
+            case DICOMTag.ContentCreatorsName:
+                mMetaInformation.setContentCreatorsName(element.getValueString());
+                break;
+
             // --- UNUSED ---
             // Line Style Sequence Macro Attributes
             // Line Style Sequence
@@ -118,17 +135,7 @@ public class DICOMAnnotationFunctions implements DICOMReaderFunctions {
             case DICOMTag.LineThickness:
                 break;
 
-            // Presentation State Description
-            case DICOMTag.PresentationCreationDate:
-                break;
-            case DICOMTag.PresentationCreationTime:
-                break;
-            case DICOMTag.ContentCreatorsName:
-                break;
-
             case DICOMTag.GraphicLayerDescription:
-                break;
-            case DICOMTag.ContentDescription:
                 break;
             case DICOMTag.GraphicLayerRecommendedDisplayCIELabValue:
                 break;
@@ -137,32 +144,34 @@ public class DICOMAnnotationFunctions implements DICOMReaderFunctions {
 
     @Override
     public boolean isRequiredElement(int tag) {
-        return (tag == DICOMTag.GraphicAnnotationSequence)
-                || (tag == DICOMTag.GraphicLayer)
-                || (tag == DICOMTag.GraphicAnnotationUnits)
-                || (tag == DICOMTag.UnformattedTextValue)
-                || (tag == DICOMTag.TextObjectSequence)
-                || (tag == DICOMTag.GraphicObjectSequence)
-                || (tag == DICOMTag.AnchorPoint)
-                || (tag == DICOMTag.AnchorPointVisibility)
-                || (tag == DICOMTag.GraphicDimensions)
-                || (tag == DICOMTag.NumberOfGraphicPoints)
-                || (tag == DICOMTag.GraphicData)
-                || (tag == DICOMTag.GraphicType)
-                || (tag == DICOMTag.GraphicFilled)
-                || (tag == DICOMTag.GraphicLayerSequence)
-                || (tag == DICOMTag.GraphicLayerOrder)
-                || (tag == DICOMTag.GraphicLayerDescription)
-                || (tag == DICOMTag.ContentDescription)
-                || (tag == DICOMTag.PresentationCreationDate)
-                || (tag == DICOMTag.PresentationCreationTime)
-                || (tag == DICOMTag.ContentCreatorsName)
-                || (tag == DICOMTag.LineStyleSequence)
-                || (tag == DICOMTag.PatternOnColorCIELabValue)
-                || (tag == DICOMTag.LineThickness)
-                || (tag == DICOMTag.GraphicLayerRecommendedDisplayCIELabValue)
+        return tag == DICOMTag.GraphicAnnotationSequence
+                || tag == DICOMTag.GraphicLayer
+                || tag == DICOMTag.GraphicAnnotationUnits
+                || tag == DICOMTag.UnformattedTextValue
+                || tag == DICOMTag.TextObjectSequence
+                || tag == DICOMTag.GraphicObjectSequence
+                || tag == DICOMTag.AnchorPoint
+                || tag == DICOMTag.AnchorPointVisibility
+                || tag == DICOMTag.GraphicDimensions
+                || tag == DICOMTag.NumberOfGraphicPoints
+                || tag == DICOMTag.GraphicData
+                || tag == DICOMTag.GraphicType
+                || tag == DICOMTag.GraphicFilled
+                || tag == DICOMTag.GraphicLayerSequence
+                || tag == DICOMTag.GraphicLayerOrder
+                || tag == DICOMTag.GraphicLayerDescription
+                || tag == DICOMTag.LineStyleSequence
+                || tag == DICOMTag.PatternOnColorCIELabValue
+                || tag == DICOMTag.LineThickness
+                || tag == DICOMTag.GraphicLayerRecommendedDisplayCIELabValue
+                // Presentation State Description
+                || tag == DICOMTag.ContentLabel
+                || tag == DICOMTag.ContentDescription
+                || tag == DICOMTag.PresentationCreationDate
+                || tag == DICOMTag.PresentationCreationTime
+                || tag == DICOMTag.ContentCreatorsName
 
-                || (tag == DICOMTag.Modality);
+                || tag == DICOMTag.Modality;
     }
 
     @Override

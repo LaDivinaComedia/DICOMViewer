@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * DICOM tags
+ * DICOM tag.
  *
  * @author Vladyslav Vasyliev
  * @author Pierre Malarme
@@ -62,6 +62,7 @@ public class DICOMTag {
     public static final int GraphicLayerSequence                = 0x0070_0060;
     public static final int GraphicLayerOrder                   = 0x0070_0062;
     public static final int GraphicLayerDescription             = 0x0070_0068;
+    public static final int ContentLabel                        = 0x0070_0080;
     public static final int ContentDescription                  = 0x0070_0081;
     public static final int PresentationCreationDate            = 0x0070_0082;
     public static final int PresentationCreationTime            = 0x0070_0083;
@@ -77,7 +78,9 @@ public class DICOMTag {
     public static final int ItemDelimitationTag                 = 0xfffe_e00d;
     public static final int SequenceDelimitationTag             = 0xfffe_e0dd;
 
-    // Map of defined tag.
+    /**
+     * Map of defined tag.
+     */
     public static final Map<Integer, DICOMTag> c = new HashMap<Integer, DICOMTag>() {
         {
             put(FileMetaInformationGroupLength, new DICOMTag(FileMetaInformationGroupLength,
@@ -234,6 +237,9 @@ public class DICOMTag {
             put(GraphicLayerDescription, new DICOMTag(GraphicLayerDescription,
                     "Graphic Layer Description",
                     DICOMValueRepresentation.c.get("LO")));
+            put(ContentLabel, new DICOMTag(ContentLabel,
+                    "Content Label",
+                    DICOMValueRepresentation.c.get("CS")));
             put(ContentDescription, new DICOMTag(ContentDescription,
                     "Content Description",
                     DICOMValueRepresentation.c.get("LO")));
@@ -260,7 +266,9 @@ public class DICOMTag {
                     DICOMValueRepresentation.c.get("US")));
         }
     };
-
+    // ---------------------------------------------------------------
+    // - VARIABLES
+    // ---------------------------------------------------------------
     /**
      * Tag integer value.
      */
@@ -273,12 +281,15 @@ public class DICOMTag {
      * Tag value representation.
      */
     private final DICOMValueRepresentation mVR;
+    // ---------------------------------------------------------------
+    // + <static> FUNCTIONS
+    // ---------------------------------------------------------------
 
     /**
      * Create a DICOM tag using a tag integer value.
      *
      * @param tag Tag integer value
-     * @return DICOMTag
+     * @return
      */
     public static final DICOMTag createDICOMTag(int tag) {
         // If the tag is known by Droid Dicom Viewer
@@ -300,7 +311,7 @@ public class DICOMTag {
      *
      * @param tag Tag integer value
      * @param VR  Value representation.
-     * @return DICOMTag
+     * @return
      */
     public static final DICOMTag createDICOMTag(int tag, DICOMValueRepresentation VR) {
         String name;
@@ -318,24 +329,36 @@ public class DICOMTag {
         }
         return new DICOMTag(tag, name, VR);
     }
+    // ---------------------------------------------------------------
+    // + CONSTRUCTOR
+    // ---------------------------------------------------------------
 
     public DICOMTag(int tag, String name, DICOMValueRepresentation VR) {
         mTag = tag;
         mName = name;
         mVR = VR;
     }
+    // ---------------------------------------------------------------
+    // + FUNCTIONS
+    // ---------------------------------------------------------------
 
-    // @return the mTag
+    /**
+     * @return the mTag
+     */
     public int getTag() {
         return mTag;
     }
 
-    // @return Tag UID as a String (group + element).
+    /**
+     * @return Tag UID as a String (group + element).
+     */
     public String toString() {
         return getGroup() + getElement();
     }
 
-    // @return Tag group as a String.
+    /**
+     * @return Tag group as a String.
+     */
     public String getGroup() {
         String toReturn = Integer.toHexString((mTag >> 16) & 0xffff);
         while (toReturn.length() < 4)
@@ -343,7 +366,9 @@ public class DICOMTag {
         return toReturn;
     }
 
-    // @return Tag element as a String.
+    /**
+     * @return Tag element as a String.
+     */
     public String getElement() {
         String toReturn = Integer.toHexString((mTag) & 0xffff);
         while (toReturn.length() < 4)
@@ -351,12 +376,16 @@ public class DICOMTag {
         return toReturn;
     }
 
-    //@return Tag description.
+    /**
+     * @return Tag description.
+     */
     public String getName() {
         return mName;
     }
 
-    // @return Value representation.
+    /**
+     * @return Value representation.
+     */
     public DICOMValueRepresentation getValueRepresentation() {
         return mVR;
     }

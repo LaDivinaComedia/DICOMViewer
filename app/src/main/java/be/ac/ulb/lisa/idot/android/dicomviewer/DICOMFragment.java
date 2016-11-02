@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.PairArrayAdapter;
@@ -678,6 +679,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 message.obj = "The file doesn't exist.";
                 mHandler.sendMessage(message);
                 return;
+            }
+            try {
+                File presentationFile = new File(mFile.getCanonicalPath() + ".ps");     // TODO
+            } catch (IOException e) {
+                e.printStackTrace();
             }
             // If image exists show image
             try {

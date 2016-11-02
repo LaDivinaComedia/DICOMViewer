@@ -2,7 +2,8 @@ package be.ac.ulb.lisa.idot.dicom.file;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
 
 import java.io.EOFException;
 import java.io.File;
@@ -11,24 +12,24 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by vlad on 02.11.2016.
+ * @author Vladyslav Vasyliev
  */
-public class DICOMAnnotationReader extends DICOMReader {
-    public DICOMAnnotationReader(File file) throws FileNotFoundException {
+public class DICOMPresentationStateReader extends DICOMReader {
+    public DICOMPresentationStateReader(File file) throws FileNotFoundException {
         super(file);
     }
 
-    public DICOMAnnotationReader(String fileName) throws FileNotFoundException {
+    public DICOMPresentationStateReader(String fileName) throws FileNotFoundException {
         super(fileName);
     }
 
-    public final void parse() throws IOException, EOFException, DICOMException {
+    public final DICOMPresentationState parse() throws IOException, EOFException, DICOMException {
         // Variables declaration
-        DICOMMetaInformation metaInformation = null;
+        DICOMMetaInformationPS metaInformation = null;
         boolean isExplicit;
         // Parse meta information
         if (hasMetaInformation()) {
-            metaInformation = parseMetaInformation();
+            metaInformation = new DICOMMetaInformationPS(parseMetaInformation());
             String transferSyntaxUID = metaInformation.getTransferSyntaxUID();
             if (transferSyntaxUID.equals("1.2.840.10008.1.2")) {
                 isExplicit = false;
@@ -49,10 +50,10 @@ public class DICOMAnnotationReader extends DICOMReader {
             setByteOrder(LITTLE_ENDIAN);
         }
         // Parse the body
-        DICOMAnnotationFunctions readerFunctions = new DICOMAnnotationFunctions();
+        DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
-        System.out.println(annotations);
+        return new DICOMPresentationState(metaInformation, annotations);
     }
 
 }

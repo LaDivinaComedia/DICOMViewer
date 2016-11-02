@@ -145,7 +145,7 @@ public class DICOMImageReader extends DICOMReader {
                     mImage.setWindowWidth(getIntFromStringArray(element));
                     break;
                 case DICOMTag.PatientsBirthDate:
-                    mMetadataInformation.setmPatientBirthDate(element.getValueString());
+                    mMetadataInformation.setPatientBirthDate(element.getValueString());
                     break;
                 case DICOMTag.PatientsName:
                     mBody.setPatientName(element.getValueString());
