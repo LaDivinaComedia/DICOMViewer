@@ -1,593 +1,299 @@
-/*
-*
-* Copyright (C) 2011 Pierre Malarme
-*
-* Authors: Pierre Malarme <pmalarme at ulb.ac.be>
-*
-* Institution: Laboratory of Image Synthesis and Analysis (LISA)
-*              Faculty of Applied Science
-*              Universite Libre de Bruxelles (U.L.B.)
-*
-* Website: http://lisa.ulb.ac.be
-*
-* This file <DICOMBody.java> is part of Droid Dicom Viewer.
-*
-* Droid Dicom Viewer is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Droid Dicom Viewer is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Droid Dicom Viewer. If not, see <http://www.gnu.org/licenses/>.
-*
-* Released date: 17-02-2011
-*
-* Version: 1.0
-*
-*/
 package be.ac.ulb.lisa.idot.dicom.data;
 
+/**
+ * DICOM Body.
+ *
+ * @author Vladyslav Vasyliev
+ * @author Pierre Malarme
+ * @version 1.1
+ */
 public class DICOMBody {
 
-    // ---------------------------------------------------------------
-    // - VARIABLES
-    // ---------------------------------------------------------------
+	private String mSpecificCharset = "ASCII";		// DICOMTag.SpecificCharacterSet
+	private String mImageType = "";					// DICOMTag.ImageType
+    private String mSOPClassUID = "";               // DICOMTag.SOPClassUID
+    private String mSOPInstanceUID = "";            // DICOMTag.SOPInstanceUID
+    private String mStudyDate = "";                 // DICOMTag.StudyDate
+    // DICOMTag.SeriesDate
+    private String mStudyTime = "";                 // DICOMTag.StudyTime
+    // DICOMTag.ContentTime
+    // DICOMTag.AccessionNumber
+	private String mModality = "";					// DICOMTag.Modality
+    private String mReferringPhysicianName = "";    // DICOMTag.ReferringPhysiciansName
+    private String mStationName = "";               // DICOMTag.StationName
+    private String mStudyDescription = "";          // DICOMTag.StudyDescription
+    // DICOMTag.SeriesDescription
+    // DICOMTag.CodingSchemeName
+    // DICOMTag.ReferencedSeriesSequence
+    // DICOMTag.ReferencedImageSequence
+
+    private int mSamplesPerPixel = 1;               // DICOMTag.SamplesPerPixel
+    private int mBitsAllocated = 0;                 // DICOMTag.BitsAllocated
+    private int mBitsStored = 0;                    // DICOMTag.BitsStored
+    private int mHightBit = 0;                      // DICOMTag.HighBit
+    private int mPixelRepresentation = 1;           // DICOMTag.PixelRepresentation
+
+	private String mManufacturer = "";
+	private String mInstitutionName = "";
+	private String mDepartmenName = "";
+	private String mManufacturerModelName = "";
+	private String mPatientName = "";
+	private String mPatientId = "";
+	private String mProtocolName = "";
+	private String mPatientPosition = "";
+	private int mStudyId = -1;
+	private int mSeriesNumber = -1;
+	private int mInstanceNumber = -1;
+	private String mPhotometricInterpretation = "MONOCHROME2";
+	private String mRequestingPhysician = "";
+	private String mRequestedProcedureDescription = "";
+	private String mScheduledProcedureStepDescription = "";
+
+
+	public DICOMBody() { }
+
+	public String getSpecificCharset() {
+		return mSpecificCharset;
+	}
 
-    /**
-     * Specific character set.
-     */
-    private String mSpecificCharset = "ASCII";
-
-    /**
-     * Image type.
-     */
-    private String mImageType = "";
-
-    /**
-     * Date of the study.
-     */
-    private String mStudyDate = "";
-
-    /**
-     * Time of the study.
-     */
-    private String mStudyTime = "";
-
-    /**
-     * Modality.
-     */
-    private String mModality = "";
-
-    /**
-     * Manufacturer.
-     */
-    private String mManufacturer = "";
-
-    /**
-     * Institution name.
-     */
-    private String mInstitutionName = "";
-
-    /**
-     * Referring physician name.
-     */
-    private String mReferringPhysicianName = "";
-
-    /**
-     * Station name.
-     */
-    private String mStationName = "";
-
-    /**
-     * Study description.
-     */
-    private String mStudyDescription = "";
-
-    /**
-     * Department name.
-     */
-    private String mDepartmenName = "";
-
-    /**
-     * Manufacturer model name.
-     */
-    private String mManufacturerModelName = "";
-
-    /**
-     * Patient name.
-     */
-    private String mPatientName = "";
-
-    /**
-     * Patient ID.
-     */
-    private String mPatientId = "";
-
-    /**
-     * Protocol name.
-     */
-    private String mProtocolName = "";
-
-    /**
-     * Patient position.
-     */
-    private String mPatientPosition = "";
-
-    /**
-     * Study ID.
-     */
-    private int mStudyId = -1;
-
-    /**
-     * Series number.
-     */
-    private int mSeriesNumber = -1;
-
-    /**
-     * Instance number.
-     */
-    private int mInstanceNumber = -1;
-
-    /**
-     * Sample per pixel.
-     */
-    private int mSamplesPerPixel = 1;
-
-    /**
-     * Photometric interpretation.
-     */
-    private String mPhotometricInterpretation = "MONOCHROME2";
-
-    /**
-     * Bits allocated.
-     */
-    private int mBitsAllocated = 0;
-
-    /**
-     * Bits stored;
-     */
-    private int mBitsStored = 0;
-
-    /**
-     * High bit.
-     */
-    private int mHightBit = 0;
-
-    /**
-     * Pixel representation.
-     * <p>
-     * 0 = unsigned, 1 = signed.
-     */
-    private int mPixelRepresentation = 1;
-
-    /**
-     * Requesting physician.
-     */
-    private String mRequestingPhysician = "";
-
-    /**
-     * Requested procedure.
-     */
-    private String mRequestedProcedureDescription = "";
-
-    /**
-     * Scheduled procedure step description.
-     */
-    private String mScheduledProcedureStepDescription = "";
-
-
-    // ---------------------------------------------------------------
-    // + CONSTRUCTOR
-    // ---------------------------------------------------------------
-
-    public DICOMBody() {
-
-    }
-
-
-    // ---------------------------------------------------------------
-    // + FUNCTIONS
-    // ---------------------------------------------------------------
-
-    // Methods generated by Eclipse.
-
-    /**
-     * @return the mSpecificCharset
-     */
-    public String getSpecificCharset() {
-        return mSpecificCharset;
-    }
-
-    /**
-     * @return the mImageType
-     */
-    public String getImageType() {
-        return mImageType;
-    }
-
-    /**
-     * @return the mStudyDate
-     */
-    public String getStudyDate() {
-        return mStudyDate;
-    }
-
-    /**
-     * @return the mStudyTime
-     */
-    public String getStudyTime() {
-        return mStudyTime;
-    }
-
-    /**
-     * @return the mModality
-     */
-    public String getModality() {
-        return mModality;
-    }
-
-    /**
-     * @return the mManufacturer
-     */
-    public String getManufacturer() {
-        return mManufacturer;
-    }
-
-    /**
-     * @return the mInstitutionName
-     */
-    public String getInstitutionName() {
-        return mInstitutionName;
-    }
-
-    /**
-     * @return the mReferringPhysicianName
-     */
-    public String getReferringPhysicianName() {
-        return mReferringPhysicianName;
-    }
-
-    /**
-     * @return the mStationName
-     */
-    public String getStationName() {
-        return mStationName;
-    }
-
-    /**
-     * @return the mStudyDescription
-     */
-    public String getStudyDescription() {
-        return mStudyDescription;
-    }
-
-    /**
-     * @return the mDepartmenName
-     */
-    public String getDepartmenName() {
-        return mDepartmenName;
-    }
-
-    /**
-     * @return the mManufacturerModelName
-     */
-    public String getManufacturerModelName() {
-        return mManufacturerModelName;
-    }
-
-    /**
-     * @return the mPatientName
-     */
-    public String getPatientName() {
-        return mPatientName;
-    }
-
-    /**
-     * @return the mPatientID
-     */
-    public String getPatientId() {
-        return mPatientId;
-    }
-
-    /**
-     * @return the mProtocolName
-     */
-    public String getProtocolName() {
-        return mProtocolName;
-    }
-
-    /**
-     * @return the mPatientPosition
-     */
-    public String getPatientPosition() {
-        return mPatientPosition;
-    }
-
-    /**
-     * @return the mStudyId
-     */
-    public int getStudyId() {
-        return mStudyId;
-    }
-
-    /**
-     * @return the mSeriesNumber
-     */
-    public int getSeriesNumber() {
-        return mSeriesNumber;
-    }
-
-    /**
-     * @return the mInstanceNumber
-     */
-    public int getInstanceNumber() {
-        return mInstanceNumber;
-    }
-
-    /**
-     * @return the mSamplePerPixel
-     */
-    public int getSamplesPerPixel() {
-        return mSamplesPerPixel;
-    }
-
-    /**
-     * @return the mPhotometricInterpretation
-     */
-    public String getPhotometricInterpretation() {
-        return mPhotometricInterpretation;
-    }
-
-    /**
-     * @return the mBitsAllocated
-     */
-    public int getBitsAllocated() {
-        return mBitsAllocated;
-    }
-
-    /**
-     * @return the mBitsStored
-     */
-    public int getBitsStored() {
-        return mBitsStored;
-    }
-
-    /**
-     * @return the mHightBit
-     */
-    public int getHightBit() {
-        return mHightBit;
-    }
-
-    /**
-     * @return the mPixelRepresentation
-     */
-    public int getPixelRepresentation() {
-        return mPixelRepresentation;
-    }
-
-    /**
-     * @return the mRequestingPhysician
-     */
-    public String getRequestingPhysician() {
-        return mRequestingPhysician;
-    }
-
-    /**
-     * @return the mRequestedProcedureDescription
-     */
-    public String getRequestedProcedureDescription() {
-        return mRequestedProcedureDescription;
-    }
-
-    /**
-     * @return the mScheduledProcedureStepDescription
-     */
-    public String getScheduledProcedureStepDescription() {
-        return mScheduledProcedureStepDescription;
-    }
-
-    /**
-     * @param mSpecificCharset the mSpecificCharset to set
-     */
     public void setSpecificCharset(String mSpecificCharset) {
         this.mSpecificCharset = mSpecificCharset;
     }
 
-    /**
-     * @param mImageType the mImageType to set
-     */
+    public String getImageType() {
+        return mImageType;
+    }
+
     public void setImageType(String mImageType) {
         this.mImageType = mImageType;
     }
 
-    /**
-     * @param mStudyDate the mStudyDate to set
-     */
+    public String getSOPClassUID() {
+        return mSOPClassUID;
+    }
+
+    public void setSOPClassUID(String mSOPClassUID) {
+        this.mSOPClassUID = mSOPClassUID;
+    }
+
+    public String getSOPInstanceUID() {
+        return mSOPInstanceUID;
+    }
+
+    public void setSOPInstanceUID(String mSOPInstanceUID) {
+        this.mSOPInstanceUID = mSOPInstanceUID;
+    }
+
+	public String getStudyDate() {
+		return mStudyDate;
+	}
+
     public void setStudyDate(String mStudyDate) {
         this.mStudyDate = mStudyDate;
     }
 
-    /**
-     * @param mStudyTime the mStudyTime to set
-     */
+    public String getStudyTime() {
+        return mStudyTime;
+    }
+
     public void setStudyTime(String mStudyTime) {
         this.mStudyTime = mStudyTime;
     }
 
-    /**
-     * @param mModality the mModality to set
-     */
+    public String getModality() {
+        return mModality;
+    }
+
     public void setModality(String mModality) {
         this.mModality = mModality;
     }
 
-    /**
-     * @param mManufacturer the mManufacturer to set
-     */
-    public void setManufacturer(String mManufacturer) {
-        this.mManufacturer = mManufacturer;
+    public String getReferringPhysicianName() {
+        return mReferringPhysicianName;
     }
 
-    /**
-     * @param mInstitutionName the mInstitutionName to set
-     */
-    public void setInstitutionName(String mInstitutionName) {
-        this.mInstitutionName = mInstitutionName;
-    }
-
-    /**
-     * @param mReferringPhysicianName the mReferingPhysicianName to set
-     */
     public void setReferringPhysicianName(String mReferringPhysicianName) {
         this.mReferringPhysicianName = mReferringPhysicianName;
     }
 
-    /**
-     * @param mStationName the mStationName to set
-     */
+    public String getStationName() {
+        return mStationName;
+    }
+
     public void setStationName(String mStationName) {
         this.mStationName = mStationName;
     }
 
-    /**
-     * @param mStudyDescription the mStudyDescription to set
-     */
+    public String getStudyDescription() {
+        return mStudyDescription;
+    }
+
     public void setStudyDescription(String mStudyDescription) {
         this.mStudyDescription = mStudyDescription;
     }
 
-    /**
-     * @param mDepartmenName the mDepartmenName to set
-     */
-    public void setDepartmenName(String mDepartmenName) {
-        this.mDepartmenName = mDepartmenName;
+    public int getSamplesPerPixel() {
+        return mSamplesPerPixel;
     }
 
-    /**
-     * @param mManufacturerModelName the mManufacturerModelName to set
-     */
-    public void setManufacturerModelName(String mManufacturerModelName) {
-        this.mManufacturerModelName = mManufacturerModelName;
-    }
-
-    /**
-     * @param mPatientName the mPatientName to set
-     */
-    public void setPatientName(String mPatientName) {
-        this.mPatientName = mPatientName;
-    }
-
-    /**
-     * @param mPatientId the mPatientID to set
-     */
-    public void setPatientId(String mPatientId) {
-        this.mPatientId = mPatientId;
-    }
-
-    /**
-     * @param mProtocolName the mProtocolName to set
-     */
-    public void setProtocolName(String mProtocolName) {
-        this.mProtocolName = mProtocolName;
-    }
-
-    /**
-     * @param mPatientPosition the mPatientPosition to set
-     */
-    public void setPatientPosition(String mPatientPosition) {
-        this.mPatientPosition = mPatientPosition;
-    }
-
-    /**
-     * @param mStudyId the mStudyId to set
-     */
-    public void setStudyId(int mStudyId) {
-        this.mStudyId = mStudyId;
-    }
-
-    /**
-     * @param mSeriesNumber the mSeriesNumber to set
-     */
-    public void setSeriesNumber(int mSeriesNumber) {
-        this.mSeriesNumber = mSeriesNumber;
-    }
-
-    /**
-     * @param mInstanceNumber the mInstanceNumber to set
-     */
-    public void setInstanceNumber(int mInstanceNumber) {
-        this.mInstanceNumber = mInstanceNumber;
-    }
-
-    /**
-     * @param mSamplesPerPixel the mSamplePerPixel to set
-     */
     public void setSamplesPerPixel(int mSamplesPerPixel) {
         this.mSamplesPerPixel = mSamplesPerPixel;
     }
 
-    /**
-     * @param mPhotometricInterpretation the mPhotometricInterpretation to set
-     */
-    public void setPhotometricInterpretation(String mPhotometricInterpretation) {
-        this.mPhotometricInterpretation = mPhotometricInterpretation;
+    public int getBitsAllocated() {
+        return mBitsAllocated;
     }
 
-    /**
-     * @param mBitsAllocated the mBitsAllocated to set
-     */
     public void setBitsAllocated(int mBitsAllocated) {
         this.mBitsAllocated = mBitsAllocated;
     }
 
-    /**
-     * @param mBitsStored the mBitsStored to set
-     */
+    public int getBitsStored() {
+        return mBitsStored;
+    }
+
     public void setBitsStored(int mBitsStored) {
         this.mBitsStored = mBitsStored;
     }
 
-    /**
-     * @param mHightBit the mHightBit to set
-     */
+    public int getHightBit() {
+        return mHightBit;
+    }
+
     public void setHightBit(int mHightBit) {
         this.mHightBit = mHightBit;
     }
 
-    /**
-     * @param mPixelRepresentation the mPixelRepresentation to set
-     */
+    public int getPixelRepresentation() {
+        return mPixelRepresentation;
+    }
+
     public void setPixelRepresentation(int mPixelRepresentation) {
         this.mPixelRepresentation = mPixelRepresentation;
     }
 
-    /**
-     * @param mRequestingPhysician the mRequestingPhysician to set
-     */
-    public void setRequestingPhysician(String mRequestingPhysician) {
-        this.mRequestingPhysician = mRequestingPhysician;
-    }
 
-    /**
-     * @param mRequestedProcedureDescription the mRequestedProcedureDescription to set
-     */
-    public void setRequestedProcedureDescription(
-            String mRequestedProcedureDescription) {
-        this.mRequestedProcedureDescription = mRequestedProcedureDescription;
-    }
 
-    /**
-     * @param mScheduledProcedureStepDescription the mScheduledProcedureStepDescription to set
-     */
-    public void setScheduledProcedureStepDescription(
-            String mScheduledProcedureStepDescription) {
-        this.mScheduledProcedureStepDescription = mScheduledProcedureStepDescription;
-    }
+	public String getManufacturer() {
+		return mManufacturer;
+	}
+
+	public String getInstitutionName() {
+		return mInstitutionName;
+	}
+
+	public String getDepartmenName() {
+		return mDepartmenName;
+	}
+
+	public String getManufacturerModelName() {
+		return mManufacturerModelName;
+	}
+
+	public String getPatientName() {
+		return mPatientName;
+	}
+
+	public String getPatientId() {
+		return mPatientId;
+	}
+
+	public String getProtocolName() {
+		return mProtocolName;
+	}
+
+	public String getPatientPosition() {
+		return mPatientPosition;
+	}
+
+	public int getStudyId() {
+		return mStudyId;
+	}
+
+	public int getSeriesNumber() {
+		return mSeriesNumber;
+	}
+
+	public int getInstanceNumber() {
+		return mInstanceNumber;
+	}
+
+	public String getPhotometricInterpretation() {
+		return mPhotometricInterpretation;
+	}
+
+	public String getRequestingPhysician() {
+		return mRequestingPhysician;
+	}
+
+	public String getRequestedProcedureDescription() {
+		return mRequestedProcedureDescription;
+	}
+
+	public String getScheduledProcedureStepDescription() {
+		return mScheduledProcedureStepDescription;
+	}
+
+	public void setManufacturer(String mManufacturer) {
+		this.mManufacturer = mManufacturer;
+	}
+
+	public void setInstitutionName(String mInstitutionName) {
+		this.mInstitutionName = mInstitutionName;
+	}
+
+	public void setDepartmenName(String mDepartmenName) {
+		this.mDepartmenName = mDepartmenName;
+	}
+
+	public void setManufacturerModelName(String mManufacturerModelName) {
+		this.mManufacturerModelName = mManufacturerModelName;
+	}
+
+	public void setPatientName(String mPatientName) {
+		this.mPatientName = mPatientName;
+	}
+
+	public void setPatientId(String mPatientId) {
+		this.mPatientId = mPatientId;
+	}
+
+	public void setProtocolName(String mProtocolName) {
+		this.mProtocolName = mProtocolName;
+	}
+
+	public void setPatientPosition(String mPatientPosition) {
+		this.mPatientPosition = mPatientPosition;
+	}
+
+	public void setStudyId(int mStudyId) {
+		this.mStudyId = mStudyId;
+	}
+
+	public void setSeriesNumber(int mSeriesNumber) {
+		this.mSeriesNumber = mSeriesNumber;
+	}
+
+	public void setInstanceNumber(int mInstanceNumber) {
+		this.mInstanceNumber = mInstanceNumber;
+	}
+
+	public void setPhotometricInterpretation(String mPhotometricInterpretation) {
+		this.mPhotometricInterpretation = mPhotometricInterpretation;
+	}
+
+	public void setRequestingPhysician(String mRequestingPhysician) {
+		this.mRequestingPhysician = mRequestingPhysician;
+	}
+
+	public void setRequestedProcedureDescription(
+			String mRequestedProcedureDescription) {
+		this.mRequestedProcedureDescription = mRequestedProcedureDescription;
+	}
+
+	public void setScheduledProcedureStepDescription(
+			String mScheduledProcedureStepDescription) {
+		this.mScheduledProcedureStepDescription = mScheduledProcedureStepDescription;
+	}
 
 }

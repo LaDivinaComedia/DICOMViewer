@@ -2,8 +2,6 @@ package be.ac.ulb.lisa.idot.dicom.data;
 
 import android.graphics.PointF;
 
-import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
-
 /**
  * @author Vladyslav Vasyliev
  */

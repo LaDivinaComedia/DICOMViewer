@@ -7,13 +7,20 @@ import java.io.IOException;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMElement;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
-import be.ac.ulb.lisa.idot.dicom.DICOMTag;
-import be.ac.ulb.lisa.idot.dicom.DICOMValueRepresentation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMBody;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 import be.ac.ulb.lisa.idot.image.data.LISAImageGray16Bit;
+import be.ac.ulb.lisa.idot.dicom.DICOMTag;
+import be.ac.ulb.lisa.idot.dicom.DICOMValueRepresentation;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 
+/**
+ * DICOM Image Reader.
+ *
+ * @author Pierre Malarme
+ * @author Vladyslav Vasyliev
+ * @version 1.1
+ */
 public class DICOMImageReader extends DICOMReader {
 
     public DICOMImageReader(File file) throws FileNotFoundException {
@@ -76,17 +83,15 @@ public class DICOMImageReader extends DICOMReader {
         return dicomImage;
     }
 
-    protected class DICOMImageReaderFunctions implements DICOMReaderFunctions {
+    protected class DICOMImageReaderFunctions extends DICOMBodyReaderFunctions {
         private DICOMMetaInformation mMetadataInformation;
         // TODO support encapsulated PixelData ? or throw an error
 
-        DICOMBody mBody;
         LISAImageGray16Bit mImage;
         boolean mIsExplicit;
         short mCompressionStatus;
 
         public DICOMImageReaderFunctions(boolean isExplicit, short compressionStatus) {
-            mBody = new DICOMBody();
             mImage = new LISAImageGray16Bit();
             mIsExplicit = isExplicit;
             mCompressionStatus = compressionStatus;
@@ -100,24 +105,20 @@ public class DICOMImageReader extends DICOMReader {
             mMetadataInformation = metaInformation;
         }
 
+        @Override
         public void addDICOMElement(DICOMElement parent, DICOMElement element) {
+            super.addDICOMElement(parent, element);
             // If this is a sequence, do nothing
-            if (parent != null)
+            if (parent != null) {
                 return;
+            }
             int tag = element.getDICOMTag().getTag();
             switch (tag){
                 case DICOMTag.SpecificCharacterSet:
-                    mBody.setSpecificCharset(element.getValueString());
                     mSpecificCharset = mBody.getSpecificCharset();
-                    break;
-                case DICOMTag.ImageType:
-                    mBody.setImageType(element.getValueString());
                     break;
                 case DICOMTag.ImageOrientationPatient:
                     mImage.setImageOrientation(getImageOrientation(element));
-                    break;
-                case DICOMTag.SamplesPerPixel:
-                    mBody.setSamplesPerPixel(element.getValueInt());
                     break;
                 case DICOMTag.Rows:
                     mImage.setHeight((short) element.getValueInt());
@@ -125,18 +126,8 @@ public class DICOMImageReader extends DICOMReader {
                 case DICOMTag.Columns:
                     mImage.setWidth((short) element.getValueInt());
                     break;
-                case DICOMTag.BitsAllocated:
-                    mBody.setBitsAllocated(element.getValueInt());
-                    break;
                 case DICOMTag.BitsStored:
-                    mBody.setBitsStored(element.getValueInt());
                     mImage.setGrayLevel((int) Math.pow(2, mBody.getBitsStored()));
-                    break;
-                case DICOMTag.HighBit:
-                    mBody.setHightBit(element.getValueInt());
-                    break;
-                case DICOMTag.PixelRepresentation:
-                    mBody.setPixelRepresentation(element.getValueInt());
                     break;
                 case DICOMTag.WindowCenter:
                     mImage.setWindowCenter(getIntFromStringArray(element));
@@ -161,15 +152,12 @@ public class DICOMImageReader extends DICOMReader {
                     ps[1] = Double.valueOf(o.substring(o.indexOf("\\") + 1));
                     mMetadataInformation.setPixelSpacing(ps);
                     break;
-                case DICOMTag.Modality:
-                    mBody.setModality(element.getValueString());
-                    break;
             }
         }
 
+        @Override
         public boolean isRequiredElement(int tag) {
-            return (tag == DICOMTag.SpecificCharacterSet)
-                    || (tag == DICOMTag.ImageType)
+            return super.isRequiredElement(tag)
                     || (tag == DICOMTag.ImageOrientationPatient)
                     || (tag == DICOMTag.SamplesPerPixel)
                     || (tag == DICOMTag.Rows)
@@ -183,10 +171,10 @@ public class DICOMImageReader extends DICOMReader {
                     || (tag == DICOMTag.PatientsBirthDate)
                     || (tag == DICOMTag.PatientsName)
                     || (tag == DICOMTag.PatientsAge)
-                    || (tag == DICOMTag.PixelSpacing)
-                    || (tag == DICOMTag.Modality);
+                    || (tag == DICOMTag.PixelSpacing);
         }
 
+        @Override
         public void computeImage(DICOMElement parent,
                                  DICOMValueRepresentation VR, long valueLength)
                 throws IOException, EOFException, DICOMException {
@@ -236,10 +224,6 @@ public class DICOMImageReader extends DICOMReader {
                     throw new DICOMException("Unknown PixelData");
                 }
             }
-        }
-
-        public DICOMBody getBody() {
-            return mBody;
         }
 
         public LISAImageGray16Bit getImage() {

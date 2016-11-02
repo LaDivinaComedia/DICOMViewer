@@ -42,65 +42,65 @@ package be.ac.ulb.lisa.idot.dicom.data;
  */
 public class DICOMFile {
 
-    // ---------------------------------------------------------------
-    // - <final> VARIABLES
-    // ---------------------------------------------------------------
+	// ---------------------------------------------------------------
+	// - <final> VARIABLES
+	// ---------------------------------------------------------------
 
-    /**
-     * DICOM meta information.
-     */
-    protected final DICOMMetaInformation mMetaInformation;
+	/**
+	 * DICOM meta information.
+	 */
+	protected final DICOMMetaInformation mMetaInformation;
 
-    /**
-     * DICOM body.
-     */
-    protected final DICOMBody mBody;
-
-
-    // ---------------------------------------------------------------
-    // + CONSTRUCTOR
-    // ---------------------------------------------------------------
-
-    public DICOMFile(DICOMMetaInformation metaInformation, DICOMBody body) {
-
-        mMetaInformation = metaInformation;
-        mBody = body;
-
-    }
+	/**
+	 * DICOM body.
+	 */
+	protected final DICOMBody mBody;
 
 
-    // ---------------------------------------------------------------
-    // + FUNCTIONS
-    // ---------------------------------------------------------------
+	// ---------------------------------------------------------------
+	// + CONSTRUCTOR
+	// ---------------------------------------------------------------
 
-    /**
-     * @return DICOM meta information.
-     */
-    public DICOMMetaInformation getMetaInformation() {
-        return mMetaInformation;
-    }
+	public DICOMFile(DICOMMetaInformation metaInformation, DICOMBody body) {
 
-    /**
-     * @return DICOM body.
-     */
-    public DICOMBody getBody() {
-        return mBody;
-    }
+		mMetaInformation = metaInformation;
+		mBody = body;
 
-    /**
-     * @return True if the file has DICOM meta information.
-     * False otherwise.
-     */
-    public boolean hasMetaInformation() {
-        return mMetaInformation != null;
-    }
+	}
 
-    /**
-     * @return True if the file has DICOM body.
-     * False otherwise.
-     */
-    public boolean hasBody() {
-        return mBody != null;
-    }
+
+	// ---------------------------------------------------------------
+	// + FUNCTIONS
+	// ---------------------------------------------------------------
+
+	/**
+	 * @return DICOM meta information.
+	 */
+	public DICOMMetaInformation getMetaInformation() {
+		return mMetaInformation;
+	}
+
+	/**
+	 * @return DICOM body.
+	 */
+	public DICOMBody getBody() {
+		return mBody;
+	}
+
+	/**
+	 * @return True if the file has DICOM meta information.
+	 * False otherwise.
+	 */
+	public boolean hasMetaInformation() {
+		return mMetaInformation != null;
+	}
+
+	/**
+	 * @return True if the file has DICOM body.
+	 * False otherwise.
+	 */
+	public boolean hasBody() {
+		return mBody != null;
+	}
 
 }

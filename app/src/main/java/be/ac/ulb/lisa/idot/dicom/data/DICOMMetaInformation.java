@@ -27,7 +27,7 @@ public class DICOMMetaInformation {
         return mGroupLength;
     }
 
-    public String getmFileMetaInformationVersion() {
+    public String getFileMetaInformationVersion() {
         return mFileMetaInformationVersion;
     }
 
@@ -76,7 +76,7 @@ public class DICOMMetaInformation {
         this.mGroupLength = mGroupLength;
     }
 
-    public void setmFileMetaInformationVersion(String mFileMetaInformationVersion) {
+    public void setFileMetaInformationVersion(String mFileMetaInformationVersion) {
         this.mFileMetaInformationVersion = mFileMetaInformationVersion;
     }
 

@@ -1,9 +1,9 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 
 import java.io.EOFException;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * @author Vladyslav Vasyliev
+ * Created by vlad on 02.11.2016.
  */
 public class DICOMPresentationStateReader extends DICOMReader {
     public DICOMPresentationStateReader(File file) throws FileNotFoundException {
@@ -53,7 +53,7 @@ public class DICOMPresentationStateReader extends DICOMReader {
         DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
-        return new DICOMPresentationState(metaInformation, annotations);
+        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations);
     }
 
 }

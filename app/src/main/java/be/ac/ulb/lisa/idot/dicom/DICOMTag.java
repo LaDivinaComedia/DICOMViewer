@@ -24,7 +24,18 @@ public class DICOMTag {
 
     public static final int SpecificCharacterSet                = 0x0008_0005;
     public static final int ImageType                           = 0x0008_0008;
+    public static final int SOPClassUID                         = 0x0008_0016;
+    public static final int SOPInstanceUID                      = 0x0008_0018;
+    public static final int StudyDate                           = 0x0008_0020;
+    public static final int SeriesDate                          = 0x0008_0023;
+    public static final int StudyTime                           = 0x0008_0030;
+    public static final int ContentTime                         = 0x0008_0033;
+    public static final int AccessionNumber                     = 0x0008_0050;
     public static final int Modality                            = 0x0008_0060;
+    public static final int ReferringPhysiciansName             = 0x0008_0090;
+    public static final int StationName                         = 0x0008_1010;
+    public static final int StudyDescription                    = 0x0008_1030;
+    public static final int SeriesDescription                   = 0x0008_103E;
     public static final int CodingSchemeName                    = 0x0008_0115;
     public static final int ReferencedSeriesSequence            = 0x0008_1115;
     public static final int ReferencedImageSequence             = 0x0008_1140;
@@ -95,6 +106,7 @@ public class DICOMTag {
             put(MediaStorageSOPInstanceUID, new DICOMTag(MediaStorageSOPInstanceUID,
                     "Media Storage SOP Instance UID",
                     DICOMValueRepresentation.c.get("UI")));
+
             put(TransferSyntaxUID, new DICOMTag(TransferSyntaxUID,
                     "TransferSyntax UID",
                     DICOMValueRepresentation.c.get("UI")));
@@ -165,9 +177,43 @@ public class DICOMTag {
             put(ImageType, new DICOMTag(ImageType,
                     "Image Type",
                     DICOMValueRepresentation.c.get("CS")));
+            put(SOPClassUID, new DICOMTag(SOPClassUID,
+                    "SOP Class UID",
+                    DICOMValueRepresentation.c.get("UI")));
+            put(SOPInstanceUID, new DICOMTag(SOPInstanceUID,
+                    "SOP Instance UID",
+                    DICOMValueRepresentation.c.get("UI")));
+
+            put(StudyDate, new DICOMTag(StudyDate,
+                    "Study Date",
+                    DICOMValueRepresentation.c.get("DA")));
+            put(SeriesDate, new DICOMTag(SeriesDate,
+                    "Series Date",
+                    DICOMValueRepresentation.c.get("DA")));
+            put(StudyTime, new DICOMTag(StudyTime,
+                    "Study Time",
+                    DICOMValueRepresentation.c.get("TM")));
+            put(ContentTime, new DICOMTag(ContentTime,
+                    "Content Time",
+                    DICOMValueRepresentation.c.get("TM")));
+            put(AccessionNumber, new DICOMTag(AccessionNumber,
+                    "Accession Number",
+                    DICOMValueRepresentation.c.get("SH")));
             put(Modality, new DICOMTag(Modality,
                     "Modality",
                     DICOMValueRepresentation.c.get("CS")));
+            put(ReferringPhysiciansName, new DICOMTag(ReferringPhysiciansName,
+                    "Referring Physicians Name",
+                    DICOMValueRepresentation.c.get("PN")));
+            put(StationName, new DICOMTag(StationName,
+                    "Station Name",
+                    DICOMValueRepresentation.c.get("SH")));
+            put(StudyDescription, new DICOMTag(StudyDescription,
+                    "Study Description",
+                    DICOMValueRepresentation.c.get("LO")));
+            put(SeriesDescription, new DICOMTag(SeriesDescription,
+                    "Series Description",
+                    DICOMValueRepresentation.c.get("LO")));
             put(CodingSchemeName, new DICOMTag(CodingSchemeName,
                     "Coding Scheme Name",
                     DICOMValueRepresentation.c.get("ST")));

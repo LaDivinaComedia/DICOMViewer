@@ -5,24 +5,22 @@ import java.util.List;
 /**
  * @author Vladyslav Vasyliev
  */
-public class DICOMPresentationState {
-    private DICOMMetaInformation mMetaInformation;
+public class DICOMPresentationState extends DICOMFile {
     private List<DICOMAnnotation> mAnnotations;
 
-    public DICOMPresentationState() {}
+    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body) {
+        super(metaInformation, body);
+    }
 
-    public DICOMPresentationState(DICOMMetaInformation metaInformation,
+    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body,
                                   List<DICOMAnnotation> annotations) {
-        mMetaInformation = metaInformation;
+        super(metaInformation, body);
         mAnnotations = annotations;
     }
 
-    public DICOMMetaInformation getMetaInformation() {
-        return mMetaInformation;
-    }
-
-    public void setMetaInformation(DICOMMetaInformation metaInformation) {
-        this.mMetaInformation = metaInformation;
+    @Override
+    public DICOMMetaInformationPS getMetaInformation() {
+        return (DICOMMetaInformationPS) mMetaInformation;
     }
 
     public List<DICOMAnnotation> getAnnotations() {

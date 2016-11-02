@@ -1,5 +1,6 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
+
 import android.graphics.PointF;
 
 import be.ac.ulb.lisa.idot.dicom.*;
@@ -13,7 +14,7 @@ import java.util.*;
  *
  * @author Vladyslav Vasyliev
  */
-public class DICOMPresentationStateFunctions implements DICOMReaderFunctions {
+public class DICOMPresentationStateFunctions extends DICOMBodyReaderFunctions {
     private DICOMMetaInformationPS mMetaInformation;
     private DICOMAnnotation mAnnotation;
     private DICOMTextObject mTextObject;
@@ -31,13 +32,12 @@ public class DICOMPresentationStateFunctions implements DICOMReaderFunctions {
 
     @Override
     public void addDICOMElement(DICOMElement parent, DICOMElement element) {
+        super.addDICOMElement(parent, element);
         DICOMTag dicomTag = element.getDICOMTag();
         int layerOrder;
         int tag = dicomTag.getTag();
         float[] points;
         String string;
-        String msg = String.format("(%04X,%04X) '%s'", (tag & 0xffff0000) >>> 16, tag & 0xffff, dicomTag.getName());
-        System.out.println(msg);
         switch (tag) {
             // Graphic Annotation Sequence
             case DICOMTag.GraphicAnnotationSequence:
@@ -144,7 +144,8 @@ public class DICOMPresentationStateFunctions implements DICOMReaderFunctions {
 
     @Override
     public boolean isRequiredElement(int tag) {
-        return tag == DICOMTag.GraphicAnnotationSequence
+        return super.isRequiredElement(tag)
+                || tag == DICOMTag.GraphicAnnotationSequence
                 || tag == DICOMTag.GraphicLayer
                 || tag == DICOMTag.GraphicAnnotationUnits
                 || tag == DICOMTag.UnformattedTextValue

@@ -559,6 +559,9 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 return;
             int tag = element.getDICOMTag().getTag();
             switch (tag) {
+                case DICOMTag.FileMetaInformationVersion:
+                    mMetaInformation.setFileMetaInformationVersion(element.getValueString());
+                    break;
                 case DICOMTag.MediaStorageSOPClassUID:
                     mMetaInformation.setSOPClassUID(element.getValueString());
                     break;
@@ -581,12 +584,15 @@ public class DICOMReader extends DICOMBufferedInputStream {
         }
 
         public boolean isRequiredElement(int tag) {
-            return (tag == DICOMTag.MediaStorageSOPClassUID)
-                    || (tag == DICOMTag.MediaStorageSOPInstanceUID)
-                    || (tag == DICOMTag.TransferSyntaxUID)
-                    || (tag == DICOMTag.ImplementationClassUID)
-                    || (tag == DICOMTag.ImplementationVersionName)
-                    || (tag == DICOMTag.SourceApplicationEntity);
+            // tag == DICOMTag.FileMetaInformationGroupLength
+            // tag == DICOMTag.PrivateInformationCreatorUID
+            return tag == DICOMTag.FileMetaInformationVersion
+                    || tag == DICOMTag.MediaStorageSOPClassUID
+                    || tag == DICOMTag.MediaStorageSOPInstanceUID
+                    || tag == DICOMTag.TransferSyntaxUID
+                    || tag == DICOMTag.ImplementationClassUID
+                    || tag == DICOMTag.ImplementationVersionName
+                    || tag == DICOMTag.SourceApplicationEntity;
         }
 
         public void computeImage(DICOMElement parent, DICOMValueRepresentation VR,

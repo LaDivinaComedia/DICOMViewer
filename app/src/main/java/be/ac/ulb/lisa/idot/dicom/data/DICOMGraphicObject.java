@@ -2,8 +2,6 @@ package be.ac.ulb.lisa.idot.dicom.data;
 
 import android.graphics.PointF;
 
-import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
-
 import java.util.*;
 
 /**
@@ -19,7 +17,6 @@ public class DICOMGraphicObject {
 
         Set<String> TYPES = new HashSet<>(Arrays.asList(POINT, POLYLINE, INTERPOLATED, CIRCLE, ELLIPSE));
     }
-
     // graphic part of the annotation
     private int mNumberOfGraphicPoints;
     private List<PointF> mPoints;
