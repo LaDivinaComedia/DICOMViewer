@@ -131,7 +131,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 
     // DICOMVIEWER DATA
     /**
-     * DICOMViewer_old data.
+     * DICOMViewer data.
      */
     private DICOMViewerData mDICOMViewerData = null;
 
@@ -837,7 +837,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
     }
 
     /**
-     * Set the DICOMViewer_old data.
+     * Set the DICOMViewer data.
      *
      * @param data
      */
