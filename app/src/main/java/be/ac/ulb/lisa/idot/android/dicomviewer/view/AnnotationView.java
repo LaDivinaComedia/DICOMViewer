@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
@@ -17,20 +18,25 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.R;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMGraphicObject;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMTextObject;
+
 
 /**
- * Created by vvanichkov on 24.10.2016.
+ * @author vvanichkov 24.10.2016.
  */
-
 public class AnnotationView extends ToolView implements View.OnTouchListener{
+    private static final float RADIUS = 5;
+    private static final double SENSITIVITY = 70;
 //    private ArrayList<Paint> mPaints = new ArrayList<Paint>();
     private ArrayList<CustomPath> mCustomPaths = new ArrayList<CustomPath>();
     private ArrayList<Paint> mPaints;
+    private ArrayList<Paint> mPaintsText;
     private CustomPath mCurrentPath;
     private float mScaleFactor;
     private int mImageWidth;
@@ -42,6 +48,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     private GestureDetector mGestureDetector = new GestureDetector(this.getContext(),new GestureListener());
     private boolean mDoubleTap = false;
     private DICOMPresentationState mPresentationState;
+    private float[] mLeftCorner;
+    private PointF pointToSaveTextAnnotation;
+
+
+
 
     public AnnotationView(Context context) {
         super(context);
@@ -120,22 +131,30 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 if(distnce>10 && mCurrentPath.paths.size()>5){
                     touch_up();
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
-                    askForAnnotationText();
+                    askForAnnotationText(true);
                     this.invalidate();
                     this.mCustomPaths.add(this.mCurrentPath);
+                    DICOMAnnotation diann = mPresentationState.getAnnotations().get(0);
+                    DICOMGraphicObject diobj = new DICOMGraphicObject();
+                    diobj.setGraphicType(DICOMGraphicObject.GraphicTypes.POLYLINE);
+                    diobj.setNumberOfGraphicPoints(mCurrentPath.paths.size());
+                    diobj.setPoints(changingPoints(mCurrentPath.paths));
+                    diann.getGraphicObjects().add(diobj);
                     init();
-                }//else{
-                    //trassByLight(startPoint);//pointInPolygonProblem(startPoint);
-                    //invalidate();
-
-                //}
+                }
                 startPoint=null;
                 break;
         }
         mGestureDetector.onTouchEvent(event);
         return true;
     }
-
+    private List<PointF> changingPoints(List<PointF> points){
+        ArrayList<PointF> pointFs = new ArrayList<>();
+        for(int i=0;i<points.size();i++){
+            pointFs.add(new PointF((points.get(i).x-mLeftCorner[0])/mScaleFactor,(points.get(i).y-mLeftCorner[1])/mScaleFactor));
+        }
+        return pointFs;
+    }
     private void touch_up() {
         mCurrentPath.mPath.lineTo(mCurrentPath.mCurrent.x,mCurrentPath.mCurrent.y);
         mCurrentPath.mEnd = new PointF(mCurrentPath.mCurrent.x,mCurrentPath.mCurrent.y);
@@ -162,6 +181,14 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         mPaint.setAlpha(100);
         return mPaint;
     }
+    private Paint initPaintText(){
+        Paint result = new Paint();
+        result.setColor(Color.RED);
+        result.setAntiAlias(true);
+        result.setStyle(Paint.Style.FILL_AND_STROKE);
+        result.setTextSize(7*mScaleFactor);
+        return result;
+    }
 
 
     @Override
@@ -173,13 +200,28 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 canvas.drawPath(this.mCustomPaths.get(i).mPath,mPaints.get(i));
             }
         }
+        if(this.mPresentationState!=null){
+            for(int i=0;i<mPresentationState.getAnnotations().size();i++){
+                DICOMAnnotation ann = mPresentationState.getAnnotations().get(i);
+                for(int j=0;j<ann.getTextObjects().size();j++){
+                    DICOMTextObject dtext = ann.getTextObjects().get(j);
+                    canvas.drawCircle(this.mLeftCorner[0]+dtext.getTextAnchor().x,this.mLeftCorner[1]+dtext.getTextAnchor().y,RADIUS*mScaleFactor/2,mPaintsText.get(i+j));
+                    canvas.drawText(
+                            dtext.getText().substring(0,dtext.getText().length()>=20?20:dtext.getText().length()),
+                            this.mLeftCorner[0]+dtext.getTextAnchor().x+RADIUS*mScaleFactor/2,this.mLeftCorner[1]+dtext.getTextAnchor().y+RADIUS*mScaleFactor/2,mPaintsText.get(i+j));
+                }
+            }
+        }
     }
 
     public void reset(DICOMPresentationState presentationState){
         //TODO loading data from tag of annotation if it exists for new image.
         this.mPresentationState = presentationState;
+        float dx = this.mLeftCorner[0];
+        float dy = this.mLeftCorner[1];
         mCustomPaths = new ArrayList<CustomPath>();
         mPaints = new ArrayList<Paint>();
+        this.mPaintsText = new ArrayList<Paint>();
         mPaints.add(initPaint());
         if(mPresentationState!=null){
             ArrayList<DICOMAnnotation> dicomAnnotation = (ArrayList<DICOMAnnotation>) mPresentationState.getAnnotations();
@@ -189,28 +231,44 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 for(int j = 0;j<d.getGraphicObjects().size();j++){
                     if(d.getGraphicObjects().get(j).getGraphicType().equals(DICOMGraphicObject.GraphicTypes.POLYLINE)){
                         CustomPath customPath = new CustomPath();
-                        customPath.paths=(ArrayList<PointF>) d.getGraphicObjects().get(j).getPoints();
-                        customPath.text=d.getTextObjects().get(j).getText();
+                        customPath.paths= new ArrayList<PointF>();
+                        //(ArrayList<PointF>) d.getGraphicObjects().get(j).getPoints();
+                        List<PointF> points=d.getGraphicObjects().get(j).getPoints();
+
+                        for(int p=0;p<points.size();p++){
+                            PointF point = points.get(p);
+                            float x = (float) (dx+point.x*mScaleFactor);
+                            float y = (float) (dy+point.y*mScaleFactor);
+                            customPath.paths.add(new PointF(x,y));
+                        }
                         customPath.mStart  = customPath.paths.get(0);
                         customPath.mEnd  = customPath.paths.get(customPath.paths.size()-1);
                         customPath.mPath.reset();
-                        for(int k = 0; k < customPath.paths.size();k++){
+                        customPath.mPath.moveTo(customPath.paths.get(0).x,customPath.paths.get(0).y);
+                        for(int k = 1; k < customPath.paths.size();k++){
                             PointF point = customPath.paths.get(k);
-                            customPath.mPath.moveTo(point.x,point.y);
+                            PointF previous_point = customPath.paths.get(k-1);
+                            customPath.mPath.quadTo(previous_point.x,previous_point.y,point.x,point.y);
                         }
+                        customPath.mPath.lineTo(customPath.mStart.x,customPath.mStart.y);
                         mCustomPaths.add(customPath);
                     }
                 }
-
+                mPaints.add(initPaint());
+                for(int j = 0;j<d.getTextObjects().size();j++){
+                    mPaintsText.add(initPaintText());
+                }
             }
         }
-
+        invalidate();
     }
-    public void setBounds(int imageWidth, int imageHeight, float scaleFactor){
+    public void setBounds(int imageWidth, int imageHeight, float scaleFactor,  Matrix mMatix){
         this.mImageWidth = imageWidth;
         this.mImageHeight = imageHeight;
         this.mScaleFactor = scaleFactor;
-
+        float[] f = new float[9];
+        mMatix.getValues(f);
+        this.mLeftCorner = new float[]{f[2],f[5]};
     }
     private void drawIt(){
         invalidate();
@@ -250,6 +308,28 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         return selected;
     }
 
+    /**
+     * Check the euclidean distance between all DICOMTextObjects point
+     * @param current <code>PointF</code>
+     */
+    private int[] checkPointWithText(PointF current){
+        int result[]=new int[]{-1,-1};
+        for(int i=0;i<this.mPresentationState.getAnnotations().size();i++){
+            DICOMAnnotation ann =this.mPresentationState.getAnnotations().get(i);
+            for(int j=0;j<ann.getTextObjects().size();j++){
+                DICOMTextObject dtext = ann.getTextObjects().get(j);
+                float x =mLeftCorner[0]+dtext.getTextAnchor().x;
+                float y =mLeftCorner[1]+ dtext.getTextAnchor().y;
+                double distance = Math.sqrt(Math.pow((current.x-x),2)+Math.pow((current.y-y),2));
+                if(distance<= SENSITIVITY){
+                    result[0]=i;
+                    result[1]=j;
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
     private CustomPath trassByLight(PointF current){
         CustomPath selected = null;
         for(int i=this.mCustomPaths.size()-1;i>=0;i--){
@@ -284,7 +364,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mCustomPaths.remove(mIndexToDelete);
-                mPaints.remove(mIndexToDelete+1);
+                mPaints.remove(mIndexToDelete);
                 drawIt();
             }
         });
@@ -297,10 +377,37 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         });
         buil.show();
     }
-
-    private void askForAnnotationText(){
+    private void agrementToDeleteTextPoint(String text, final int[] adress){
+        AlertDialog.Builder buil = new AlertDialog.Builder(this.getContext());
+        final TextView textView = new TextView(this.getContext());
+        buil.setTitle(getResources().getString(R.string.title_for_delete_alert_dialog));
+        textView.setText("Annotation:\r\n"+text);
+        textView.setTextSize(12);
+        buil.setView(textView);
+        buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mPresentationState.getAnnotations().get(adress[0]).getTextObjects().remove(adress[1]);
+                mPaintsText.remove(adress[0]+adress[1]);
+                drawIt();
+            }
+        });
+        buil.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        buil.show();
+    }
+    private void askForAnnotationText(final boolean modePointOrPolygon){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-        builder.setTitle(getResources().getString(R.string.title_for_asking_aler_dialog));
+
+        builder.setTitle(modePointOrPolygon?
+                getResources().getString(R.string.title_for_asking_aler_dialog)
+                :
+                getResources().getString(R.string.title_for_asking_text_annotation_alert_dialog)
+        );
         final EditText input = new EditText(this.getContext());
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
@@ -308,28 +415,46 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mCustomPaths.get(mCustomPaths.size()-1).text = input.getText().toString();
-                System.out.println(input.getText().toString());
+                if(modePointOrPolygon)
+                    mCustomPaths.get(mCustomPaths.size()-1).text = input.getText().toString();
+                else{
+                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
+                    DICOMTextObject t = new DICOMTextObject();
+                    t.setText(input.getText().toString());
+                    t.setTextAnchor(pointToSaveTextAnnotation);
+                    dicomAnnotation.getTextObjects().add(t);
+                    mPaintsText.add(initPaintText());
+                    drawIt();
+                }
             }
         });
         builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
-
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mCustomPaths.remove(mCustomPaths.size()-1);
-                mPaints.remove(mCustomPaths.size());
-                drawIt();
+                if(modePointOrPolygon){
+                    mCustomPaths.remove(mCustomPaths.size()-1);
+                    mPaints.remove(mCustomPaths.size());
+                    drawIt();
+                }else{
+                    pointToSaveTextAnnotation=null;
+                }
                 dialog.cancel();
             }
         } );
         builder.show();
     }
 
-    private void showtingText(CustomPath customPath2Show){
+    private void showtingText(CustomPath customPath2Show,boolean typePointOrPolygon,int[] adress){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
         builder.setTitle(getResources().getString(R.string.title_for_double_tap_aler_dialog));
         final TextView textView = new TextView(this.getContext());
-        textView.setText(customPath2Show.text);
+        if(typePointOrPolygon)
+            textView.setText(customPath2Show.text);
+        else if(adress[0]!=-1 && adress[1]!=-1)
+            textView.setText(mPresentationState.getAnnotations().get(adress[0]).getTextObjects().
+                    get(adress[1]).getText());
+        else
+            textView.setText("");
         builder.setView(textView);
         builder.setNegativeButton("OK",new DialogInterface.OnClickListener(){
 
@@ -349,7 +474,12 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
             if(!mDoubleTap){
                 CustomPath tryTofind = trassByLight(new PointF(event.getX(),event.getY()));
                 if(tryTofind!=null){
-                    showtingText(tryTofind);
+                    showtingText(tryTofind,true, new int[]{-1,-1});
+                    mDoubleTap=true;
+                }
+                int[] search = checkPointWithText(new PointF(event.getX(),event.getY()));
+                if(search[0]!=-1 && search[1]!=-1){
+                    showtingText(tryTofind,false, search);
                     mDoubleTap=true;
                 }
             }
@@ -357,14 +487,24 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         }
         @Override
         public boolean onSingleTapUp(MotionEvent event){
-
+            pointToSaveTextAnnotation = new PointF(event.getX()-mLeftCorner[0],event.getY()-mLeftCorner[1]);
+            askForAnnotationText(false);
             return true;
         }
         @Override
         public void onLongPress(MotionEvent e){
-            trassByLight(startPoint);//pointInPolygonProblem(startPoint);
-            agrementToDelete();
-            invalidate();
+            CustomPath a = trassByLight(startPoint);//pointInPolygonProblem(startPoint);
+            if(a!=null){
+                agrementToDelete();
+                invalidate();
+            }
+            int[] res =checkPointWithText(startPoint);
+            if(res[0]!=-1 && res[1]!=-1){
+                agrementToDeleteTextPoint(
+                        mPresentationState.getAnnotations().get(res[0]).getTextObjects().get(res[1])
+                                .getText()
+                        ,res);
+            }
         }
     }
     private class CustomPath{
