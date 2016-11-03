@@ -4,6 +4,7 @@ package be.ac.ulb.lisa.idot.dicom.file;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMGraphicObject;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMTextObject;
 
 import static be.ac.ulb.lisa.idot.dicom.DICOMTag.GraphicLayer;
@@ -33,16 +35,35 @@ public class DICOMAnnotationWriter {
             0x00, 0x00, 0x00, 0x00};                                //0x00000000
     private final byte[] mEmptyLength = new byte[]{0, 0, 0, 0};     //0x00000000
 
-    public byte[] convertAnnotations(List<DICOMAnnotation> annotations) {
+    public byte[] convertAnnotations(List<DICOMAnnotation> annotations, DICOMMetaInformationPS mips) {
 
+        //header
+        byte[] hdr = createHeader();
         //00700001
         byte[] gas = createGraphicAnnotationSequence(annotations);
         //0070060
         byte[] gls = createGraphicLayerSequence(annotations);
+        //footer
+        byte[] ftr = createFooter(mips.getContentDescription(),mips.getContentLabel()
+                ,mips.getContentCreatorsName());
 
-        return ByteBuffer.allocate(gas.length + gls.length)
+        return ByteBuffer.allocate(gas.length + gls.length + ftr.length)
                 .put(gas)
                 .put(gls)
+                .put(ftr)
+                .array();
+    }
+
+    public byte[] createFooter(String label, String desc, String name) {
+        Date d = new Date();
+        String date = String.format("%s%s%s", d.getYear(), d.getMonth(), d.getDay());
+        String time = String.format("%s%s", d.getHours(), d.getMinutes());
+        return ByteBuffer.allocate(8 + label.length() + 8 + desc.length() + 8 + date.length() + 8 + time.length() + 8 + name.length())
+                .put(createStringTag(DICOMTag.ContentLabel, label)) // 8 + label.len
+                .put(createStringTag(DICOMTag.ContentDescription, desc)) // 8 + desc.len
+                .put(createStringTag(DICOMTag.PresentationCreationDate, date)) // 8+date.len
+                .put(createStringTag(DICOMTag.PresentationCreationDate, time)) // 8 + time.len
+                .put(createStringTag(DICOMTag.ContentCreatorsName, name)) // 8 + name.len
                 .array();
     }
 
@@ -84,7 +105,7 @@ public class DICOMAnnotationWriter {
         ArrayList<byte[]> arrays = new ArrayList<>();
         int arraysLength = 0;
         for (DICOMAnnotation a : annotations) {
-           byte[] ann = annotationToByteArray(a);
+            byte[] ann = annotationToByteArray(a);
             arrays.add(mItemTag);
             arrays.add(ann);
             arrays.add(mItemDelimiter);
