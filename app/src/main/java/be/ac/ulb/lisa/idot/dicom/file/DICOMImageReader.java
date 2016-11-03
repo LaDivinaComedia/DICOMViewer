@@ -1,5 +1,7 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
+import android.util.Log;
+
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,25 +49,29 @@ public class DICOMImageReader extends DICOMReader {
         if (hasMetaInformation()) {
             metaInformation = parseMetaInformation();
             String transferSyntaxUID = metaInformation.getTransferSyntaxUID();
-            if (transferSyntaxUID.equals("1.2.840.10008.1.2")) {
-                isExplicit = false;
-                setByteOrder(LITTLE_ENDIAN);
-                compressionStatus = DICOMImage.UNCOMPRESSED;
-            } else if (transferSyntaxUID.equals("1.2.840.10008.1.2.1")) {
-                isExplicit = true;
-                setByteOrder(LITTLE_ENDIAN);
-                compressionStatus = DICOMImage.UNCOMPRESSED;
-            } else if (transferSyntaxUID.equals("1.2.840.10008.1.2.2")) {
-                isExplicit = true;
-                setByteOrder(BIG_ENDIAN);
-                compressionStatus = DICOMImage.UNCOMPRESSED;
-            } else {
-                isExplicit = true;
-                setByteOrder(LITTLE_ENDIAN);
-                compressionStatus = DICOMImage.COMPRESSED;
-                // Compressed image are not supported yet => throw a exception
-                throw new DICOMException("The image is compressed."
-                        + " This is not supported yet.");
+            switch (transferSyntaxUID) {
+                case "1.2.840.10008.1.2":
+                    isExplicit = false;
+                    setByteOrder(LITTLE_ENDIAN);
+                    compressionStatus = DICOMImage.UNCOMPRESSED;
+                    break;
+                case "1.2.840.10008.1.2.1":
+                    isExplicit = true;
+                    setByteOrder(LITTLE_ENDIAN);
+                    compressionStatus = DICOMImage.UNCOMPRESSED;
+                    break;
+                case "1.2.840.10008.1.2.2":
+                    isExplicit = true;
+                    setByteOrder(BIG_ENDIAN);
+                    compressionStatus = DICOMImage.UNCOMPRESSED;
+                    break;
+                default:
+                    isExplicit = true;
+                    setByteOrder(LITTLE_ENDIAN);
+                    compressionStatus = DICOMImage.COMPRESSED;
+                    // Compressed image are not supported yet => throw a exception
+                    throw new DICOMException("The image is compressed."
+                            + " This is not supported yet.");
             }
         } else {
             metaInformation = null;
@@ -145,11 +151,13 @@ public class DICOMImageReader extends DICOMReader {
                 case DICOMTag.PatientsAge:
                     mMetadataInformation.setPatientAge(element.getValueString());
                     break;
+                case DICOMTag.ImagerPixelSpacing:
                 case DICOMTag.PixelSpacing:
                     String o = (String) element.getValue();
-                    double[] ps = new double[2];
-                    ps[0] = Double.valueOf(o.substring(0, o.indexOf("\\")));
-                    ps[1] = Double.valueOf(o.substring(o.indexOf("\\") + 1));
+                    float[] ps = new float[2];
+                    String[] split = o.split("\\\\");
+                    ps[0] = Float.valueOf(split[0]);
+                    ps[1] = Float.valueOf(split[1]);
                     mMetadataInformation.setPixelSpacing(ps);
                     break;
             }
@@ -171,7 +179,8 @@ public class DICOMImageReader extends DICOMReader {
                     || (tag == DICOMTag.PatientsBirthDate)
                     || (tag == DICOMTag.PatientsName)
                     || (tag == DICOMTag.PatientsAge)
-                    || (tag == DICOMTag.PixelSpacing);
+                    || (tag == DICOMTag.PixelSpacing)
+                    || (tag == DICOMTag.ImagerPixelSpacing);
         }
 
         @Override

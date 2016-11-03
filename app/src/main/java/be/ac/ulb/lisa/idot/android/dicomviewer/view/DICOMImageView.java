@@ -39,6 +39,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -135,13 +136,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      */
     private DICOMViewerData mDICOMViewerData = null;
 
-    // CONTEXT
-    /**
-     * Context.
-     */
-    private Context mContext;
-
-    private double[] mPixelSpacing;
+    private float[] mPixelSpacing;
 
     // ---------------------------------------------------------------
     // + CONSTRUCTORS
@@ -149,22 +144,16 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 
     public DICOMImageView(Context context) {
         super(context);
-
-        mContext = context;
         init();
     }
 
     public DICOMImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        mContext = context;
         init();
     }
 
     public DICOMImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        mContext = context;
         init();
     }
 
@@ -195,7 +184,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
     // display of the image. It is for that we override
     // this method.
     /* (non-Javadoc)
-	 * @see android.widget.ImageView#drawableStateChanged()
+     * @see android.widget.ImageView#drawableStateChanged()
 	 */
     @Override
     protected void drawableStateChanged() {
@@ -215,7 +204,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 
     // This function is override to center the image
     // when the size of the screen change
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see android.view.View#onSizeChanged(int, int, int, int)
 	 */
     @Override
@@ -230,209 +219,139 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
     }
 
 
-    // ---------------------------------------------------------------
-    // + <implement> FUNCTIONS
-    // ---------------------------------------------------------------
-
     public boolean onTouch(View v, MotionEvent event) {
-
-        if (mImage == null
-                || mDICOMViewerData == null)
+        if (mImage == null || mDICOMViewerData == null)
             return false;
-
         // Get the tool mode
         short toolMode = mDICOMViewerData.getToolMode();
-
         // Handle touch event
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
-
             case MotionEvent.ACTION_DOWN:
-
                 // Double tap
                 if ((System.currentTimeMillis() - mTouchTime) < 450) {
-
                     // The touch mode is set to none
                     mTouchMode = TouchMode.NONE;
                     mTouchTime = 0;
-
                     // If toolMode is DIMENSION, fit the image
                     // in the screen.
                     if (toolMode == ToolMode.DIMENSION) {
-
                         if (mDICOMViewerData.getScaleMode() == ScaleMode.FITIN)
                             fitIn();
                         else
                             realSize();
-
                     } else if (toolMode == ToolMode.GRAYSCALE) {
-
                         mDICOMViewerData.setWindowWidth(mImage.getWindowWidth());
                         mDICOMViewerData.setWindowCenter(mImage.getWindowCenter());
                         draw();
-
                     }
-
                     return true;
-
                     // Single tap
                 } else if (mTouchMode == TouchMode.NONE) {
-
                     // Set the touch time
                     mTouchTime = System.currentTimeMillis();
-
                     // Set the touch mode to ONE_FINGER
                     mTouchMode = TouchMode.ONE_FINGER;
-
                     // Set the mSavedMatrix
                     mSavedMatrix.set(mMatrix);
-
                     // Set the mTouchStartPoint value
                     mTouchStartPoint.set(event.getX(), event.getY());
-
                 } else {
-
                     mTouchTime = 0;
-
                 }
-
                 break;
-
             case MotionEvent.ACTION_POINTER_DOWN:
-
                 // Check if there is two pointers
                 if (event.getPointerCount() == 2) {
-
                     // Set mTouchMode to TouchMode.TWO_FINGERS
                     mTouchMode = TouchMode.TWO_FINGERS;
-
                     // Reset mTouchTime
                     mTouchTime = 0;
-
                     // DIMENSION MODE
                     if (toolMode == ToolMode.DIMENSION) {
-
                         // Compute the olf dist between the two pointer.
                         mTouchOldDist = Geometry.euclidianDistance(event.getX(0), event.getY(0),
                                 event.getX(1), event.getY(1));
-
                         // Compute the old scale factor as the mScaleFactor
                         // at the begining of the touch event.
                         mTouchOldScaleFactor = mScaleFactor;
-
                         // Compute the midPoint
                         if ((mImage.getWidth() * mScaleFactor) <= getMeasuredWidth()
                                 || (mImage.getHeight() * mScaleFactor) <= getMeasuredHeight()) {
-
                             mTouchMidPoint = new PointF(getMeasuredWidth() / 2f,
                                     getMeasuredHeight() / 2f);
-
                         } else {
-
                             mTouchMidPoint = Geometry.midPoint(event.getX(0), event.getY(0),
                                     event.getX(1), event.getY(1));
-
                         }
-
                     }
-
                 } else if (event.getPointerCount() == 3) {
-
                     // Set the touch mode to three fingers
                     mTouchMode = TouchMode.THREE_FINGERS;
-
                     // Reset the mTouchTime
                     mTouchTime = 0;
-
                     // The start point is the average of the three fingers
                     // just for the x coordinate
                     mTouchStartPoint.set(
                             (event.getX(0) + event.getX(1) + event.getX(2)) / 3f,
                             0f);
-
                 }
-
                 break;
-
             case MotionEvent.ACTION_MOVE:
                 // If this is a ONE_FINGER touch mode
                 if (mTouchMode == TouchMode.ONE_FINGER) {
-
                     // Switch on toolMode
                     switch (toolMode) {
-
                         case ToolMode.DIMENSION:
                             // Set the matrix
                             mMatrix.set(mSavedMatrix);
-
                             // Variable declaration
                             float dx = 0;
                             float dy = 0;
-
                             // Compute the translation
                             dx = event.getX() - mTouchStartPoint.x;
                             dy = event.getY() - mTouchStartPoint.y;
-
                             // TODO center the image if width or height > this size
-
                             // Set the translation
                             mMatrix.postTranslate(dx, dy);
-
                             // Set the transformation matrix
                             setImageMatrix(mMatrix);
-
                             break;
-
                         case ToolMode.GRAYSCALE:
-
                             // Compute the grayscale window center
                             int center = (getMeasuredHeight() - 10 - (int) event.getY())
                                     * /*grayscaleWindow.getGrayLevel()*/mImage.getDataMax()
                                     / (getMeasuredHeight());
-
                             // Compute the grayscale window width
                             int width = (int) event.getX() * /*grayscaleWindow.getGrayLevel()*/mImage.getDataMax()
                                     / (getMeasuredWidth());
-
                             // Set the grayscale window attributes
                             mDICOMViewerData.setWindowWidth(width);
                             mDICOMViewerData.setWindowCenter(center);
-
                             // Compute the RGB image
                             draw();
-
                             break;
-
                     }
-                    ;
-
                 } else if (mTouchMode == TouchMode.TWO_FINGERS
                         && toolMode == ToolMode.DIMENSION) {
-
                     // Compute the distance between the two finger
                     float newDist = Geometry.euclidianDistance(event.getX(0), event.getY(0),
                             event.getX(1), event.getY(1));
-
                     // TODO necessary ?
                     //if (newDist > 3f) {
                     if (newDist != mTouchOldDist) {
-
                         // Set the matrix
                         mMatrix.set(mSavedMatrix);
-
                         // Scale factor
                         float scaleFactor = newDist / mTouchOldDist;
-
                         // Compute the global scale factor
                         mScaleFactor = mTouchOldScaleFactor * scaleFactor;
-
                         // Set the scale center at the mid point of the event
                         mMatrix.postScale(scaleFactor, scaleFactor, mTouchMidPoint.x, mTouchMidPoint.y);
-
                         // Set the transformation matrix
                         setImageMatrix(mMatrix);
                     }
                 } //else if (mTouchMode == TouchMode.THREE_FINGERS) {
-                    // Get the current event average (3 fingers) x coordinate
+                // Get the current event average (3 fingers) x coordinate
 //                    float eventAverageX = event.getX(0) + event.getX(1) + event.getX(2) / 3f;
 //                    // If the distance is greater than 40% of the ImageView width, change image.
 //                    if (Geometry.euclidianDistance(eventAverageX, 0, mTouchStartPoint.x, 0)
@@ -449,173 +368,114 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
 //                    }
 //                }
                 return true; // Draw
-
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP:
-
                 // Set that this is the end of the touch event
                 mTouchMode = TouchMode.NONE;
-
                 // Check the dimension
                 if (toolMode == ToolMode.DIMENSION) {
-
                     // Compute mImageView width and height and the image
                     // or the image size if is in ScaleMode real size
                     // scaled width and height
                     float imageWidth, imageHeight;
-
                     // Check the scale mode to see if the image size is
                     // smaller than the required size
                     if (mDICOMViewerData.getScaleMode() == ScaleMode.FITIN) {
-
                         imageWidth = getMeasuredWidth();
                         imageHeight = getMeasuredHeight();
-
                     } else {
-
                         imageWidth = mImage.getWidth();
                         imageHeight = mImage.getHeight();
-
                     }
-
                     float scaledImageWidth = (float) mImage.getWidth() * mScaleFactor;
                     float scaledImageHeight = (float) mImage.getHeight() * mScaleFactor;
-
                     // If the image fit int the window => fit in the window
                     if (scaledImageWidth <= imageWidth
                             && scaledImageHeight <= imageHeight) {
-
                         if (mDICOMViewerData.getScaleMode() == ScaleMode.FITIN)
                             fitIn();
                         else
                             realSize();
-
                     } else {
-
                         // The ImageView size is needed
                         imageWidth = getMeasuredWidth();
                         imageHeight = getMeasuredHeight();
-
                         // Get the matrix for the transformation
                         mMatrix.set(getImageMatrix());
-
                         // Set the source and destination rect points that correpond
                         // to the upper left corner and the bottom right corner
                         float[] srcRectPoints = {0f, 0f, mImage.getWidth(), mImage.getHeight()};
                         float[] dstRectPoints = new float[4];
-
                         // Apply the image matrix transformation on these points
                         mMatrix.mapPoints(dstRectPoints, srcRectPoints);
-
                         // Init transalation variables
                         float dx = 0f;
                         float dy = 0f;
-
                         // If the scaled image width is greater than the mImageView width
                         if (scaledImageWidth > imageWidth) {
-
                             // If there is black at the left of the screen
                             if (dstRectPoints[0] > 0f) {
-
                                 dx = (-1f) * dstRectPoints[0];
-
                                 // Else if there is black at the right of the screen
                             } else if (dstRectPoints[2] < imageWidth) {
-
                                 dx = imageWidth - dstRectPoints[2];
-
                             }
-
                         } else {
-
                             // Compute the left border and the right border
                             // to center the image
                             float lx = (imageWidth - scaledImageWidth) / 2f;
                             float rx = (imageWidth + scaledImageWidth) / 2f;
-
                             // If the image is more left than the left border
                             if (dstRectPoints[0] < lx) {
-
                                 dx = (-1f) * dstRectPoints[0] + lx;
-
                                 // Else if the image is more right than the right border
                             } else if (dstRectPoints[2] > rx) {
-
                                 dx = rx - dstRectPoints[2];
-
                             }
-
                         }
-
                         // If the scaled image height is greater than the mImageView height
                         if (scaledImageHeight > imageHeight) {
-
                             // If there is black at the top of the screen
                             if (dstRectPoints[1] > 0f) {
-
                                 dy = (-1f) * dstRectPoints[1];
-
                                 // Else if there is black at the bottom of the screen
                             } else if (dstRectPoints[3] < imageHeight) {
-
                                 dy = imageHeight - dstRectPoints[3];
-
                             }
-
                         } else {
-
                             // Compute the top border and the bottom border
                             // to center the image
                             float ty = (imageHeight - scaledImageHeight) / 2f;
                             float by = (imageHeight + scaledImageHeight) / 2f;
-
                             // If the image is upper the top border
                             if (dstRectPoints[1] < 0f) {
-
                                 dy = (-1f) * dstRectPoints[1] + ty;
-
                                 // Else if the image is under the bottom border
                             } else if (dstRectPoints[3] > imageHeight) {
-
                                 dy = by - dstRectPoints[3];
-
                             }
-
                         }
-
                         // If there is translation to compute
                         if (dx != 0f || dy != 0f) {
-
                             // Add the translation
                             mMatrix.postTranslate(dx, dy);
-
                             // Set the image matrix
                             setImageMatrix(mMatrix);
-
                         }
-
                     }
-
                 }
-
                 break;
-
         }
-        ;
-
         return true; // Do not draw
     }
 
-    public void setPixelSpacing(double[] pixelSpacing) {
+    public void setPixelSpacing(float[] pixelSpacing) {
         this.mPixelSpacing = pixelSpacing;
     }
 
-    public double[] getPixelSpacing() {
+    public float[] getPixelSpacing() {
         return mPixelSpacing;
     }
-    // ---------------------------------------------------------------
-    // + FUNCTIONS
-    // ---------------------------------------------------------------
 
     /**
      * Draw the image.
@@ -675,76 +535,53 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      * Fit the image in the screen
      */
     public void fitIn() {
-
         // Get the image width and height
         int imageWidth = mImage.getWidth();
         int imageHeight = mImage.getHeight();
-
         // Variable declaration
         float dx = 0f;
         float dy = 0f;
-
         // Get the image matrix
         mMatrix.set(getImageMatrix());
-
-        // If the width of the ImageView is smaller than the
-        // height, the image width is set to the ImageView width.
+        // If the width of the ImageView is smaller than the height,
+        // the image width is set to the ImageView width.
         if (getMeasuredWidth() <= getMeasuredHeight()) {
-
             float measuredWidth = getMeasuredWidth();
-
             mScaleFactor = measuredWidth / imageWidth;
-
             // Translate to center the image.
             dy = ((float) getMeasuredHeight() - imageHeight
                     * mScaleFactor) / 2f;
-
             // Else the image height is set to the ImageView height.
         } else {
-
             float measuredHeight = getMeasuredHeight();
-
             mScaleFactor = measuredHeight / imageHeight;
-
             // Translate to center the image.
             dx = ((float) getMeasuredWidth() - imageWidth * mScaleFactor) / 2f;
-
         }
-
         // Set the transformation
         mMatrix.setScale(mScaleFactor, mScaleFactor, 0f, 0f);
         mMatrix.postTranslate(dx, dy);
-
         // Set the Image Matrix
         setImageMatrix(mMatrix);
-
     }
 
     /**
      * Display the real size of the image.
      */
     public void realSize() {
-
         // Get the image width and height
         int imageWidth = mImage.getWidth();
         int imageHeight = mImage.getHeight();
-
         // Compute the translation
         float dx = ((float) getMeasuredWidth() - imageWidth) / 2f;
-
         float dy = ((float) getMeasuredHeight() - imageHeight) / 2f;
-
         mScaleFactor = 1f;
-
         mMatrix.set(getImageMatrix());
-
         // Set the transformation
         mMatrix.setScale(mScaleFactor, mScaleFactor, 0f, 0f);
         mMatrix.postTranslate(dx, dy);
-
         // Set the Image Matrix
         setImageMatrix(mMatrix);
-
     }
 
     /**
@@ -753,29 +590,21 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      * of the ImageView.
      */
     public void center() {
-
         // Scaled image sizes.
         float scaledImageWidth = (float) mImage.getWidth() * mScaleFactor;
         float scaledImageHeight = (float) mImage.getHeight() * mScaleFactor;
-
-        if (scaledImageWidth <= getMeasuredWidth()
-                && scaledImageHeight <= getMeasuredHeight()) {
-
+//        if (scaledImageWidth <= getMeasuredWidth()
+//                && scaledImageHeight <= getMeasuredHeight()) {
             // Compute the translation
             float dx = ((float) getMeasuredWidth() - scaledImageWidth) / 2f;
             float dy = ((float) getMeasuredHeight() - scaledImageHeight) / 2f;
 
             mMatrix.set(getImageMatrix());
-
             mMatrix.setScale(mScaleFactor, mScaleFactor, 0f, 0f);
             mMatrix.postTranslate(dx, dy);
-
-
             // Set the Image Matrix
             setImageMatrix(mMatrix);
-
-        }
-
+//        }
     }
 
     /**
@@ -834,6 +663,9 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
      */
     public void setScaleFactor(float scaleFactor) {
         mScaleFactor = scaleFactor;
+        mMatrix.set(getImageMatrix());
+        mMatrix.setScale(mScaleFactor, mScaleFactor, 0f, 0f);
+        setImageMatrix(mMatrix);
     }
 
     /**

@@ -44,6 +44,8 @@ public class DICOMTag {
     public static final int PatientsBirthDate                   = 0x0010_0030;
     public static final int PatientsAge                         = 0x0010_1010;
 
+    public static final int ImagerPixelSpacing                  = 0x0018_1164;
+
     public static final int ImageOrientationPatient             = 0x0020_0037;
 
     public static final int SamplesPerPixel                     = 0x0028_0002;
@@ -125,9 +127,15 @@ public class DICOMTag {
             put(PrivateInformation, new DICOMTag(PrivateInformation,
                     "PrivateInformation",
                     DICOMValueRepresentation.c.get("OB")));
+            // 0018
+            put(ImagerPixelSpacing, new DICOMTag(ImagerPixelSpacing,
+                    "Imager Pixel Spacing",
+                    DICOMValueRepresentation.c.get("DS")));
+            // 0020
             put(ImageOrientationPatient, new DICOMTag(ImageOrientationPatient,
                     "Image Orientation (Patient)",
                     DICOMValueRepresentation.c.get("DS")));
+            // 0028
             put(SamplesPerPixel, new DICOMTag(SamplesPerPixel,
                     "Samples per pixel",
                     DICOMValueRepresentation.c.get("US")));
@@ -335,7 +343,7 @@ public class DICOMTag {
      * Create a DICOM tag using a tag integer value.
      *
      * @param tag Tag integer value
-     * @return
+     * @return DICOMTag
      */
     public static final DICOMTag createDICOMTag(int tag) {
         // If the tag is known by Droid Dicom Viewer
@@ -357,7 +365,7 @@ public class DICOMTag {
      *
      * @param tag Tag integer value
      * @param VR  Value representation.
-     * @return
+     * @return DICOMTag
      */
     public static final DICOMTag createDICOMTag(int tag, DICOMValueRepresentation VR) {
         String name;
