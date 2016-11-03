@@ -81,7 +81,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     private AnnotationView mAnnotationView;                 // the annotation view with drawing figure with text for annotations
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
-    DICOMPresentationState mPresentationState = null;        // Presentation State of the file (Contains annotations)
+    private DICOMPresentationState mPresentationState = null;// Presentation State of the file (Contains annotations)
     private LISAImageGray16Bit mImage = null;               // The LISA 16-Bit image
     private boolean mIsInitialized = false;                 //Set if the DICOM Viewer is initialized or not
     private ListView mListMetadata;                         // List view that is used to output metadata

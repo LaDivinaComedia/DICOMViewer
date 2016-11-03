@@ -85,7 +85,7 @@ public class DrawerFragment extends Fragment {
 
         getActionBar().hide();
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition,null);
+        selectItem(mCurrentSelectedPosition, null);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class DrawerFragment extends Fragment {
                              Bundle savedInstanceState) {
         mDrawerListView = (ExpandableListView) inflater.inflate(R.layout.drawer_dicomviewer, container, false);
         preparingData();
-        mExpListAdapter = new ExpandableListAdapter(inflater.getContext(),listDataHeader,listDataChild);
+        mExpListAdapter = new ExpandableListAdapter(inflater.getContext(), listDataHeader, listDataChild);
         mDrawerListView.setAdapter(mExpListAdapter);
         // load values for navigation drawer from resources
         String[] list = getResources().getStringArray(R.array.drawer_items);
@@ -116,9 +116,9 @@ public class DrawerFragment extends Fragment {
         mDrawerListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                for(int i=0;i<listDataHeader.size();i++){
-                    if(listDataHeader.indexOf("Presets")==groupPosition){
-                        selectItem(groupPosition,childPosition);
+                for (int i = 0; i < listDataHeader.size(); i++) {
+                    if (listDataHeader.indexOf("Presets") == groupPosition) {
+                        selectItem(groupPosition, childPosition);
                         break;
                     }
                 }
@@ -133,34 +133,36 @@ public class DrawerFragment extends Fragment {
                 selectItem(position);
             }
         });*/
-        mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener(){
+        mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                selectItem(groupPosition,0);
+                selectItem(groupPosition, 0);
                 return false;
             }
         });
         return mDrawerListView;
     }
-    private void preparingData(){
+
+    private void preparingData() {
         String[] headers = getResources().getStringArray(R.array.drawer_items);
         String[] child = getResources().getStringArray(R.array.child_items);
         this.listDataHeader = new ArrayList<String>();
-        for(int i=0;i<headers.length;i++)
+        for (int i = 0; i < headers.length; i++)
             this.listDataHeader.add(headers[i]);
         ArrayList<String> childs = new ArrayList<String>();
-        for(String s: child)
+        for (String s : child)
             childs.add(s);
-        this.listDataChild = new HashMap<String,List<String>>();
-        for(int i=0;i<this.listDataHeader.size();i++){
-            if(listDataHeader.get(i).toLowerCase().equals("presets"))
+        this.listDataChild = new HashMap<String, List<String>>();
+        for (int i = 0; i < this.listDataHeader.size(); i++) {
+            if (listDataHeader.get(i).toLowerCase().equals("presets"))
                 this.listDataChild.put(listDataHeader.get(i), childs);
             else
                 this.listDataChild.put(listDataHeader.get(i), new ArrayList<String>());
         }
 
     }
+
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
@@ -237,25 +239,25 @@ public class DrawerFragment extends Fragment {
 
     }
 
-    private void selectItem(int position,Integer value) {
+    private void selectItem(int position, Integer value) {
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }
         if (mDrawerLayout != null) {
-            if(listDataHeader.indexOf("Presets")!=position)
+            if (listDataHeader.indexOf("Presets") != position)
                 mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
-        if (mCallbacks != null && value !=null) {
-            if(value!=0)
+        if (mCallbacks != null && value != null) {
+            if (value != 0)
                 mCallbacks.onNavigationDrawerItemSelected(position,
-                            getResources().getIntArray(R.array.presets_numbers_center)[value-1],
-                            getResources().getIntArray(R.array.presets_numbers_width)[value-1]
-                 );
+                        getResources().getIntArray(R.array.presets_numbers_center)[value - 1],
+                        getResources().getIntArray(R.array.presets_numbers_width)[value - 1]
+                );
             else
                 mCallbacks.onNavigationDrawerItemSelected(position,
-                       -2,
-                       -2
+                        -2,
+                        -2
                 );
         }
     }
