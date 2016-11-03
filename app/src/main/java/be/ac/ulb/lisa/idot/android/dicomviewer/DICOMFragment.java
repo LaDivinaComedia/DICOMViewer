@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -314,7 +313,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             case Tool.ANNOTATIONS:
                 mTouchListener = mAnnotationView;
                 mAnnotationView.setVisibility(View.VISIBLE);
-                mAnnotationView.reset();
+                mAnnotationView.reset(mPresentationState);
                 mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor());
                 break;
             default:

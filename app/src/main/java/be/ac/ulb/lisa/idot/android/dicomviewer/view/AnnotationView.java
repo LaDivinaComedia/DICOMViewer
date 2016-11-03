@@ -19,6 +19,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.R;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMGraphicObject;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
 
 /**
  * Created by vvanichkov on 24.10.2016.
@@ -38,6 +41,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     private int mIndexToDelete;
     private GestureDetector mGestureDetector = new GestureDetector(this.getContext(),new GestureListener());
     private boolean mDoubleTap = false;
+    private DICOMPresentationState mPresentationState;
+
     public AnnotationView(Context context) {
         super(context);
         init();
@@ -170,12 +175,36 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         }
     }
 
-    public void reset(){
+    public void reset(DICOMPresentationState presentationState){
         //TODO loading data from tag of annotation if it exists for new image.
+        this.mPresentationState = presentationState;
         mCustomPaths = new ArrayList<CustomPath>();
         mPaints = new ArrayList<Paint>();
         mPaints.add(initPaint());
-        //setOnLongClickListener(this);
+        if(mPresentationState!=null){
+            ArrayList<DICOMAnnotation> dicomAnnotation = (ArrayList<DICOMAnnotation>) mPresentationState.getAnnotations();
+            for(int i=0;i<dicomAnnotation.size();i++){
+
+                DICOMAnnotation d = dicomAnnotation.get(i);
+                for(int j = 0;j<d.getGraphicObjects().size();j++){
+                    if(d.getGraphicObjects().get(j).getGraphicType().equals(DICOMGraphicObject.GraphicTypes.POLYLINE)){
+                        CustomPath customPath = new CustomPath();
+                        customPath.paths=(ArrayList<PointF>) d.getGraphicObjects().get(j).getPoints();
+                        customPath.text=d.getTextObjects().get(j).getText();
+                        customPath.mStart  = customPath.paths.get(0);
+                        customPath.mEnd  = customPath.paths.get(customPath.paths.size()-1);
+                        customPath.mPath.reset();
+                        for(int k = 0; k < customPath.paths.size();k++){
+                            PointF point = customPath.paths.get(k);
+                            customPath.mPath.moveTo(point.x,point.y);
+                        }
+                        mCustomPaths.add(customPath);
+                    }
+                }
+
+            }
+        }
+
     }
     public void setBounds(int imageWidth, int imageHeight, float scaleFactor){
         this.mImageWidth = imageWidth;
@@ -296,13 +325,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         builder.show();
     }
 
-    private void showtingText(){
+    private void showtingText(CustomPath customPath2Show){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
         builder.setTitle(getResources().getString(R.string.title_for_double_tap_aler_dialog));
         final TextView textView = new TextView(this.getContext());
-        textView.setText(mCurrentPath.text);
+        textView.setText(customPath2Show.text);
         builder.setView(textView);
-        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
+        builder.setNegativeButton("OK",new DialogInterface.OnClickListener(){
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -318,10 +347,16 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         @Override
         public boolean onDoubleTapEvent(MotionEvent event){
             if(!mDoubleTap){
-                mCurrentPath = trassByLight(new PointF(event.getX(),event.getY()));
-                showtingText();
-                mDoubleTap=true;
+                CustomPath tryTofind = trassByLight(new PointF(event.getX(),event.getY()));
+                if(tryTofind!=null){
+                    showtingText(tryTofind);
+                    mDoubleTap=true;
+                }
             }
+            return true;
+        }
+        @Override
+        public boolean onSingleTapUp(MotionEvent event){
 
             return true;
         }
