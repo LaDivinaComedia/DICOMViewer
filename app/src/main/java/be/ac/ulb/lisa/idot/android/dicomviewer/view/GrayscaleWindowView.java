@@ -61,7 +61,7 @@ public class GrayscaleWindowView extends ImageView {
 	private LISAImageGray16Bit mImage = null;
 	
 	/**
-	 * DICOMViewer_old data.
+	 * DICOMViewer data.
 	 */
 	private DICOMViewerData mDICOMViewerData = null;
 	
@@ -300,7 +300,7 @@ public class GrayscaleWindowView extends ImageView {
 	}
 	
 	/**
-	 * Set the DICOMViewer_old data.
+	 * Set the DICOMViewer data.
 	 * 
 	 * @param data
 	 */
@@ -312,8 +312,7 @@ public class GrayscaleWindowView extends ImageView {
 	 * Set the CLUT Mode.
 	 * 
 	 * This must be set each time, the CLUT mode is changed.
-	 * 
-	 * @param clutMode
+	 *
 	 */
 	public void updateCLUTMode() {
 		

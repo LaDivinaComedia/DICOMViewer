@@ -28,16 +28,16 @@ public class DICOMReader extends DICOMBufferedInputStream {
     /**
      * Length of the preamble.
      */
-    protected static final int PREAMBLE_LENGTH = 128;
+    private static final int PREAMBLE_LENGTH = 128;
 
     /**
      * Prefix of DICOM file.
      */
-    protected static final String PREFIX = "DICM";
-    protected static final byte PREFIX_D = 68;
-    protected static final byte PREFIX_I = 73;
-    protected static final byte PREFIX_C = 67;
-    protected static final byte PREFIX_M = 77;
+    private static final String PREFIX = "DICM";
+    private static final byte PREFIX_D = 68;
+    private static final byte PREFIX_I = 73;
+    private static final byte PREFIX_C = 67;
+    private static final byte PREFIX_M = 77;
 
     // mModality of the image. Used in order to distinct presentation state files
     private String mModality = "";
@@ -559,6 +559,9 @@ public class DICOMReader extends DICOMBufferedInputStream {
                 return;
             int tag = element.getDICOMTag().getTag();
             switch (tag) {
+                case DICOMTag.FileMetaInformationVersion:
+                    mMetaInformation.setFileMetaInformationVersion(element.getValueString());
+                    break;
                 case DICOMTag.MediaStorageSOPClassUID:
                     mMetaInformation.setSOPClassUID(element.getValueString());
                     break;
@@ -581,12 +584,15 @@ public class DICOMReader extends DICOMBufferedInputStream {
         }
 
         public boolean isRequiredElement(int tag) {
-            return (tag == DICOMTag.MediaStorageSOPClassUID)
-                    || (tag == DICOMTag.MediaStorageSOPInstanceUID)
-                    || (tag == DICOMTag.TransferSyntaxUID)
-                    || (tag == DICOMTag.ImplementationClassUID)
-                    || (tag == DICOMTag.ImplementationVersionName)
-                    || (tag == DICOMTag.SourceApplicationEntity);
+            // tag == DICOMTag.FileMetaInformationGroupLength
+            // tag == DICOMTag.PrivateInformationCreatorUID
+            return tag == DICOMTag.FileMetaInformationVersion
+                    || tag == DICOMTag.MediaStorageSOPClassUID
+                    || tag == DICOMTag.MediaStorageSOPInstanceUID
+                    || tag == DICOMTag.TransferSyntaxUID
+                    || tag == DICOMTag.ImplementationClassUID
+                    || tag == DICOMTag.ImplementationVersionName
+                    || tag == DICOMTag.SourceApplicationEntity;
         }
 
         public void computeImage(DICOMElement parent, DICOMValueRepresentation VR,

@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class represents Graphic Layer. It may contain 0..N text and
+ * graphic objects.
+ *
  * @author Vladyslav Vasyliev
  */
 public class DICOMAnnotation {
-    private String mLayerName;
-    private int mLayerOrder;
-    private List<DICOMTextObject> mTextObjects;
-    private List<DICOMGraphicObject> mGraphicObjects;
+    private String mLayerName;          // Name of the layer (annotation).
+    private int mLayerOrder;            // Z-index of the layer (annotation).
+    private List<DICOMTextObject> mTextObjects;         // List of the text objects.
+    private List<DICOMGraphicObject> mGraphicObjects;   // List of the graphic objects.
 
     public DICOMAnnotation() {
         mLayerOrder = -1;
