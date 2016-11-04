@@ -12,7 +12,7 @@ import java.util.Map;
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMGraphicObject;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMTextObject;
 
 import static be.ac.ulb.lisa.idot.dicom.DICOMTag.GraphicLayer;
@@ -35,23 +35,40 @@ public class DICOMAnnotationWriter {
             0x00, 0x00, 0x00, 0x00};                                //0x00000000
     private final byte[] mEmptyLength = new byte[]{0, 0, 0, 0};     //0x00000000
 
-    public byte[] convertAnnotations(List<DICOMAnnotation> annotations, DICOMMetaInformationPS mips) {
+    public byte[] convertAnnotations(DICOMPresentationState state) {
 
         //header
-        byte[] hdr = createHeader();
+        byte[] hdr = createHeader(state);
         //00700001
-        byte[] gas = createGraphicAnnotationSequence(annotations);
+        byte[] gas = createGraphicAnnotationSequence(state.getAnnotations());
         //0070060
-        byte[] gls = createGraphicLayerSequence(annotations);
+        byte[] gls = createGraphicLayerSequence(state.getAnnotations());
         //footer
-        byte[] ftr = createFooter(mips.getContentDescription(),mips.getContentLabel()
-                ,mips.getContentCreatorsName());
+        byte[] ftr = createFooter(state.getMetaInformation().getContentDescription(),
+                state.getMetaInformation().getContentLabel(),
+                state.getMetaInformation().getContentCreatorsName());
 
-        return ByteBuffer.allocate(gas.length + gls.length + ftr.length)
+        return ByteBuffer.allocate(hdr.length + gas.length + gls.length + ftr.length)
+                .put(hdr)
                 .put(gas)
                 .put(gls)
                 .put(ftr)
                 .array();
+    }
+
+    private byte[] createHeader(DICOMPresentationState ps) {
+
+        byte[] t00020000 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.FileMetaInformationGroupLength),0); //todo count bytes of 0002
+//        (0002,0001) 'File Meta Information Version' OB Other Byte String
+//        (0002,0002) 'Media Storage SOP Class UID' UI Unique Identifier
+//                (0002,0003) 'Media Storage SOP Instance UID' UI Unique Identifier
+//                (0002,0010) 'TransferSyntax UID' UI Unique Identifier
+//                (0002,0012) 'Implementation Class UID' UI Unique Identifier
+//                (0002,0013) 'Implementation Version Name' SH Short String
+//                (0008,0005) 'Specific Character Set' CS Code String
+        //todo (0008,0060)
+        //ToDO (0020,0013)
+        return new byte[0];
     }
 
     public byte[] createFooter(String label, String desc, String name) {

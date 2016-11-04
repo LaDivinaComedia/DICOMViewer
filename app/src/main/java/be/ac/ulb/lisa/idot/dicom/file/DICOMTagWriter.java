@@ -29,18 +29,14 @@ public class DICOMTagWriter extends DICOMReader {
     /**
      * Writes tag to DICOM image. Does not have tag-to-valuetype type-check.
      *
-     * @param t tag specification to write
+     * @param tag tag specification to write
      * @param b byte[] value representation
      * @throws IOException
      * @throws DICOMException
      */
-    public void WriteTag(DICOMTag t, byte[] b) throws IOException, DICOMException {
+    public void WriteTag(int tag, byte[] b) throws IOException, DICOMException {
 
-        if (t.getValueRepresentation().equals("SQ") || t.getValueRepresentation().equals("UN")) {
-            throw new DICOMException("Cannot write sequences or undefined data yet");
-        }
-
-        long tagOffset = searchTag(t.getTag());
+        long tagOffset = searchTag(tag);
         boolean replace = true;
         if (tagOffset < 0) {
             tagOffset *= -1;
@@ -48,7 +44,6 @@ public class DICOMTagWriter extends DICOMReader {
         }
         resetReader();
         byte[] beforeTag; // preparing bytes that were before tag
-        byte[] tag; //preparing tag data
         byte[] afterTag; //preparing bytes that will be after tag
 
         //compute before tag part
@@ -58,16 +53,12 @@ public class DICOMTagWriter extends DICOMReader {
         if (replace) {
             //compute tag part
             long oldTagLength = skipTag(); // we skip old tag
-            tag = convertToBytes(t, b);
 
             //compute after tag part
             int afterTagLength = (int) (mFileSize - beforeTag.length - oldTagLength);
             afterTag = new byte[afterTagLength];
             read(afterTag);
         } else {
-            //compute tag part
-            tag = convertToBytes(t, b);
-
             //compute after tag part
             int afterTagLength = (int) (mFileSize - beforeTag.length);
             afterTag = new byte[afterTagLength];
@@ -85,38 +76,6 @@ public class DICOMTagWriter extends DICOMReader {
         fs.write(tag);
         fs.write(afterTag);
         fs.close();
-    }
-
-    /**
-     * Converts given tag and its value to byte representation
-     *
-     * @param t DICOM tag specification
-     * @param b byte[] tag value representation
-     * @return
-     */
-    private byte[] convertToBytes(DICOMTag t, byte[] b) {
-        ByteBuffer bb;
-
-        int vl = hasValueLengthOn2Bytes(t.getValueRepresentation().getVR()) ? 4 : 8;
-        bb = ByteBuffer.allocate(4 + vl + b.length); // preparing buffer
-        if (mByteOrder == LITTLE_ENDIAN) { //setting byte order
-            bb.order(ByteOrder.LITTLE_ENDIAN);
-        } else {
-            bb.order(ByteOrder.BIG_ENDIAN);
-        }
-
-        bb.putInt(t.getTag());
-        byte[] vrBytes = t.getValueRepresentation().getVR().getBytes(Charset.forName("UTF-8"));
-        bb.put(vrBytes);
-        if (hasValueLengthOn2Bytes(t.getValueRepresentation().getVR())) {
-            bb.putShort((short) b.length);
-            bb.put(b);
-        } else {
-            bb.putShort((short) 0);
-            bb.putInt(b.length);
-            bb.put(b);
-        }
-        return bb.array();
     }
 
     /**
