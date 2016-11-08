@@ -11,13 +11,14 @@ import java.nio.charset.Charset;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 import be.ac.ulb.lisa.idot.dicom.DICOMValueRepresentation;
+import be.ac.ulb.lisa.idot.dicom.Interfaces.ITagWriter;
 
 
 /**
  * Created by Iggytoto on 18.10.2016.
  */
 
-public class DICOMTagWriter extends DICOMReader {
+public class DICOMTagWriter extends DICOMReader implements ITagWriter{
 
     private final String mFileName;
 
@@ -26,15 +27,16 @@ public class DICOMTagWriter extends DICOMReader {
         this.mFileName = filename;
     }
 
+
     /**
      * Writes tag to DICOM image. Does not have tag-to-valuetype type-check.
      *
      * @param tag tag specification to write
-     * @param b byte[] value representation
+     * @param v byte[] value representation
      * @throws IOException
      * @throws DICOMException
      */
-    public void WriteTag(int tag, byte[] b) throws IOException, DICOMException {
+    public void writeTag(int tag, byte[] v) throws IOException, DICOMException {
 
         long tagOffset = searchTag(tag);
         boolean replace = true;
@@ -73,7 +75,7 @@ public class DICOMTagWriter extends DICOMReader {
 
         FileOutputStream fs = new FileOutputStream(mFileName);
         fs.write(beforeTag);
-        fs.write(tag);
+        fs.write(v);
         fs.write(afterTag);
         fs.close();
     }
@@ -152,7 +154,7 @@ public class DICOMTagWriter extends DICOMReader {
 
             if (currentTag == tag) {
                 return mByteOffset - 4;
-            } else if (prevTag < tag) {
+            } else if (prevTag < tag && currentTag > tag) {
                 return -(mByteOffset - 4);
             }
 
@@ -226,5 +228,10 @@ public class DICOMTagWriter extends DICOMReader {
         }
 
         return vl;
+    }
+
+    @Override
+    public void writeTag(DICOMTag t, byte[] v) throws IOException, DICOMException {
+        writeTag(t.getTag(),v);
     }
 }

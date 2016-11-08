@@ -1,5 +1,8 @@
 package be.ac.ulb.lisa.idot.dicom.Interfaces;
 
+import java.io.IOException;
+
+import be.ac.ulb.lisa.idot.dicom.DICOMException;
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 
 /**
@@ -7,6 +10,5 @@ import be.ac.ulb.lisa.idot.dicom.DICOMTag;
  */
 
 public interface ITagWriter {
-    void openDICM(String filename);
-    void writeTag(DICOMTag t,byte[] v);
+    void writeTag(DICOMTag t,byte[] v) throws IOException, DICOMException;
 }
