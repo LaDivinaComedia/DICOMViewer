@@ -78,7 +78,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     @Override
     protected void init(){
         mCurrentPath = new CustomPath();
-        //initPaint();
         if(mPaints==null)
             mPaints = new ArrayList<Paint>();
         mPaints.add(initPaint());
@@ -112,7 +111,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     touch_start(x, y);
                     this.invalidate();
                 }
-
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(!inbound){
@@ -128,12 +126,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 this.invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                double distnce= Math.sqrt(Math.pow(startPoint.x-x,2)+Math.sqrt(Math.pow(startPoint.y-y,2)));
-                if(distnce>10 && mCurrentPath.paths.size()>5){
+                double distance= Math.sqrt(Math.pow(startPoint.x-x,2)+Math.sqrt(Math.pow(startPoint.y-y,2)));
+                if(distance>10 && mCurrentPath.paths.size()>5){
                     touch_up();
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x,mCurrentPath.mStart.y);
-                    askForAnnotationText(true);
-                    this.invalidate();
+
                     this.mCustomPaths.add(this.mCurrentPath);
                     DICOMAnnotation diann = mPresentationState.getAnnotations().get(0);
                     DICOMGraphicObject diobj = new DICOMGraphicObject();
@@ -141,6 +138,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     diobj.setNumberOfGraphicPoints(mCurrentPath.paths.size());
                     diobj.setPoints(changingPoints(mCurrentPath.paths));
                     diann.getGraphicObjects().add(diobj);
+                    askForAnnotationText(true);
+                    this.invalidate();
                     init();
                 }
                 startPoint=null;
@@ -216,7 +215,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     }
 
     public void reset(DICOMPresentationState presentationState){
-        //TODO loading data from tag of annotation if it exists for new image.
         this.mPresentationState = presentationState;
         float dx = this.mLeftCorner[0];
         float dy = this.mLeftCorner[1];
@@ -233,7 +231,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     if(d.getGraphicObjects().get(j).getGraphicType().equals(DICOMGraphicObject.GraphicTypes.POLYLINE)){
                         CustomPath customPath = new CustomPath();
                         customPath.paths= new ArrayList<PointF>();
-                        //(ArrayList<PointF>) d.getGraphicObjects().get(j).getPoints();
                         List<PointF> points=d.getGraphicObjects().get(j).getPoints();
 
                         for(int p=0;p<points.size();p++){
@@ -455,8 +452,9 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(modePointOrPolygon){
-                    mCustomPaths.remove(mCustomPaths.size()-1);
+                    CustomPath p = mCustomPaths.remove(mCustomPaths.size()-1);
                     mPaints.remove(mCustomPaths.size());
+                    deleteFromAnnotation(p);
                     drawIt();
                 }else{
                     pointToSaveTextAnnotation=null;
