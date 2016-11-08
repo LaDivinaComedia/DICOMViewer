@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.text.InputType;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -253,8 +254,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                         customPath.mPath.lineTo(customPath.mStart.x,customPath.mStart.y);
                         mCustomPaths.add(customPath);
                     }
+                    mPaints.add(initPaint());
                 }
-                mPaints.add(initPaint());
                 for(int j = 0;j<d.getTextObjects().size();j++){
                     mPaintsText.add(initPaintText());
                 }
@@ -363,8 +364,9 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mCustomPaths.remove(mIndexToDelete);
+                CustomPath deleted = mCustomPaths.remove(mIndexToDelete);
                 mPaints.remove(mIndexToDelete);
+                deleteFromAnnotation(deleted);
                 drawIt();
             }
         });
@@ -376,6 +378,27 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
             }
         });
         buil.show();
+    }
+    private boolean deleteFromAnnotation(CustomPath deleted){
+        List<DICOMAnnotation> d = mPresentationState.getAnnotations();
+        List<PointF> del = changingPoints(deleted.paths);
+        for(DICOMAnnotation i: d){
+            for(DICOMGraphicObject j: i.getGraphicObjects()){
+                if(j.getGraphicType().equals(DICOMGraphicObject.GraphicTypes.POLYLINE)){
+                    boolean res = true;
+                    for(int k=0;k<Math.min(j.getPoints().size(),del.size());k++){
+                        res &=(j.getPoints().get(k).x-del.get(k).x)<0.01 && (j.getPoints().get(k).y-del.get(k).y)<0.01;
+                        if(!res)
+                            break;
+                    }
+                    if(res && j.getPoints().size()==del.size()){
+                        i.getGraphicObjects().remove(j);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     private void agrementToDeleteTextPoint(String text, final int[] adress){
         AlertDialog.Builder buil = new AlertDialog.Builder(this.getContext());
@@ -441,6 +464,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 dialog.cancel();
             }
         } );
+        int c=0;
         builder.show();
     }
 
@@ -468,29 +492,75 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         builder.show();
     }
 
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener{
+    private class GestureListener implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener{
         @Override
-        public boolean onDoubleTapEvent(MotionEvent event){
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            pointToSaveTextAnnotation = new PointF(e.getX()-mLeftCorner[0],e.getY()-mLeftCorner[1]);
+//            synchronized (this){
+//                try {
+//                    wait(500);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            askForAnnotationText(false);
+            Log.d("SINGLE_TAP", "CONFIRMED");
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
             if(!mDoubleTap){
-                CustomPath tryTofind = trassByLight(new PointF(event.getX(),event.getY()));
+                CustomPath tryTofind = trassByLight(new PointF(e.getX(),e.getY()));
                 if(tryTofind!=null){
                     showtingText(tryTofind,true, new int[]{-1,-1});
                     mDoubleTap=true;
                 }
-                int[] search = checkPointWithText(new PointF(event.getX(),event.getY()));
+                int[] search = checkPointWithText(new PointF(e.getX(),e.getY()));
                 if(search[0]!=-1 && search[1]!=-1){
                     showtingText(tryTofind,false, search);
                     mDoubleTap=true;
                 }
             }
+            Log.d("SINGLE_TAP", "DOUBLE");
             return true;
         }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent event){
+//            if(onSingleTapConfirmed(event)) {
+                Log.d("SINGLE_TAP", "DOUBLE_EVENT");
+//            }
+            return true;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            Log.d("SINGLE_TAP", "DOWN");
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+            Log.d("SINGLE_TAP", "SHOWPRESS");
+        }
+
         @Override
         public boolean onSingleTapUp(MotionEvent event){
-            pointToSaveTextAnnotation = new PointF(event.getX()-mLeftCorner[0],event.getY()-mLeftCorner[1]);
-            askForAnnotationText(false);
-            return true;
+            //if(onSingleTapConfirmed(event)){
+
+            Log.d("SINGLE_TAP","SINGLE");
+                return true;
+           //}
+            //return true;
+
         }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
         @Override
         public void onLongPress(MotionEvent e){
             CustomPath a = trassByLight(startPoint);//pointInPolygonProblem(startPoint);
@@ -505,6 +575,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                                 .getText()
                         ,res);
             }
+            Log.d("SINGLE_TAP", "LONG");
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.d("SINGLE_TAP", "FLING");
+            return false;
         }
     }
     private class CustomPath{
