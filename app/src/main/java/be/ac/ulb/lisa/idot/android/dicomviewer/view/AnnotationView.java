@@ -11,12 +11,12 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.text.InputType;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -365,13 +365,14 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 mPaints.remove(mIndexToDelete);
                 deleteFromAnnotation(deleted);
                 drawIt();
+                Toast t =Toast.makeText(getContext(),"Successfully deleted.",Toast.LENGTH_LONG);
+                t.show();
             }
         });
         buil.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-
             }
         });
         buil.show();
@@ -410,6 +411,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 mPresentationState.getAnnotations().get(adress[0]).getTextObjects().remove(adress[1]);
                 mPaintsText.remove(adress[0]+adress[1]);
                 drawIt();
+                Toast t =Toast.makeText(getContext(),"Successfully deleted.",Toast.LENGTH_LONG);
+                t.show();
             }
         });
         buil.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -446,6 +449,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     mPaintsText.add(initPaintText());
                     drawIt();
                 }
+                Toast toast =Toast.makeText(getContext(),"Successfully saved.",Toast.LENGTH_LONG);
+                toast.show();
             }
         });
         builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener(){
@@ -494,15 +499,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             pointToSaveTextAnnotation = new PointF(e.getX()-mLeftCorner[0],e.getY()-mLeftCorner[1]);
-//            synchronized (this){
-//                try {
-//                    wait(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             askForAnnotationText(false);
-            Log.d("SINGLE_TAP", "CONFIRMED");
             return false;
         }
 
@@ -520,38 +517,26 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     mDoubleTap=true;
                 }
             }
-            Log.d("SINGLE_TAP", "DOUBLE");
             return true;
         }
 
         @Override
         public boolean onDoubleTapEvent(MotionEvent event){
-//            if(onSingleTapConfirmed(event)) {
-                Log.d("SINGLE_TAP", "DOUBLE_EVENT");
-//            }
             return true;
         }
 
         @Override
         public boolean onDown(MotionEvent e) {
-            Log.d("SINGLE_TAP", "DOWN");
             return false;
         }
 
         @Override
         public void onShowPress(MotionEvent e) {
-            Log.d("SINGLE_TAP", "SHOWPRESS");
         }
 
         @Override
         public boolean onSingleTapUp(MotionEvent event){
-            //if(onSingleTapConfirmed(event)){
-
-            Log.d("SINGLE_TAP","SINGLE");
-                return true;
-           //}
-            //return true;
-
+            return true;
         }
 
         @Override
@@ -573,12 +558,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                                 .getText()
                         ,res);
             }
-            Log.d("SINGLE_TAP", "LONG");
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d("SINGLE_TAP", "FLING");
+
             return false;
         }
     }
