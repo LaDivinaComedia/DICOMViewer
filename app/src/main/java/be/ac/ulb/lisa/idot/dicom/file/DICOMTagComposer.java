@@ -12,7 +12,7 @@ import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 public class DICOMTagComposer {
 
     public static byte[] composeTag(DICOMTag tag, Object value) {
-        switch (tag.getValueRepresentation().getName()) {
+        switch (tag.getValueRepresentation().getVR()) {
             case "UL":
                 return createUnsingedLongTag(tag, value);
             case "OB":
@@ -100,6 +100,7 @@ public class DICOMTagComposer {
             bb.putShort((short) 0);
             bb.putInt(data.length);
         }
+        bb.put(data);
         return bb.array();
     }
 
