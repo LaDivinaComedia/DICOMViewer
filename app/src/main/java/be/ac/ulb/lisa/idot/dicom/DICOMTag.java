@@ -44,6 +44,7 @@ public class DICOMTag {
     public static final int PatientsBirthDate                   = 0x0010_0030;
     public static final int PatientsAge                         = 0x0010_1010;
 
+    public static final int InstanceNumber                      = 0x0020_0013;
     public static final int ImageOrientationPatient             = 0x0020_0037;
 
     public static final int SamplesPerPixel                     = 0x0028_0002;
@@ -125,6 +126,9 @@ public class DICOMTag {
             put(PrivateInformation, new DICOMTag(PrivateInformation,
                     "PrivateInformation",
                     DICOMValueRepresentation.c.get("OB")));
+            put(InstanceNumber,new DICOMTag(InstanceNumber,
+                    "Instance number",
+                    DICOMValueRepresentation.c.get("IS")));
             put(ImageOrientationPatient, new DICOMTag(ImageOrientationPatient,
                     "Image Orientation (Patient)",
                     DICOMValueRepresentation.c.get("DS")));

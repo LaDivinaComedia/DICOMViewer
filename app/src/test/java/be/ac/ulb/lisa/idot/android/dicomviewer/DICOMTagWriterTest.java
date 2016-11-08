@@ -18,6 +18,7 @@ import java.util.Arrays;
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 import be.ac.ulb.lisa.idot.dicom.DICOMValueRepresentation;
 import be.ac.ulb.lisa.idot.dicom.Interfaces.ITagWriter;
+import be.ac.ulb.lisa.idot.dicom.file.DICOMTagWriter;
 
 /**
  * Created by Iggytoto on 27.10.2016.

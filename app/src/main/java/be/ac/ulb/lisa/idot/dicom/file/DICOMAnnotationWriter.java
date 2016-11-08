@@ -41,7 +41,7 @@ public class DICOMAnnotationWriter {
         byte[] hdr = createHeader(state);
         //00700001
         byte[] gas = createGraphicAnnotationSequence(state.getAnnotations());
-        //0070060
+        //00700060
         byte[] gls = createGraphicLayerSequence(state.getAnnotations());
         //footer
         byte[] ftr = createFooter(state.getMetaInformation().getContentDescription(),
@@ -57,18 +57,46 @@ public class DICOMAnnotationWriter {
     }
 
     private byte[] createHeader(DICOMPresentationState ps) {
-
-        byte[] t00020000 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.FileMetaInformationGroupLength),0); //todo count bytes of 0002
-//        (0002,0001) 'File Meta Information Version' OB Other Byte String
-//        (0002,0002) 'Media Storage SOP Class UID' UI Unique Identifier
-//                (0002,0003) 'Media Storage SOP Instance UID' UI Unique Identifier
-//                (0002,0010) 'TransferSyntax UID' UI Unique Identifier
-//                (0002,0012) 'Implementation Class UID' UI Unique Identifier
-//                (0002,0013) 'Implementation Version Name' SH Short String
-//                (0008,0005) 'Specific Character Set' CS Code String
-        //todo (0008,0060)
-        //ToDO (0020,0013)
-        return new byte[0];
+        byte[] t00020001 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.FileMetaInformationVersion),
+                ps.getMetaInformation().getFileMetaInformationVersion());
+        byte[] t00020002 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.MediaStorageSOPClassUID),
+                ps.getMetaInformation().getSOPClassUID());
+        byte[] t00020003 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.SOPInstanceUID),
+                ps.getMetaInformation().getSOPInstanceUID());
+        byte[] t00020010 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.TransferSyntaxUID),
+                ps.getMetaInformation().getTransferSyntaxUID());
+        byte[] t00020012 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.ImplementationClassUID),
+                ps.getMetaInformation().getImplementationClassUID());
+        byte[] t00020013 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.ImplementationVersionName),
+                ps.getMetaInformation().getImplementationVersionName());
+        int sectionLength =
+                t00020001.length +
+                t00020002.length +
+                t00020003.length +
+                t00020010.length +
+                t00020012.length +
+                t00020013.length;
+        byte[] t00020000 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.FileMetaInformationGroupLength),
+                sectionLength);
+        byte[] t00080060 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.SpecificCharacterSet),
+                ps.getBody().getSpecificCharset());
+        byte[] t00200013 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.InstanceNumber),
+                ps.getBody().getInstanceNumber());
+        return ByteBuffer.allocate(
+                t00020000.length +
+                sectionLength +
+                t00080060.length +
+                t00200013.length)
+                .put(t00020000)
+                .put(t00020001)
+                .put(t00020002)
+                .put(t00020003)
+                .put(t00020010)
+                .put(t00020012)
+                .put(t00020013)
+                .put(t00080060)
+                .put(t00200013)
+                .array();
     }
 
     public byte[] createFooter(String label, String desc, String name) {
