@@ -77,9 +77,9 @@ public class DICOMImage extends DICOMFile {
 	// ---------------------------------------------------------------
 
 	public DICOMImage(DICOMMetaInformation metaInformation, DICOMBody body,
-					  LISAImageGray16Bit image, short compressionStatus) {
+					  LISAImageGray16Bit image, short compressionStatus,String fileName) {
 
-		super(metaInformation, body);
+		super(metaInformation, body, fileName);
 
 		mImage = image;
 		mCompressionStatus = compressionStatus;

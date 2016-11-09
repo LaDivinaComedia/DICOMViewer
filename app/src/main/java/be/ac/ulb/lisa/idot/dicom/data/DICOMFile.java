@@ -56,16 +56,21 @@ public class DICOMFile {
 	 */
 	protected final DICOMBody mBody;
 
+	/**
+	 * DICOM filename
+	 */
+	protected final String mFileName;
+
 
 	// ---------------------------------------------------------------
 	// + CONSTRUCTOR
 	// ---------------------------------------------------------------
 
-	public DICOMFile(DICOMMetaInformation metaInformation, DICOMBody body) {
+	public DICOMFile(DICOMMetaInformation metaInformation, DICOMBody body, String fileName) {
 
 		mMetaInformation = metaInformation;
 		mBody = body;
-
+		mFileName = fileName;
 	}
 
 

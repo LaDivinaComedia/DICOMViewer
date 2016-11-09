@@ -1,7 +1,13 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +40,21 @@ public class DICOMAnnotationWriter {
             (byte) 0xff, (byte) 0xfe, (byte) 0xe0, 0x0d,            //0xfffee00d
             0x00, 0x00, 0x00, 0x00};                                //0x00000000
     private final byte[] mEmptyLength = new byte[]{0, 0, 0, 0};     //0x00000000
+
+    public void writeAnnotations(DICOMPresentationState state,String filename) throws IOException {
+        byte[] preamble = getPreamble();
+        byte[] body = convertAnnotations(state);
+
+        byte[] bytesToWrite = ByteBuffer.allocate(preamble.length + body.length)
+                .put(preamble)
+                .put(body)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .array();
+
+        FileOutputStream f = new FileOutputStream(filename);
+        f.write(bytesToWrite);
+        f.close();
+    }
 
     public byte[] convertAnnotations(DICOMPresentationState state) {
 
@@ -317,5 +338,13 @@ public class DICOMAnnotationWriter {
         return bb.array();
     }
 
-
+    /**
+     * GETS DICM PREAMBLE
+     * @return
+     */
+    public byte[] getPreamble() {
+        return ByteBuffer.allocate(128 + 4)
+                .putInt(128,0x4449434d)
+                .array();
+    }
 }

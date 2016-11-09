@@ -79,7 +79,7 @@ public class DICOMImageReader extends DICOMReader {
         DICOMImage dicomImage = new DICOMImage(metaInformation,
                 dicomReaderFunctions.getBody(),
                 dicomReaderFunctions.getImage(),
-                compressionStatus);
+                compressionStatus, mFileName);
         return dicomImage;
     }
 

@@ -55,7 +55,7 @@ public class DICOMPresentationStateReader extends DICOMReader {
         DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
-        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations);
+        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations,mFileName);
     }
 
 }

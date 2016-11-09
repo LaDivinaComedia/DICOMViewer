@@ -30,30 +30,22 @@ public class DICOMBufferedInputStream extends BufferedInputStream {
     // ---------------------------------------------------------------
 
     protected short mByteOrder = LITTLE_ENDIAN;
+    protected final String mFileName;
     // ---------------------------------------------------------------
     // + CONSTRUCTORS
     // ---------------------------------------------------------------
 
     public DICOMBufferedInputStream(File file) throws FileNotFoundException {
         super(new FileInputStream(file), 8192);
+        mFileName = file.getAbsolutePath();
     }
 
-    public DICOMBufferedInputStream(FileDescriptor fd) throws FileNotFoundException {
-        super(new FileInputStream(fd), 8192);
-    }
-
-    public DICOMBufferedInputStream(String fileName) throws FileNotFoundException {
+     public DICOMBufferedInputStream(String fileName) throws FileNotFoundException {
         super(new FileInputStream(fileName), 8192);
+        mFileName = fileName;
     }
 
-    public DICOMBufferedInputStream(InputStream inputStream) {
-        super(inputStream, 8192);
-    }
-
-    public DICOMBufferedInputStream(InputStream inputStream, int bufferSize) {
-        super(inputStream, bufferSize);
-    }
-    // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
     // # FUNCTIONS
     // ---------------------------------------------------------------
 
@@ -245,7 +237,7 @@ public class DICOMBufferedInputStream extends BufferedInputStream {
     }
 
     /**
-     * @param byteOrder6 Byte order to set
+     * @param byteOrder Byte order to set
      */
     protected void setByteOrder(short byteOrder) {
         this.mByteOrder = byteOrder;
