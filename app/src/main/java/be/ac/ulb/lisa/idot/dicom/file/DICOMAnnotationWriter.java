@@ -209,8 +209,6 @@ public class DICOMAnnotationWriter {
         if (graphicObjects.size() == 0) {
             return ByteBuffer.allocate(8)
                     .put(tagHeader)
-                    .putInt(0)
-                    .putInt(0)
                     .array();
         }
 
@@ -225,11 +223,11 @@ public class DICOMAnnotationWriter {
                 points[i + 1] = Float.floatToIntBits(obj.getPoints().get(i).y);
             }
 
-            byte[] objectBytes = ByteBuffer.allocate(8 + 6 + 8 + 2 + 8 + 2 + 8 + points.length + 8 + obj.getGraphicType().length() + 8 + 2 + 8)
+            byte[] objectBytes= ByteBuffer.allocate(8 + 6 + 8 + 2 + 8 + 2 + 8 + points.length*4 + 8 + obj.getGraphicType().length() + 8 + 2 + 8)
                     .put(createStringTag(DICOMTag.GraphicAnnotationUnits, "PIXEL ")) // 8 + 6
                     .put(createShortTag(DICOMTag.GraphicDimensions, (short) 2)) // 8 + 2
                     .put(createShortTag(DICOMTag.NumberOfGraphicPoints, (short) obj.getNumberOfGraphicPoints()))//8+2
-                    .put(createIntArrayTag(DICOMTag.GraphicData, points)) //8 + points.len
+                    .put(createIntArrayTag(DICOMTag.GraphicData, points)) //8 + points.len * 4
                     .put(createStringTag(DICOMTag.GraphicType, obj.getGraphicType()))//8 + str.len
                     .put(createStringTag(DICOMTag.GraphicFilled, obj.isGraphicFilled() ? "Y " : "N ")) // 8 + str.len
                     .put(mItemDelimiter) // 8
@@ -267,8 +265,6 @@ public class DICOMAnnotationWriter {
         if (textObjects.size() == 0) {
             return ByteBuffer.allocate(8)
                     .put(tagHeader)
-                    .putInt(0)
-                    .putInt(0)
                     .array();
         }
 
@@ -276,15 +272,17 @@ public class DICOMAnnotationWriter {
         int arraysLength = 0;
         //pack all text elements
         for (DICOMTextObject obj : textObjects) {
-            byte[] objectBytes = ByteBuffer.allocate(8 + 6 + 8 + obj.getText().length() + 4 + 4 + 4 + 8 + 2 + 8)
-                    .put(createStringTag(DICOMTag.GraphicAnnotationUnits, "PIXEL ")) // 8 + 6
+            ByteBuffer bb = ByteBuffer.allocate(8 + 6 + 8 + obj.getText().length() + 4 + 4 + 8 + 8 + 2 + 8);
+            byte[] objectBytes;
+                    bb.put(createStringTag(DICOMTag.GraphicAnnotationUnits, "PIXEL ")) // 8 + 6
                     .put(createStringTag(DICOMTag.UnformattedTextValue, obj.getText())) // 8 + str.len
                     .put(createIntArrayTag(DICOMTag.GraphicObjectSequence, new int[]{Float.floatToIntBits(obj.getTextAnchor().x),
-                            Float.floatToIntBits(obj.getTextAnchor().y)})) // 4 + 4 + 4
+                            Float.floatToIntBits(obj.getTextAnchor().y)})) // 4 + 4 + 8
                     .put(createStringTag(DICOMTag.AnchorPointVisibility, obj.isAnchorVisible() ? "Y " : "N ")) //8 + 2
                     //TODO add 0x0070,0232 Line Style Sequence
                     .put(mItemDelimiter) // 8
                     .array();
+            objectBytes = bb.array();
             arrays.add(objectBytes);
             arraysLength += objectBytes.length;
         }

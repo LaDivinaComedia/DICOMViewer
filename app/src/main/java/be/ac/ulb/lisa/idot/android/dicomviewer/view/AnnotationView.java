@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +103,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
             else if((centerY+this.mImageHeight*this.mScaleFactor/2)<y)
                 y=(centerY+this.mImageHeight*this.mScaleFactor/2);
         }
-
+        try {
+            mPresentationState.saveAnnotations();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         switch (event.getAction()& MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if(this.startPoint==null){
