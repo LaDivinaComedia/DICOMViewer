@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -356,7 +357,9 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         final TextView textView = new TextView(this.getContext());
         buil.setTitle(getResources().getString(R.string.title_for_delete_alert_dialog));
         textView.setText("Annotation:\r\n"+mCustomPaths.get(mIndexToDelete).text);
-        textView.setTextSize(12);
+        textView.setTextSize(getResources().getInteger(R.integer.text_size_in_alertdialog));
+        int d = getResources().getInteger(R.integer.padding_size_in_alertdialog);
+        textView.setPadding(d*2,d,d,d);
         buil.setView(textView);
         buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
@@ -403,7 +406,9 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         final TextView textView = new TextView(this.getContext());
         buil.setTitle(getResources().getString(R.string.title_for_delete_alert_dialog));
         textView.setText("Annotation:\r\n"+text);
-        textView.setTextSize(12);
+        textView.setTextSize(getResources().getInteger(R.integer.text_size_in_alertdialog));
+        int d = getResources().getInteger(R.integer.padding_size_in_alertdialog);
+        textView.setPadding(d*2,d,d,d);
         buil.setView(textView);
         buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
@@ -474,6 +479,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     private void showtingText(CustomPath customPath2Show,boolean typePointOrPolygon,int[] adress){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
         builder.setTitle(getResources().getString(R.string.title_for_double_tap_aler_dialog));
+        RelativeLayout rl = new RelativeLayout(getContext());
+
         final TextView textView = new TextView(this.getContext());
         if(typePointOrPolygon)
             textView.setText(customPath2Show.text);
@@ -482,7 +489,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                     get(adress[1]).getText());
         else
             textView.setText("");
-        builder.setView(textView);
+        textView.setTextSize(getResources().getInteger(R.integer.text_size_in_alertdialog));
+        rl.addView(textView);
+        int d = getResources().getInteger(R.integer.padding_size_in_alertdialog);
+        rl.setPadding(2*d,d,d,d);
+        builder.setView(rl);
         builder.setNegativeButton("OK",new DialogInterface.OnClickListener(){
 
             @Override

@@ -20,4 +20,6 @@
         <item>1000</item>
         <item>4000</item>
     </integer-array>
+    <integer name="text_size_in_alertdialog">17</integer>
+    <integer name="padding_size_in_alertdialog">25</integer>
 </resources>
