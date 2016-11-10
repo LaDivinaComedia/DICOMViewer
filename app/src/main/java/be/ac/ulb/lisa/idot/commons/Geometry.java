@@ -64,9 +64,8 @@ public class Geometry {
 		// Compute coordinate subtraction
 		float x = x2 - x1;
 		float y = y2 - y1;
-		
 		// Compute the euclidian distance
-		return FloatMath.sqrt(x * x + y * y);
+		return (float) Math.pow(x * x + y * y, 2.0);
 		
 	}
 	

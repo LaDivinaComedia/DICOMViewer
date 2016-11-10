@@ -2,8 +2,8 @@ package be.ac.ulb.lisa.idot.android.dicomviewer;
 
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -16,10 +16,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -56,18 +57,13 @@ public class DrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerListView;
     private View mFragmentContainerView;
-    private ExpandableListView mExpListView;
     private ExpandableListAdapter mExpListAdapter;
-    HashMap<String, List<String>> listDataChild;
-    List<String> listDataHeader;
+    private HashMap<String, List<String>> mListDataChild;
+    private List<String> mListDataHeader;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
-
-
-    public DrawerFragment() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,42 +95,22 @@ public class DrawerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mDrawerListView = (ExpandableListView) inflater.inflate(R.layout.drawer_dicomviewer, container, false);
-        preparingData();
-        mExpListAdapter = new ExpandableListAdapter(inflater.getContext(), listDataHeader, listDataChild);
+        prepareData();
+        mExpListAdapter = new ExpandableListAdapter(inflater.getContext(), mListDataHeader, mListDataChild);
         mDrawerListView.setAdapter(mExpListAdapter);
-        // load values for navigation drawer from resources
-        String[] list = getResources().getStringArray(R.array.drawer_items);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_1,
-                android.R.id.text1,
-                list);
-        /*mDrawerListView.setAdapter(arrayAdapter);
-        mDrawerListView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        */
         mDrawerListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                for (int i = 0; i < listDataHeader.size(); i++) {
-                    if (listDataHeader.indexOf("Presets") == groupPosition) {
+                for (int i = 0; i < mListDataHeader.size(); i++) {
+                    if (mListDataHeader.indexOf("Presets") == groupPosition) {
                         selectItem(groupPosition, childPosition);
                         break;
                     }
                 }
-
                 return false;
             }
-
         });
-        /*mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });*/
         mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 selectItem(groupPosition, 0);
@@ -144,23 +120,20 @@ public class DrawerFragment extends Fragment {
         return mDrawerListView;
     }
 
-    private void preparingData() {
+    private void prepareData() {
         String[] headers = getResources().getStringArray(R.array.drawer_items);
         String[] child = getResources().getStringArray(R.array.child_items);
-        this.listDataHeader = new ArrayList<String>();
-        for (int i = 0; i < headers.length; i++)
-            this.listDataHeader.add(headers[i]);
-        ArrayList<String> childs = new ArrayList<String>();
-        for (String s : child)
-            childs.add(s);
-        this.listDataChild = new HashMap<String, List<String>>();
-        for (int i = 0; i < this.listDataHeader.size(); i++) {
-            if (listDataHeader.get(i).toLowerCase().equals("presets"))
-                this.listDataChild.put(listDataHeader.get(i), childs);
+        this.mListDataHeader = new ArrayList<>();
+        Collections.addAll(this.mListDataHeader, headers);
+        List<String> children = Arrays.asList(child);
+        List<String> empty = new ArrayList<>();
+        this.mListDataChild = new HashMap<>();
+        for (int i = 0; i < this.mListDataHeader.size(); i++) {
+            if (mListDataHeader.get(i).toLowerCase().equals("presets"))
+                this.mListDataChild.put(mListDataHeader.get(i), children);
             else
-                this.listDataChild.put(listDataHeader.get(i), new ArrayList<String>());
+                this.mListDataChild.put(mListDataHeader.get(i), empty);
         }
-
     }
 
     public boolean isDrawerOpen() {
@@ -245,7 +218,7 @@ public class DrawerFragment extends Fragment {
             mDrawerListView.setItemChecked(position, true);
         }
         if (mDrawerLayout != null) {
-            if (listDataHeader.indexOf("Presets") != position)
+            if (mListDataHeader.indexOf("Presets") != position)
                 mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null && value != null) {
@@ -263,10 +236,10 @@ public class DrawerFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mCallbacks = (NavigationDrawerCallbacks) activity;
+            mCallbacks = (NavigationDrawerCallbacks) context;
         } catch (ClassCastException e) {
             throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
         }
