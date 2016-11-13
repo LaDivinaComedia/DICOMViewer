@@ -2,16 +2,10 @@ package be.ac.ulb.lisa.idot.android.dicomviewer.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
-
-import be.ac.ulb.lisa.idot.android.dicomviewer.R;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 
 /**
  * Created by Iggytoto on 08.10.2016.
@@ -35,6 +29,10 @@ public class ProtractorView extends ToolView implements View.OnTouchListener {
         mAngle = 0;
         mCurrent = null;
         mPoints = new PointF[3];
+    }
+
+    public float getAngle() {
+        return mAngle;
     }
 
     @Override
@@ -103,7 +101,7 @@ public class ProtractorView extends ToolView implements View.OnTouchListener {
 
     private void updateAngle() {
         if (mPoints[0] != null && mPoints[1] != null && mPoints[2] != null)
-            mAngle = CalculusView.getRealAngle(new PointF[]{mPoints[0], mPoints[1], mPoints[2]},
+            mAngle = Calculus.getRealAngle(new PointF[]{mPoints[0], mPoints[1], mPoints[2]},
                     mPixelSpacing[0], mPixelSpacing[1]);
     }
 

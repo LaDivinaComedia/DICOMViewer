@@ -1,3 +1,5 @@
+package be.ac.ulb.lisa.idot.android.dicomviewer.adapters;
+
 import android.app.Instrumentation;
 import android.content.res.Resources;
 import android.support.test.InstrumentationRegistry;
@@ -33,9 +35,6 @@ import static junit.framework.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ExpandableListAdapterTest {
-    @Rule
-    public ActivityTestRule<DICOMViewer> mActivityRule = new ActivityTestRule<>(DICOMViewer.class);
-
     private Instrumentation mInstrumentation;
 
     private ExpandableListAdapter mAdapter;

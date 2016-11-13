@@ -10,8 +10,8 @@ import android.view.View;
 
 public class DICOMViewer extends Activity
         implements DrawerFragment.NavigationDrawerCallbacks {
-    private static final String WAS_INITIALIZED = "WAS_INITIALIZED";
-    private static final String DRAWER_FRAGMENT = "DRAWER_FRAGMENT";
+    public static final String WAS_INITIALIZED = "WAS_INITIALIZED";
+    public static final String DRAWER_FRAGMENT = "DRAWER_FRAGMENT";
 
     // Fragment managing the behaviors, interactions and presentation of the navigation drawer
     private DrawerFragment mDrawerFragment;

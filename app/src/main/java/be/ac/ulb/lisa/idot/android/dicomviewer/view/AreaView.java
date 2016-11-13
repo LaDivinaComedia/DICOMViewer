@@ -20,7 +20,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.R;
  * Created by vvanichkov on 08.10.2016.
  */
 
-public class FigureDrawingView extends ToolView implements View.OnTouchListener {
+public class AreaView extends ToolView implements View.OnTouchListener {
     private static final float TOUCH_TOLERANCE = 1;
     private Canvas mCanvas;     // Canvas on which is drawing view
     private float mRadius;      // Radius of the line
@@ -38,17 +38,17 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
     private int mAlpha = 100;
 
 
-    public FigureDrawingView(Context context) {
+    public AreaView(Context context) {
         super(context);
         init();
     }
 
-    public FigureDrawingView(Context context, AttributeSet attrs) {
+    public AreaView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public FigureDrawingView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AreaView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -70,7 +70,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
             case MotionEvent.ACTION_UP:
                 touch_up();
                 //this.invalidate();
-                mPath.lineTo(mStart.x,mStart.y);
+                mPath.lineTo(mStart.x, mStart.y);
                 this.invalidate();
                 this.buildDrawingCache();
                 this.mBitmap = this.getDrawingCache();
@@ -81,73 +81,74 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
     }
 
     private void touch_up() {
-        mPath.lineTo(mCurrent.x,mCurrent.y);
-        mEnd = new PointF(mCurrent.x,mCurrent.y);
+        mPath.lineTo(mCurrent.x, mCurrent.y);
+        mEnd = new PointF(mCurrent.x, mCurrent.y);
         this.path.add(mEnd);
-        mPath.computeBounds(bounds,true);
+        mPath.computeBounds(bounds, true);
     }
 
 
     private void touch_move(float x, float y) {
-        float dx = Math.abs(x-mCurrent.x);
-        float dy = Math.abs(y-mCurrent.y);
+        float dx = Math.abs(x - mCurrent.x);
+        float dy = Math.abs(y - mCurrent.y);
         //if(dx>=TOUCH_TOLERANCE || dy>=TOUCH_TOLERANCE){
-        mPath.quadTo(mCurrent.x,mCurrent.y,x,y);
-            //mPath.addRoundRect(mStart.x,mStart.y,x,y,5,5, Path.Direction.CW);
-        mCurrent = new PointF(x,y);
+        mPath.quadTo(mCurrent.x, mCurrent.y, x, y);
+        //mPath.addRoundRect(mStart.x,mStart.y,x,y,5,5, Path.Direction.CW);
+        mCurrent = new PointF(x, y);
         this.path.add(mCurrent);
-       // }
+        // }
     }
 
     private void touch_start(float x, float y) {
         mPath.reset();
-        mPath.moveTo(x,y);
-        mStart = new PointF(x,y);
-        mCurrent = new PointF(x,y);
+        mPath.moveTo(x, y);
+        mStart = new PointF(x, y);
+        mCurrent = new PointF(x, y);
         this.path.add(mCurrent);
     }
 
 
     @Override
-    protected void onDraw(Canvas canvas){
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawPath(mPath,mPaint);
-        if(mEnd!=null){
+        canvas.drawPath(mPath, mPaint);
+        if (mEnd != null) {
             float margin = 50;
             float height = canvas.getHeight() - mPaint.getTextSize() - margin;
             String format;
-            if (mSquare != null && mSquare > 1000){
+            if (mSquare != null && mSquare > 1000) {
                 format = String.format("%.2f cm2", mSquare / 100);
-            }
-            else{
+            } else {
                 format = String.format("%.2f mm2", mSquare);
             }
             canvas.drawText(format, margin, height, mPaintText);
         }
     }
-    private void getSquare(){
-        int starty = (int) ((int)bounds.centerY()-bounds.height()/2);
-        int endy = (int) ((int)bounds.centerY()+bounds.height()/2);
-        int startx = (int) ((int)bounds.centerX()-bounds.width()/2);
-        int endx = (int) ((int)bounds.centerX()+bounds.width()/2);
+
+    private void getSquare() {
+        int starty = (int) ((int) bounds.centerY() - bounds.height() / 2);
+        int endy = (int) ((int) bounds.centerY() + bounds.height() / 2);
+        int startx = (int) ((int) bounds.centerX() - bounds.width() / 2);
+        int endx = (int) ((int) bounds.centerX() + bounds.width() / 2);
         float result = 0;
-        int count2 =0;
-        if(mBitmap!=null){
-            for(int i=starty;i<endy && i<mBitmap.getHeight();i++){
-                for(int j=startx;j<endx && j<mBitmap.getWidth();j++){
-                    if(mBitmap.getPixel(j,i)== mPaint.getColor()){
+        int count2 = 0;
+        if (mBitmap != null) {
+            for (int i = starty; i < endy && i < mBitmap.getHeight(); i++) {
+                for (int j = startx; j < endx && j < mBitmap.getWidth(); j++) {
+                    if (mBitmap.getPixel(j, i) == mPaint.getColor()) {
                         count2++;
                     }
                 }
             }
         }
-        mSquare = CalculusView.getRealSquare(count2, mScaleFactor,mPixelSpacing[0],mPixelSpacing[1]);
+        mSquare = Calculus.getRealSquare(count2, mScaleFactor, mPixelSpacing[0], mPixelSpacing[1]);
     }
 
-    public void reset(){
+    public void reset() {
         mPath = new Path();
         this.init();
     }
+
     @Override
     protected void init() {
         mRadius = 10;
@@ -164,6 +165,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mPaint.setAlpha(100);
     }
+
     public float getScaleFactor() {
         return mScaleFactor;
     }
@@ -172,4 +174,7 @@ public class FigureDrawingView extends ToolView implements View.OnTouchListener 
         this.mScaleFactor = mScaleFactor;
     }
 
+    public float getArea() {
+        return mSquare;
+    }
 }

@@ -28,8 +28,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AnnotationView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
-import be.ac.ulb.lisa.idot.android.dicomviewer.view.FigureDrawingView;
-import be.ac.ulb.lisa.idot.android.dicomviewer.view.GrayscaleWindowView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.AreaView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
@@ -40,8 +39,6 @@ import be.ac.ulb.lisa.idot.dicom.file.DICOMFileFilter;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMImageReader;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMPresentationStateReader;
 import be.ac.ulb.lisa.idot.image.data.LISAImageGray16Bit;
-import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitReader;
-import be.ac.ulb.lisa.idot.image.file.LISAImageGray16BitWriter;
 
 
 /**
@@ -77,7 +74,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     private RulerView mRulerView;                           // The image view without any decorators
     private ProtractorView mProtractorView;                 // The image view without any decorators with protractor functionality
     private DICOMImageView mImageView;                      // The image view with decorators (tools)
-    private FigureDrawingView mFigureView;                  // the image view with drawing the figure
+    private AreaView mAreaView;                  // the image view with drawing the figure
     private AnnotationView mAnnotationView;                 // the annotation view with drawing figure with text for annotations
     private DICOMViewerData mDICOMViewerData = null;        // DICOM Viewer data
     private DICOMFileLoader mDICOMFileLoader = null;
@@ -135,8 +132,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
         mProtractorView = (ProtractorView) view.findViewById(R.id.protractor_view);
         mProtractorView.setVisibility(View.GONE);
-        mFigureView = (FigureDrawingView) view.findViewById(R.id.figure_view);
-        mFigureView.setVisibility(View.GONE);
+        mAreaView = (AreaView) view.findViewById(R.id.area_view);
+        mAreaView.setVisibility(View.GONE);
         mAnnotationView = (AnnotationView) view.findViewById(R.id.annotation_view);
         mAnnotationView.setVisibility(View.GONE);
         mImageView = (DICOMImageView) view.findViewById(R.id.image_view);
@@ -297,7 +294,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         mRulerView.setVisibility(View.GONE);
         mProtractorView.setVisibility(View.GONE);
-        mFigureView.setVisibility(View.GONE);
+        mAreaView.setVisibility(View.GONE);
         mAnnotationView.setVisibility(View.GONE);
         switch (tool) {
             case Tool.RULER:
@@ -312,10 +309,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mProtractorView.setVisibility(View.VISIBLE);
                 break;
             case Tool.AREA:
-                mTouchListener = mFigureView;
-                mFigureView.reset();
-                mFigureView.setVisibility(View.VISIBLE);
-                mFigureView.setScaleFactor(mImageView.getScaleFactor());
+                mTouchListener = mAreaView;
+                mAreaView.reset();
+                mAreaView.setVisibility(View.VISIBLE);
+                mAreaView.setScaleFactor(mImageView.getScaleFactor());
                 break;
             case Tool.ANNOTATIONS:
                 mTouchListener = mAnnotationView;
@@ -614,7 +611,7 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
 
                         mRulerView.setPixelSpacing(pixelSpasing);
                         mProtractorView.setPixelSpacing(pixelSpasing);
-                        mFigureView.setPixelSpacing(pixelSpasing);
+                        mAreaView.setPixelSpacing(pixelSpasing);
                         String keyName = resources.getString(R.string.metadata_name),
                                 keyBirthDate = resources.getString(R.string.metadata_birth_date),
                                 keyAge = resources.getString(R.string.metadata_age);

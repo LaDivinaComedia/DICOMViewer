@@ -44,9 +44,17 @@ public class RulerView extends ToolView implements View.OnTouchListener {
         this.mScaleFactor = mScaleFactor;
     }
 
+    /**
+     * This method is required for test purposes only!
+     * @return calculated distance between specified points.
+     */
+    public float getDistance() {
+        return mDistance;
+    }
+
     private void calculateRealDistance() {
         if (mPoints[0] != null && mPoints[1] != null)
-            mDistance = CalculusView.getRealDistance(mPoints,
+            mDistance = Calculus.getRealDistance(mPoints,
                     mPixelSpacing[0], mPixelSpacing[1], mScaleFactor);
     }
 
