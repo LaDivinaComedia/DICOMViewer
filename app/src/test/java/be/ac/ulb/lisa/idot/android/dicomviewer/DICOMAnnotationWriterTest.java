@@ -3,6 +3,11 @@ package be.ac.ulb.lisa.idot.android.dicomviewer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.Console;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMAnnotationWriter;
 
@@ -93,5 +98,12 @@ public class DICOMAnnotationWriterTest extends DICOMAnnotationWriter {
         };
         byte[] result = createShortTag(tagValue, value);
         Assert.assertArrayEquals(desired, result);
+    }
+
+    @Test
+    public void as(){
+        byte[] little = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putShort((short) (0x00020001 >> 16)).array();
+        System.out.print(Arrays.toString(little));
+        Assert.assertTrue(true);
     }
 }

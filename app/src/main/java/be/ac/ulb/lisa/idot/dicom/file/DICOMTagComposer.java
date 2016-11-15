@@ -1,6 +1,7 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 import be.ac.ulb.lisa.idot.dicom.DICOMTag;
@@ -10,6 +11,8 @@ import be.ac.ulb.lisa.idot.dicom.DICOMTag;
  */
 
 public class DICOMTagComposer {
+
+    public static ByteOrder ByteOrder = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     public static byte[] composeTag(DICOMTag tag, Object value) {
         switch (tag.getValueRepresentation().getVR()) {
@@ -36,7 +39,6 @@ public class DICOMTagComposer {
      */
     private static byte[] createStringTag(DICOMTag tag, Object value) {
         String valueToPack = (String) value;
-
         return composeTag(
                 tag.getTag(),
                 tag.getValueRepresentation().getVR(),
@@ -74,6 +76,7 @@ public class DICOMTagComposer {
      */
     private static byte[] intArrayToByteArray(Integer[] array){
         ByteBuffer bb =  ByteBuffer.allocate(array.length*4);
+        bb.order(ByteOrder);
         for(int i:array){
             bb.putInt(i);
         }
@@ -89,9 +92,12 @@ public class DICOMTagComposer {
      * represented in short and LINT - length represented in int
      */
     private static byte[] composeTag(int tagName,String vr,byte[] data){
+        short[] tag = splitDicomTag(tagName);
         boolean isLengthOnTwoBytes = DICOMReader.hasValueLengthOn2Bytes(vr);
         ByteBuffer bb = ByteBuffer.allocate(4 + (isLengthOnTwoBytes ? 4 : 8) + data.length);
-        bb.putInt(tagName);
+        bb.order(ByteOrder);
+        bb.putShort(tag[0]);            //0xGGGG    -   groupname
+        bb.putShort(tag[1]);                    //0xTTTT    -   TAG
         bb.put(stringToByteArray(vr));
         if(isLengthOnTwoBytes){
             bb.putShort((short)data.length);
@@ -107,9 +113,22 @@ public class DICOMTagComposer {
     /**
      * Converts string to byte representation according to UTF-8
      * @param s string to convert
-     * @return byte array length of s
+     * @return byte array length of s, length of s+1 if s.length mod 2 != 0, last byte is 00
      */
     private static byte[] stringToByteArray(String s){
-        return s.getBytes(Charset.forName("UTF-8"));
+        byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
+        if(s.length() % 2 != 0){
+            return ByteBuffer.allocate(s.length() + 1).put(bytes).put((byte) 0).array();
+        }
+        return bytes;
+    }
+
+    /**
+     * Splits dicom tag presentation from int to short[2]
+     * @param tag
+     * @return short[2] where [0] is 0xGGGG - group , [1] - 0xTTTT - tag
+     */
+    public static short[] splitDicomTag(int tag){
+        return new short[]{(short)(tag >> 16),(short) tag };
     }
 }

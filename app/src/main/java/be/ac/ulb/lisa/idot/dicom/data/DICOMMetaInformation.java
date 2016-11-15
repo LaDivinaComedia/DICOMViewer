@@ -78,6 +78,9 @@ public class DICOMMetaInformation {
 
     public void setFileMetaInformationVersion(String mFileMetaInformationVersion) {
         this.mFileMetaInformationVersion = mFileMetaInformationVersion;
+        if(mFileMetaInformationVersion == "0/1"){
+            this.mFileMetaInformationVersion = "1";
+        }
     }
 
     public void setSOPClassUID(String mSOPClassUID) {
