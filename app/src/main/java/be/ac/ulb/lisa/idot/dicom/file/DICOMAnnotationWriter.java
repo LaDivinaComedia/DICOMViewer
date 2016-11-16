@@ -244,9 +244,9 @@ public class DICOMAnnotationWriter {
         //pack all text elements
         for (DICOMGraphicObject obj : graphicObjects) {
             int[] points = new int[obj.getNumberOfGraphicPoints() * 2];
-            for (int i = 0; i < obj.getPoints().size(); i++) {
-                points[i] = Float.floatToIntBits(obj.getPoints().get(i).x);
-                points[i + 1] = Float.floatToIntBits(obj.getPoints().get(i).y);
+            for (int i = 0, j = 0; i < obj.getPoints().size() ; i++, j += 2) {
+                points[j] = Float.floatToIntBits(obj.getPoints().get(i).x);
+                points[j + 1] = Float.floatToIntBits(obj.getPoints().get(i).y);
             }
 
             byte[] objectBytes = ByteBuffer.allocate(8 + 8 + 6 + 8 + 2 + 8 + 2 + 8 + points.length * 4 + 8 + obj.getGraphicType().length() + 8 + 2 + 8)
