@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.PairArrayAdapter;
@@ -27,11 +28,12 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AnnotationView;
-import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AreaView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
@@ -318,6 +320,9 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mTouchListener = mAnnotationView;
                 mAnnotationView.setVisibility(View.VISIBLE);
                 mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor(), mImageView.getMatrix());
+                if(mPresentationState==null){
+                    mPresentationState = new DICOMPresentationState(null,null, new ArrayList<DICOMAnnotation>(),mFileName);
+                }
                 mAnnotationView.reset(mPresentationState);
                 break;
             default:
@@ -504,6 +509,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.saveAnnotations();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -545,6 +555,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.saveAnnotations();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -740,11 +755,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mHandler.sendMessage(message);
             }
             Message message;
-            message = mHandler.obtainMessage();
-            message.what = ThreadState.PROGRESSION_UPDATE;
-            message.obj = presentationState;
-            mHandler.sendMessage(message);
-
             DICOMImage dicomImage;
             DICOMImageReader dicomFileReader;
             // Create a LISA image and ask to show the
@@ -755,6 +765,13 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 dicomImage = dicomFileReader.parse();
                 readMetadata(dicomImage);
                 dicomFileReader.close();
+                // Instantiate presentation state object.
+                message = mHandler.obtainMessage();
+                message.what = ThreadState.PROGRESSION_UPDATE;
+                if (presentationState == null)
+                    presentationState = new DICOMPresentationState(dicomImage,mFile.getAbsolutePath());
+                message.obj = presentationState;
+                mHandler.sendMessage(message);
                 // If the image is uncompressed, show it and cached it.
                 if (dicomImage.isUncompressed()) {
                     message = mHandler.obtainMessage();

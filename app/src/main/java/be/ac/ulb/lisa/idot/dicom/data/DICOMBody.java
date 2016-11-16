@@ -1,5 +1,7 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
+import java.io.Serializable;
+
 /**
  * DICOM Body.
  *
@@ -7,7 +9,7 @@ package be.ac.ulb.lisa.idot.dicom.data;
  * @author Pierre Malarme
  * @version 1.1
  */
-public class DICOMBody {
+public class DICOMBody implements Serializable {
 
 	private String mSpecificCharset = "ASCII";		// DICOMTag.SpecificCharacterSet
 	private String mImageType = "";					// DICOMTag.ImageType

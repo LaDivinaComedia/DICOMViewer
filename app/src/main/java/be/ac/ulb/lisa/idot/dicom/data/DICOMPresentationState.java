@@ -1,8 +1,11 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import be.ac.ulb.lisa.idot.dicom.CloneFactory;
 import be.ac.ulb.lisa.idot.dicom.file.DICOMAnnotationWriter;
 
 /**
@@ -14,7 +17,17 @@ import be.ac.ulb.lisa.idot.dicom.file.DICOMAnnotationWriter;
  */
 public class DICOMPresentationState extends DICOMFile {
     // List of the annotations of the specified file.
-    private List<DICOMAnnotation> mAnnotations;
+    private List<DICOMAnnotation> mAnnotations = new ArrayList<>();
+
+    protected static DICOMBody createBody(DICOMImage image) {
+        DICOMBody body = (DICOMBody) CloneFactory.deepClone(image.getBody());
+        body.setModality("PS");
+        return body;
+    }
+
+    public DICOMPresentationState(DICOMImage image, String fileName) {
+        super(new DICOMMetaInformationPS(image.getMetaInformation()), createBody(image), fileName);
+    }
 
     public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body,String fileName) {
         super(metaInformation, body, fileName);

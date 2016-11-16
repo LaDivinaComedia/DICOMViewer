@@ -133,12 +133,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x, mCurrentPath.mStart.y);
 
                     this.mCustomPaths.add(this.mCurrentPath);
-                    DICOMAnnotation diann = mPresentationState.getAnnotations().get(0);
+                    DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMGraphicObject diobj = new DICOMGraphicObject();
                     diobj.setGraphicType(DICOMGraphicObject.GraphicTypes.POLYLINE);
                     diobj.setNumberOfGraphicPoints(mCurrentPath.paths.size());
                     diobj.setPoints(changingPoints(mCurrentPath.paths));
-                    diann.getGraphicObjects().add(diobj);
+                    newAnnotation.getGraphicObjects().add(diobj);
+                    mPresentationState.getAnnotations().add(newAnnotation);
                     askForAnnotationText(true);
                     this.invalidate();
                     init();
@@ -445,7 +446,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
 
     private void askForAnnotationText(final boolean modePointOrPolygon) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-
         builder.setTitle(modePointOrPolygon ?
                 getResources().getString(R.string.title_for_asking_aler_dialog)
                 :
@@ -461,11 +461,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 if (modePointOrPolygon)
                     mCustomPaths.get(mCustomPaths.size() - 1).text = input.getText().toString();
                 else {
-                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
+//                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
+                    DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMTextObject t = new DICOMTextObject();
                     t.setText(input.getText().toString());
                     t.setTextAnchor(pointToSaveTextAnnotation);
-                    dicomAnnotation.getTextObjects().add(t);
+                    newAnnotation.getTextObjects().add(t);
+                    mPresentationState.getAnnotations().add(newAnnotation);
                     mPaintsText.add(initPaintText());
                     drawIt();
                 }
