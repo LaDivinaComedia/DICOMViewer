@@ -300,6 +300,13 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     public void setTool(int tool) {
         if (mCurrentTool == Tool.NONE)
             mScreenOrientation = getActivity().getRequestedOrientation();
+        if (mCurrentTool == Tool.ANNOTATIONS && tool != Tool.ANNOTATIONS)
+            try {
+                if (mPresentationState != null)
+                    mPresentationState.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         mCurrentTool = tool;
         if (mCurrentTool == Tool.NONE)
             getActivity().setRequestedOrientation(mScreenOrientation);
@@ -522,11 +529,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
-        try {
-            mPresentationState.save();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -568,11 +570,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
-        try {
-            mPresentationState.save();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
