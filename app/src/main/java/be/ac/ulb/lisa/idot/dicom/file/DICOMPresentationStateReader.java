@@ -56,6 +56,12 @@ public class DICOMPresentationStateReader extends DICOMReader {
         DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
+        Collections.sort(annotations, new Comparator<DICOMAnnotation>() {
+            @Override
+            public int compare(DICOMAnnotation o1, DICOMAnnotation o2) {
+                return o1.getLayerOrder() - o2.getLayerOrder();
+            }
+        });
         return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations,
                 mFileName);
     }
