@@ -80,7 +80,7 @@ public class DICOMImageReaderTest {
                     if (fileName.endsWith("chest.dcm")) {
                         assertEquals("19910101", metaInformation.getPatientBirthDate());
                         assertEquals("PORTABLE^CHEST", metaInformation.getPatientName());
-                        assertArrayEquals(new double[] { 0.2000, 0.2000 }, metaInformation.getPixelSpacing(), 0);
+                        assertArrayEquals(new float[] { 0.2000f, 0.2000f }, metaInformation.getPixelSpacing(), 0);
 
                         assertEquals("CR", body.getModality());
 
@@ -91,7 +91,7 @@ public class DICOMImageReaderTest {
                     } else if (fileName.endsWith("CT.dcm")) {
                         assertEquals("19410101", metaInformation.getPatientBirthDate());
                         assertEquals("Prpqefryjbqj1", metaInformation.getPatientName());
-                        assertArrayEquals(new double[] { 0.763672, 0.763672 }, metaInformation.getPixelSpacing(), 0);
+                        assertArrayEquals(new float[] { 0.763672f, 0.763672f }, metaInformation.getPixelSpacing(), 0);
 
                         assertEquals("CT", body.getModality());
 
@@ -102,7 +102,7 @@ public class DICOMImageReaderTest {
                     } else if (fileName.endsWith("IM-0001-0004.dcm")) {
                         assertEquals("19490301", metaInformation.getPatientBirthDate());
                         assertEquals("BRAINIX", metaInformation.getPatientName());
-                        assertArrayEquals(new double[] { 0.8984375, 0.8984375 }, metaInformation.getPixelSpacing(), 0);
+                        assertArrayEquals(new float[] { 0.8984375f, 0.8984375f }, metaInformation.getPixelSpacing(), 0);
 
                         assertEquals("MR", body.getModality());
 

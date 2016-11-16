@@ -1,30 +1,11 @@
-<ExpandableListView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:id="@+id/lvExp"
+    android:layout_height="match_parent"
     android:layout_gravity="left"
-    android:focusableInTouchMode="true"
     android:background="#cccc"
-    android:divider="@android:color/transparent"
-    android:dividerHeight="1dp"
     android:choiceMode="singleChoice"
-></ExpandableListView>
-
-
-
-        <!-- The navigation menu -->
-        <!--ListView
-            android:id="@+id/itemsfragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#cccc"
-            android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            tools:context="be.ac.ulb.lisa.idot.android.dicomviewer.DrawerFragment">
-        </ListView-->
-
-
-
+    android:dividerHeight="1dp"
+    android:divider="@android:color/transparent"
+    android:groupIndicator="@android:color/transparent"
+    android:focusableInTouchMode="true" />

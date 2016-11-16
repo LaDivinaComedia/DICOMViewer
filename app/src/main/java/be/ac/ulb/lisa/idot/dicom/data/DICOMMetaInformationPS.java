@@ -31,7 +31,7 @@ public class DICOMMetaInformationPS extends DICOMMetaInformation {
         mPatientBirthDate = metaInformation.mPatientBirthDate;
         mPatientName = metaInformation.mPatientName;
         mPatientAge = metaInformation.mPatientAge;
-        pixelSpacing = metaInformation.pixelSpacing;
+        mPixelSpacing = metaInformation.mPixelSpacing;
     }
 
     public String getContentLabel() {

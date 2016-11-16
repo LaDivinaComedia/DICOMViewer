@@ -6,7 +6,12 @@ import android.graphics.PointF;
 /**
  *
  */
-public class CalculusView {
+public class Calculus {
+    /**
+     * Exclude possibility to instantiate this class.
+     */
+    private Calculus() {}
+
     /**
      * Method calculate the distance in real measure considering the scale of view
      *
@@ -54,6 +59,4 @@ public class CalculusView {
 
         return (float) (Math.acos(cosab) * 180 / Math.PI);
     }
-
-
 }

@@ -21,7 +21,12 @@ public class DICOMMetaInformation {
     protected String mPatientBirthDate = "";
     protected String mPatientName = "";
     protected String mPatientAge = "";
-    protected double[] pixelSpacing;
+    protected float[] mPixelSpacing;
+
+    public DICOMMetaInformation() {
+        // Set default value for the pixel spacing
+        mPixelSpacing = new float[] { 1.0f, 1.0f };
+    }
 
     public long getGroupLength() {
         return mGroupLength;
@@ -67,8 +72,8 @@ public class DICOMMetaInformation {
         return mPatientAge;
     }
 
-    public double[] getPixelSpacing() {
-        return pixelSpacing;
+    public float[] getPixelSpacing() {
+        return mPixelSpacing;
     }
 
 
@@ -119,8 +124,8 @@ public class DICOMMetaInformation {
         this.mPatientAge = patientName;
     }
 
-    public void setPixelSpacing(double[] pixelSpacing) {
-        this.pixelSpacing = pixelSpacing;
+    public void setPixelSpacing(float[] pixelSpacing) {
+        this.mPixelSpacing = pixelSpacing;
     }
 
 }

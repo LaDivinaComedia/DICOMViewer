@@ -37,13 +37,7 @@
     <string name="metadata_anonymous">&lt;anonymous&gt;</string>
 
     <string name="title_activity_dicomviewer">DICOMViewer</string>
-
-    <string name="drawer_ruler">Ruler</string>
-    <string name="drawer_protractor">Protractor</string>
-    <string name="drawer_area">Area</string>
-    <string name="drawer_metadata">Metadata</string>
-    <string name="drawer_settings">Settings</string>
-
+    
     <string-array name="drawer_items">
         <item>Ruler</item>
         <item>Protractor</item>
@@ -71,8 +65,5 @@
     <string name="title_for_double_tap_aler_dialog">Annotation information:</string>
     <string name="on">On</string>
     <string name="off">Off</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 
