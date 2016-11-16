@@ -20,7 +20,7 @@ public class DICOMPresentationState extends DICOMFile {
 
     protected static DICOMBody createBody(DICOMImage image) {
         DICOMBody body = (DICOMBody) CloneFactory.deepClone(image.getBody());
-        body.setModality("PS");
+        body.setModality("PR");
         return body;
     }
 
