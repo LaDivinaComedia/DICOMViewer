@@ -82,7 +82,7 @@ public class DICOMAnnotationWriter {
                 ps.getMetaInformation().getFileMetaInformationVersion());
         byte[] t00020002 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.MediaStorageSOPClassUID),
                 ps.getMetaInformation().getSOPClassUID());
-        byte[] t00020003 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.SOPInstanceUID),
+        byte[] t00020003 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.MediaStorageSOPInstanceUID),
                 ps.getMetaInformation().getSOPInstanceUID());
         byte[] t00020010 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.TransferSyntaxUID),
                 ps.getMetaInformation().getTransferSyntaxUID());
@@ -99,13 +99,19 @@ public class DICOMAnnotationWriter {
                 t00020013.length;
         byte[] t00020000 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.FileMetaInformationGroupLength),
                 sectionLength);
-        byte[] t00080060 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.SpecificCharacterSet),
-                ps.getBody().getSpecificCharset());
-        byte[] t00200013 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.InstanceNumber),
-                ps.getBody().getInstanceNumber());
+//        byte[] t00080005 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.SpecificCharacterSet),
+//                ps.getBody().getSpecificCharset());
+//        byte[] t00080060 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.Modality),
+//                ps.getBody().getModality());
+        byte[] t00080005 = createStringTag(DICOMTag.SpecificCharacterSet,ps.getBody().getSpecificCharset());
+        byte[] t00080060 = createStringTag(DICOMTag.Modality,ps.getBody().getModality());
+//        byte[] t00200013 = DICOMTagComposer.composeTag(DICOMTag.c.get(DICOMTag.InstanceNumber),
+//                ps.getBody().getInstanceNumber());
+        byte[] t00200013 =createStringTag(DICOMTag.InstanceNumber, String.valueOf(ps.getBody().getInstanceNumber()));
         return ByteBuffer.allocate(
                 t00020000.length +
                 sectionLength +
+                t00080005.length +
                 t00080060.length +
                 t00200013.length)
                 .put(t00020000)
@@ -115,6 +121,7 @@ public class DICOMAnnotationWriter {
                 .put(t00020010)
                 .put(t00020012)
                 .put(t00020013)
+                .put(t00080005)
                 .put(t00080060)
                 .put(t00200013)
                 .array();
@@ -147,10 +154,10 @@ public class DICOMAnnotationWriter {
 
         for (String s : layerMap.keySet()) {
             byte[] item = ByteBuffer.allocate(8 + 8 + s.length() + 8 + 2 + 8)
-                    .put(mItemTag)//8
+                    .put(getdelimiter(mItemTag))//8
                     .put(createStringTag(DICOMTag.GraphicLayer, s)) // 8 + str.len
                     .put(createStringTag(DICOMTag.GraphicLayerOrder, layerMap.get(s).toString() + " "))//8+2
-                    .put(mItemDelimiter)//8
+                    .put(getdelimiter(mItemDelimiter))//8
                     .array();
             arrays.add(item);
             arraysLength += item.length;
@@ -161,7 +168,7 @@ public class DICOMAnnotationWriter {
         for (byte[] a : arrays) {
             bb.put(a);
         }
-        bb.put(mSequenceDelimiter);
+        bb.put(getdelimiter(mSequenceDelimiter));
         return bb.array();
     }
 
@@ -173,9 +180,9 @@ public class DICOMAnnotationWriter {
         int arraysLength = 0;
         for (DICOMAnnotation a : annotations) {
             byte[] ann = annotationToByteArray(a);
-            arrays.add(mItemTag);
+            arrays.add(getdelimiter(mItemTag));
             arrays.add(ann);
-            arrays.add(mItemDelimiter);
+            arrays.add(getdelimiter(mItemDelimiter));
             arraysLength += ann.length + mItemDelimiter.length + mItemTag.length;
         }
 
@@ -184,7 +191,7 @@ public class DICOMAnnotationWriter {
         for (byte[] a : arrays) {
             bb.put(a);
         }
-        bb.put(mSequenceDelimiter);
+        bb.put(getdelimiter(mSequenceDelimiter));
         return bb.array();
     }
 
@@ -224,14 +231,14 @@ public class DICOMAnnotationWriter {
             }
 
             byte[] objectBytes= ByteBuffer.allocate(8 + 8 + 6 + 8 + 2 + 8 + 2 + 8 + points.length*4 + 8 + obj.getGraphicType().length() + 8 + 2 + 8)
-                    .put(mItemTag)
+                    .put(getdelimiter(mItemTag))
                     .put(createStringTag(DICOMTag.GraphicAnnotationUnits, "PIXEL ")) // 8 + 6
                     .put(createShortTag(DICOMTag.GraphicDimensions, (short) 2)) // 8 + 2
                     .put(createShortTag(DICOMTag.NumberOfGraphicPoints, (short) obj.getNumberOfGraphicPoints()))//8+2
                     .put(createIntArrayTag(DICOMTag.GraphicData, points)) //8 + points.len * 4
                     .put(createStringTag(DICOMTag.GraphicType, obj.getGraphicType()))//8 + str.len
                     .put(createStringTag(DICOMTag.GraphicFilled, obj.isGraphicFilled() ? "Y " : "N ")) // 8 + str.len
-                    .put(mItemDelimiter) // 8
+                    .put(getdelimiter(mItemDelimiter)) // 8
                     .array();
             arrays.add(objectBytes);
             arraysLength += objectBytes.length;
@@ -245,7 +252,7 @@ public class DICOMAnnotationWriter {
             result.put(arr);
         }
         //delimit em all
-        result.put(mSequenceDelimiter);
+        result.put(getdelimiter(mSequenceDelimiter));
         return result.array();
     }
 
@@ -267,14 +274,14 @@ public class DICOMAnnotationWriter {
             ByteBuffer bb = ByteBuffer.allocate(8+ 8 + 6 + 8 + obj.getText().length() + 4 + 4 + 8 + 8 + 2 + 8);
             byte[] objectBytes;
                     bb
-                    .put(mItemTag) // 8
+                    .put(getdelimiter(mItemTag)) // 8
                     .put(createStringTag(DICOMTag.GraphicAnnotationUnits, "PIXEL ")) // 8 + 6
                     .put(createStringTag(DICOMTag.UnformattedTextValue, obj.getText())) // 8 + str.len
                     .put(createIntArrayTag(DICOMTag.AnchorPoint, new int[]{Float.floatToIntBits(obj.getTextAnchor().x),
                             Float.floatToIntBits(obj.getTextAnchor().y)})) // 4 + 4 + 8
                     .put(createStringTag(DICOMTag.AnchorPointVisibility, obj.isAnchorVisible() ? "Y " : "N ")) //8 + 2
                     //TODO add 0x0070,0232 Line Style Sequence
-                    .put(mItemDelimiter) // 8
+                    .put(getdelimiter(mItemDelimiter)) // 8
                     .array();
             objectBytes = bb.array();
             arrays.add(objectBytes);
@@ -289,7 +296,7 @@ public class DICOMAnnotationWriter {
             result.put(arr);
         }
         //delimit em all
-        result.put(mSequenceDelimiter);
+        result.put(getdelimiter(mSequenceDelimiter));
         return result.array();
     }
 
@@ -323,6 +330,7 @@ public class DICOMAnnotationWriter {
         short[] tag = DICOMTagComposer.splitDicomTag(number);
 
         return ByteBuffer.allocate(10)
+                .order(DICOMTagComposer.ByteOrder)
                 .putShort(tag[0])        // tag
                 .putShort(tag[1])
                 .putShort((short) 2)
@@ -367,5 +375,27 @@ public class DICOMAnnotationWriter {
         return ByteBuffer.allocate(128 + 4)
                 .putInt(128,0x4449434d)
                 .array();
+    }
+
+    private byte[] getdelimiter(byte[] array){
+        if(DICOMTagComposer.ByteOrder == ByteOrder.BIG_ENDIAN)
+        {
+            return ByteBuffer.allocate(8)
+                    .put(new byte[]{array[0],array[1]})
+                    .put(new byte[]{array[2],array[3]})
+                    .put(new byte[]{array[4],array[5]})
+                    .put(new byte[]{array[6],array[7]})
+                    .array();
+        }
+        else
+        {
+            return ByteBuffer.allocate(8)
+                    .put(new byte[]{array[1],array[0]})
+                    .put(new byte[]{array[3],array[2]})
+                    .put(new byte[]{array[5],array[4]})
+                    .put(new byte[]{array[7],array[6]})
+                    .array();
+        }
+
     }
 }

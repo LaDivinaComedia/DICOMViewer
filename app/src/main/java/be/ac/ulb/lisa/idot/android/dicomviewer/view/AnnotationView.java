@@ -54,9 +54,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
     private float[] mLeftCorner;
     private PointF pointToSaveTextAnnotation;
 
-
-
-
     public AnnotationView(Context context) {
         super(context);
         init();
@@ -162,7 +159,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         mCurrentPath.mEnd = new PointF(mCurrentPath.mCurrent.x,mCurrentPath.mCurrent.y);
     }
 
-
     private void touch_move(float x, float y) {
         mCurrentPath.mPath.quadTo(mCurrentPath.mCurrent.x,mCurrentPath.mCurrent.y,x,y);
         mCurrentPath.addToPath(new PointF(x,y));
@@ -192,11 +188,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
         return result;
     }
 
-
     @Override
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
         canvas.drawPath(mCurrentPath.mPath,mPaint);
+        int count = 0;
         if(this.mCustomPaths.size()>0){
             for(int i=0;i<this.mCustomPaths.size();i++){
                 canvas.drawPath(this.mCustomPaths.get(i).mPath,mPaints.get(i));
@@ -207,10 +203,11 @@ public class AnnotationView extends ToolView implements View.OnTouchListener{
                 DICOMAnnotation ann = mPresentationState.getAnnotations().get(i);
                 for(int j=0;j<ann.getTextObjects().size();j++){
                     DICOMTextObject dtext = ann.getTextObjects().get(j);
-                    canvas.drawCircle(this.mLeftCorner[0]+dtext.getTextAnchor().x,this.mLeftCorner[1]+dtext.getTextAnchor().y,RADIUS*mScaleFactor/2,mPaintsText.get(i+j));
+                    canvas.drawCircle(this.mLeftCorner[0]+dtext.getTextAnchor().x,this.mLeftCorner[1]+dtext.getTextAnchor().y,RADIUS*mScaleFactor/2,mPaintsText.get(count));
                     canvas.drawText(
                             dtext.getText().substring(0,dtext.getText().length()>=20?20:dtext.getText().length()),
-                            this.mLeftCorner[0]+dtext.getTextAnchor().x+RADIUS*mScaleFactor/2,this.mLeftCorner[1]+dtext.getTextAnchor().y+RADIUS*mScaleFactor/2,mPaintsText.get(i+j));
+                            this.mLeftCorner[0]+dtext.getTextAnchor().x+RADIUS*mScaleFactor/2,this.mLeftCorner[1]+dtext.getTextAnchor().y+RADIUS*mScaleFactor/2,mPaintsText.get(count));
+                    count++;
                 }
             }
         }
