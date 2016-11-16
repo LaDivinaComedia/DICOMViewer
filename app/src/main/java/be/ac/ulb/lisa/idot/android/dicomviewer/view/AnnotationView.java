@@ -408,6 +408,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                     }
                     if (res && j.getPoints().size() == del.size()) {
                         i.getGraphicObjects().remove(j);
+                        mPresentationState.getAnnotations().remove(i);
                         return true;
                     }
                 }
