@@ -25,7 +25,7 @@ public class DICOMPresentationState extends DICOMFile {
     }
 
     public DICOMPresentationState(DICOMImage image, String fileName) {
-        super((DICOMMetaInformation) CloneFactory.deepClone(image.getMetaInformation()),
+        super(new DICOMMetaInformationPS(image.getMetaInformation()),
                 createBody(image), fileName);
     }
 
