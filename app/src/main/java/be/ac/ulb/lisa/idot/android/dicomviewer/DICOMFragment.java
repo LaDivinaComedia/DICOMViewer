@@ -312,8 +312,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             getActivity().setRequestedOrientation(mScreenOrientation);
         else
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
-        if (mCurrentTool == Tool.ANNOTATIONS && tool != Tool.ANNOTATIONS)
-
         mRulerView.setVisibility(View.GONE);
         mProtractorView.setVisibility(View.GONE);
         mAreaView.setVisibility(View.GONE);
