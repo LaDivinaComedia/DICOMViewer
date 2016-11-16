@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.AnnotationView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AreaView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.Calculus;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
@@ -19,6 +20,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ToolViewTest;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.hasSibling;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -45,7 +47,7 @@ public class ToolsTest {
     }
 
     @Test
-    public void checkRuler() throws Exception {
+    public void testRuler() throws Exception {
         DICOMViewer activity;
         RulerView rulerView;
         float scale;
@@ -66,7 +68,7 @@ public class ToolsTest {
     }
 
     @Test
-    public void checkArea() {
+    public void testArea() {
         DICOMViewer activity;
         AreaView areaView;
         float scale;
@@ -83,7 +85,7 @@ public class ToolsTest {
     }
 
     @Test
-    public void checkProtractor() {
+    public void testProtractor() {
         DICOMViewer activity;
         ProtractorView protractorView;
         float[] ps;
@@ -105,17 +107,21 @@ public class ToolsTest {
     }
 
     @Test
-    public void checkMetadata() {
+    public void testMetadata() {
         DICOMViewer activity;
-        ListView listView;
-        float scale;
-        float[] ps;
+        AnnotationView annotationView;
         activity = activityRule.launchActivity(mIntent);
-        listView = (ListView) activity.findViewById(R.id.list_metadata);
+        annotationView = (AnnotationView) activity.findViewById(R.id.annotation_view);
         // check whether the tool is visible
-        ToolViewTest.selectTool("Metadata");
-        assertEquals(View.VISIBLE, activity.findViewById(R.id.list_metadata).getVisibility());
-        onView(allOf(withText("BRAINIX"), hasSibling(withText("Name")))).check(matches(isDisplayed()));
+        ToolViewTest.selectTool("Annotation");
+        assertEquals(View.VISIBLE, activity.findViewById(R.id.annotation_view).getVisibility());
+
+        onView(withId(R.id.annotation_view)).perform(click());
+
     }
 
+    @Test
+    public void testAnnotations() {
+
+    }
 }

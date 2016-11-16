@@ -740,11 +740,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mHandler.sendMessage(message);
             }
             Message message;
-            message = mHandler.obtainMessage();
-            message.what = ThreadState.PROGRESSION_UPDATE;
-            message.obj = presentationState;
-            mHandler.sendMessage(message);
-
             DICOMImage dicomImage;
             DICOMImageReader dicomFileReader;
             // Create a LISA image and ask to show the
@@ -755,6 +750,13 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 dicomImage = dicomFileReader.parse();
                 readMetadata(dicomImage);
                 dicomFileReader.close();
+                // Instantiate presentation state object.
+                message = mHandler.obtainMessage();
+                message.what = ThreadState.PROGRESSION_UPDATE;
+                if (presentationState == null)
+                    presentationState = new DICOMPresentationState(dicomImage);
+                message.obj = presentationState;
+                mHandler.sendMessage(message);
                 // If the image is uncompressed, show it and cached it.
                 if (dicomImage.isUncompressed()) {
                     message = mHandler.obtainMessage();
