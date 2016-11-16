@@ -32,6 +32,7 @@ public class DICOMPresentationState extends DICOMFile {
     public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body, String fileName) {
         super(metaInformation, body, fileName);
     }
+
     public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body,
                                   List<DICOMAnnotation> annotations, String fileName) {
         super(metaInformation, body, fileName);
