@@ -21,6 +21,21 @@ public class DICOMViewer extends Activity
     private Boolean mInitialized;
 
     @Override
+    public void onBackPressed() {
+
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+
+        mDICOMFragment.save();
+
+        } else {
+            getFragmentManager().popBackStack();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dicomviewer);
