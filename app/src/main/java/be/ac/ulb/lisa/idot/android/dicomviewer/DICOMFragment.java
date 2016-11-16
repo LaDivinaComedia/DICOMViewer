@@ -20,6 +20,7 @@ import android.widget.ListView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import be.ac.ulb.lisa.idot.android.dicomviewer.adapters.PairArrayAdapter;
@@ -32,6 +33,7 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMImage;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformation;
 import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
@@ -318,6 +320,9 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mTouchListener = mAnnotationView;
                 mAnnotationView.setVisibility(View.VISIBLE);
                 mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor(), mImageView.getMatrix());
+                if(mPresentationState==null){
+                    mPresentationState = new DICOMPresentationState(null,null, new ArrayList<DICOMAnnotation>());
+                }
                 mAnnotationView.reset(mPresentationState);
                 break;
             default:
