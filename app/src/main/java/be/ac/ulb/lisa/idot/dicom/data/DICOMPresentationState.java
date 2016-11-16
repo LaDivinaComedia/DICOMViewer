@@ -29,7 +29,7 @@ public class DICOMPresentationState extends DICOMFile {
         super(new DICOMMetaInformationPS(image.getMetaInformation()), createBody(image), fileName);
     }
 
-    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body,String fileName) {
+    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body, String fileName) {
         super(metaInformation, body, fileName);
     }
 
@@ -57,7 +57,7 @@ public class DICOMPresentationState extends DICOMFile {
      */
     public void saveAnnotations() throws IOException {
         DICOMAnnotationWriter writer = new DICOMAnnotationWriter();
-        writer.writeAnnotations(this,mFileName);
+        writer.writeAnnotations(this, mFileName);
     }
 
 }

@@ -1,15 +1,17 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
-import be.ac.ulb.lisa.idot.dicom.DICOMException;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
-import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
-
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import be.ac.ulb.lisa.idot.dicom.DICOMException;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMAnnotation;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMMetaInformationPS;
+import be.ac.ulb.lisa.idot.dicom.data.DICOMPresentationState;
 
 /**
  * DICOM Presentation State File Eeader.
@@ -55,7 +57,13 @@ public class DICOMPresentationStateReader extends DICOMReader {
         DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
-        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations,mFileName);
+        Collections.sort(annotations, new Comparator<DICOMAnnotation>() {
+            @Override
+            public int compare(DICOMAnnotation o1, DICOMAnnotation o2) {
+                return o1.getLayerOrder() - o2.getLayerOrder();
+            }
+        });
+        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations, mFileName);
     }
 
 }

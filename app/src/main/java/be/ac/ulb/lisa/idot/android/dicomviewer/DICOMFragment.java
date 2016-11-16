@@ -321,7 +321,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 mAnnotationView.setVisibility(View.VISIBLE);
                 mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor(), mImageView.getMatrix());
                 if(mPresentationState==null){
-                    mPresentationState = new DICOMPresentationState(null,null, new ArrayList<DICOMAnnotation>(),mFileName);
+                    mPresentationState = new DICOMPresentationState(null, null,
+                            new ArrayList<DICOMAnnotation>(), mFileName + ".ps");
                 }
                 mAnnotationView.reset(mPresentationState);
                 break;
@@ -769,7 +770,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 message = mHandler.obtainMessage();
                 message.what = ThreadState.PROGRESSION_UPDATE;
                 if (presentationState == null)
-                    presentationState = new DICOMPresentationState(dicomImage,mFile.getAbsolutePath());
+                    presentationState = new DICOMPresentationState(dicomImage,
+                            mFile.getAbsolutePath() + ".ps");
                 message.obj = presentationState;
                 mHandler.sendMessage(message);
                 // If the image is uncompressed, show it and cached it.

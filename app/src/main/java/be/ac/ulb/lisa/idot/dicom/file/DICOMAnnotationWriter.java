@@ -1,11 +1,8 @@
 package be.ac.ulb.lisa.idot.dicom.file;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -43,8 +40,12 @@ public class DICOMAnnotationWriter {
     private ByteOrder mByteOrder = ByteOrder.LITTLE_ENDIAN;
 
     public void writeAnnotations(DICOMPresentationState state,String filename) throws IOException {
+        if(state == null || state.getAnnotations() == null || state.getAnnotations().size() == 0){
+            return;
+        }
+
         byte[] preamble = getPreamble();
-        byte[] body = convertAnnotations(state);
+        byte[] body = convertAnnotations(preprocess(state));
 
         byte[] bytesToWrite = ByteBuffer.allocate(preamble.length + body.length)
                 .put(preamble)
@@ -54,6 +55,19 @@ public class DICOMAnnotationWriter {
         FileOutputStream f = new FileOutputStream(filename);
         f.write(bytesToWrite);
         f.close();
+    }
+
+    private DICOMPresentationState preprocess(DICOMPresentationState state) {
+        int i = 0;
+        for (DICOMAnnotation a : state.getAnnotations()) {
+            if (a.getLayerOrder() >= 0) {
+                i = a.getLayerOrder();
+                continue;
+            }
+            a.setLayerOrder(++i);
+            a.setLayerName("LAYER" + i);
+        }
+        return state;
     }
 
     public byte[] convertAnnotations(DICOMPresentationState state) {
