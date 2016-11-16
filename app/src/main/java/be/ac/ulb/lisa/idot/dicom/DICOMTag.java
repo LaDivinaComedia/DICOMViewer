@@ -46,6 +46,7 @@ public class DICOMTag {
 
     public static final int ImagerPixelSpacing                  = 0x0018_1164;
 
+    public static final int InstanceNumber = 0x0020_0013;
     public static final int ImageOrientationPatient             = 0x0020_0037;
 
     public static final int SamplesPerPixel                     = 0x0028_0002;
@@ -132,6 +133,9 @@ public class DICOMTag {
                     "Imager Pixel Spacing",
                     DICOMValueRepresentation.c.get("DS")));
             // 0020
+            put(InstanceNumber, new DICOMTag(InstanceNumber,
+                    "Instance number",
+                    DICOMValueRepresentation.c.get("IS")));
             put(ImageOrientationPatient, new DICOMTag(ImageOrientationPatient,
                     "Image Orientation (Patient)",
                     DICOMValueRepresentation.c.get("DS")));

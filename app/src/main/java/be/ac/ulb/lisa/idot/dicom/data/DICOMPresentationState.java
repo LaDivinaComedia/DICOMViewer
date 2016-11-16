@@ -1,9 +1,11 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import be.ac.ulb.lisa.idot.dicom.CloneFactory;
+import be.ac.ulb.lisa.idot.dicom.file.DICOMAnnotationWriter;
 
 /**
  * This file represent DICOM Presentation State file.
@@ -22,18 +24,17 @@ public class DICOMPresentationState extends DICOMFile {
         return body;
     }
 
-    public DICOMPresentationState(DICOMImage image) {
+    public DICOMPresentationState(DICOMImage image, String fileName) {
         super((DICOMMetaInformation) CloneFactory.deepClone(image.getMetaInformation()),
-                createBody(image));
+                createBody(image), fileName);
     }
 
-    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body) {
-        super(metaInformation, body);
+    public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body, String fileName) {
+        super(metaInformation, body, fileName);
     }
-
     public DICOMPresentationState(DICOMMetaInformationPS metaInformation, DICOMBody body,
-                                  List<DICOMAnnotation> annotations) {
-        super(metaInformation, body);
+                                  List<DICOMAnnotation> annotations, String fileName) {
+        super(metaInformation, body, fileName);
         mAnnotations = annotations;
     }
 
@@ -50,4 +51,8 @@ public class DICOMPresentationState extends DICOMFile {
         this.mAnnotations = annotations;
     }
 
+    public void save() throws IOException {
+        DICOMAnnotationWriter writer = new DICOMAnnotationWriter();
+        writer.writeAnnotations(this, mFileName);
+    }
 }

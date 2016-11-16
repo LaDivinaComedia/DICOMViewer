@@ -17,6 +17,7 @@ import java.util.*;
  * @author Vladyslav Vasyliev
  */
 public class DICOMPresentationStateReader extends DICOMReader {
+
     public DICOMPresentationStateReader(File file) throws FileNotFoundException {
         super(file);
     }
@@ -55,7 +56,8 @@ public class DICOMPresentationStateReader extends DICOMReader {
         DICOMPresentationStateFunctions readerFunctions = new DICOMPresentationStateFunctions(metaInformation);
         parse(null, 0xffffffffL, isExplicit, readerFunctions, true);
         List<DICOMAnnotation> annotations = Collections.list(readerFunctions.getAnnotations());
-        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations);
+        return new DICOMPresentationState(metaInformation, readerFunctions.getBody(), annotations,
+                mFileName);
     }
 
 }

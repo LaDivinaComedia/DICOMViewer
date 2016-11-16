@@ -24,20 +24,21 @@ public class DICOMReader extends DICOMBufferedInputStream {
     // ---------------------------------------------------------------
     // - <static> VARIABLES
     // ---------------------------------------------------------------
+    protected String mFileName;
 
     /**
      * Length of the preamble.
      */
-    private static final int PREAMBLE_LENGTH = 128;
+    protected static final int PREAMBLE_LENGTH = 128;
 
     /**
      * Prefix of DICOM file.
      */
-    private static final String PREFIX = "DICM";
-    private static final byte PREFIX_D = 68;
-    private static final byte PREFIX_I = 73;
-    private static final byte PREFIX_C = 67;
-    private static final byte PREFIX_M = 77;
+    protected static final String PREFIX = "DICM";
+    protected static final byte PREFIX_D = 68;
+    protected static final byte PREFIX_I = 73;
+    protected static final byte PREFIX_C = 67;
+    protected static final byte PREFIX_M = 77;
 
     // mModality of the image. Used in order to distinct presentation state files
     private String mModality = "";
@@ -47,6 +48,7 @@ public class DICOMReader extends DICOMBufferedInputStream {
 
     public DICOMReader(File file) throws FileNotFoundException {
         super(file);
+        mFileName = file.getAbsolutePath();
         mFileSize = file.length();
         mark(Integer.MAX_VALUE);
     }
@@ -54,6 +56,7 @@ public class DICOMReader extends DICOMBufferedInputStream {
     public DICOMReader(String fileName) throws FileNotFoundException {
         super(fileName);
         File file = new File(fileName);
+        mFileName = fileName;
         mFileSize = file.length();
         mark(Integer.MAX_VALUE);
     }

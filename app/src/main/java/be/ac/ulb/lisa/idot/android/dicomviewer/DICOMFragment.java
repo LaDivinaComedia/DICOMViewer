@@ -27,8 +27,8 @@ import be.ac.ulb.lisa.idot.android.dicomviewer.data.DICOMViewerData;
 import be.ac.ulb.lisa.idot.android.dicomviewer.mode.ToolMode;
 import be.ac.ulb.lisa.idot.android.dicomviewer.thread.ThreadState;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AnnotationView;
-import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.AreaView;
+import be.ac.ulb.lisa.idot.android.dicomviewer.view.DICOMImageView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.ProtractorView;
 import be.ac.ulb.lisa.idot.android.dicomviewer.view.RulerView;
 import be.ac.ulb.lisa.idot.dicom.DICOMException;
@@ -504,6 +504,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -545,6 +550,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -754,7 +764,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
                 message = mHandler.obtainMessage();
                 message.what = ThreadState.PROGRESSION_UPDATE;
                 if (presentationState == null)
-                    presentationState = new DICOMPresentationState(dicomImage);
+                    presentationState = new DICOMPresentationState(dicomImage,
+                            mFile.getAbsolutePath() + ".ps");
                 message.obj = presentationState;
                 mHandler.sendMessage(message);
                 // If the image is uncompressed, show it and cached it.
