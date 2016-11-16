@@ -1,5 +1,7 @@
 package be.ac.ulb.lisa.idot.dicom.data;
 
+import java.io.Serializable;
+
 /**
  * DICOM Meta Information.
  *
@@ -7,7 +9,7 @@ package be.ac.ulb.lisa.idot.dicom.data;
  * @author Vladyslav Vasyliev
  * @version 1.2
  */
-public class DICOMMetaInformation {
+public class DICOMMetaInformation implements Serializable {
     protected long mGroupLength = -1;                     // DICOMTag.FileMetaInformationGroupLength
     protected String mFileMetaInformationVersion = "";    // DICOMTag.FileMetaInformationVersion
     protected String mSOPClassUID = "";                   // DICOMTag.MediaStorageSOPClassUID
