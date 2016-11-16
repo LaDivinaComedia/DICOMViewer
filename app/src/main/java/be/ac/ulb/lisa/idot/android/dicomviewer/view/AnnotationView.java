@@ -210,6 +210,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
         if (this.mPresentationState != null) {
             for (int i = 0; i < mPresentationState.getAnnotations().size(); i++) {
                 DICOMAnnotation ann = mPresentationState.getAnnotations().get(i);
+                if(ann.getGraphicObjects().size()==0)
                 for (int j = 0; j < ann.getTextObjects().size(); j++) {
                     DICOMTextObject dtext = ann.getTextObjects().get(j);
                     canvas.drawCircle(this.mLeftCorner[0] + dtext.getTextAnchor().x, this.mLeftCorner[1] + dtext.getTextAnchor().y, RADIUS * mScaleFactor / 2, mPaintsText.get(count));
@@ -258,13 +259,16 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                             customPath.mPath.quadTo(previous_point.x, previous_point.y, point.x, point.y);
                         }
                         customPath.mPath.lineTo(customPath.mStart.x, customPath.mStart.y);
+                        customPath.text = d.getTextObjects().size()>0?d.getTextObjects().
+                                get(d.getTextObjects().size()-1).getText():"";
                         mCustomPaths.add(customPath);
                     }
                     mPaints.add(initPaint());
                 }
-                for (int j = 0; j < d.getTextObjects().size(); j++) {
-                    mPaintsText.add(initPaintText());
-                }
+                if(d.getGraphicObjects().size()==0)
+                    for (int j = 0; j < d.getTextObjects().size(); j++) {
+                        mPaintsText.add(initPaintText());
+                    }
             }
         }
         invalidate();
@@ -430,8 +434,17 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
         buil.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mPresentationState.getAnnotations().get(adress[0]).getTextObjects().remove(adress[1]);
-                mPaintsText.remove(adress[0] + adress[1]);
+                //mPresentationState.getAnnotations().get(adress[0]).getTextObjects().remove(adress[1]);
+                int count = 0;
+                for(int c = 0;c<mPresentationState.getAnnotations().size();c++){
+                    DICOMAnnotation i = mPresentationState.getAnnotations().get(c);
+                    if(i.getTextObjects().size()>0 && i.getGraphicObjects().size()==0)
+                        count++;
+                    if(c==adress[0])
+                        break;
+                }
+                mPaintsText.remove(count-1);
+                mPresentationState.getAnnotations().remove(adress[0]);
                 drawIt();
                 Toast t = Toast.makeText(getContext(), "Successfully deleted.", Toast.LENGTH_LONG);
                 t.show();
@@ -460,9 +473,14 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (modePointOrPolygon)
+                if (modePointOrPolygon){
                     mCustomPaths.get(mCustomPaths.size() - 1).text = input.getText().toString();
-                else {
+                    int in_d = mPresentationState.getAnnotations().size()-1;
+                    DICOMTextObject t = new DICOMTextObject();
+                    t.setTextAnchor(new PointF(0,0));
+                    t.setText(mCustomPaths.get(mCustomPaths.size() - 1).text);
+                    mPresentationState.getAnnotations().get(in_d).getTextObjects().add(t);
+                }else {
                     DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMTextObject t = new DICOMTextObject();
                     t.setText(input.getText().toString());
