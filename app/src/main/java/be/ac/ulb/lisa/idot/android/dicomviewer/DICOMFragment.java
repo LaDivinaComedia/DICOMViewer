@@ -319,9 +319,10 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             case Tool.ANNOTATIONS:
                 mTouchListener = mAnnotationView;
                 mAnnotationView.setVisibility(View.VISIBLE);
-                mAnnotationView.setBounds(mImage.getWidth(),mImage.getHeight(),mImageView.getScaleFactor(), mImageView.getMatrix());
-                if(mPresentationState==null){
-                    mPresentationState = new DICOMPresentationState(null,null, new ArrayList<DICOMAnnotation>());
+                mAnnotationView.setBounds(mImage.getWidth(), mImage.getHeight(), mImageView.getScaleFactor(), mImageView.getMatrix());
+                if (mPresentationState == null) {
+                    mPresentationState = new DICOMPresentationState(null, null,
+                            new ArrayList<DICOMAnnotation>(), mFileName + ".ps");
                 }
                 mAnnotationView.reset(mPresentationState);
                 break;
