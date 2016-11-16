@@ -130,8 +130,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 double distance = Math.sqrt(Math.pow(startPoint.x - x, 2) + Math.sqrt(Math.pow(startPoint.y - y, 2)));
                 if (distance > 10 && mCurrentPath.paths.size() > 5) {
                     touch_up();
-                    mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x, mCurrentPath.mStart.y);
-
                     this.mCustomPaths.add(this.mCurrentPath);
                     DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMGraphicObject diobj = new DICOMGraphicObject();
@@ -162,6 +160,8 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
     private void touch_up() {
         mCurrentPath.mPath.lineTo(mCurrentPath.mCurrent.x, mCurrentPath.mCurrent.y);
         mCurrentPath.mEnd = new PointF(mCurrentPath.mCurrent.x, mCurrentPath.mCurrent.y);
+        mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x, mCurrentPath.mStart.y);
+        mCurrentPath.addToPath(new PointF(mCurrentPath.mStart.x, mCurrentPath.mStart.y));
     }
 
 
@@ -224,6 +224,7 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
 
     public void reset(DICOMPresentationState presentationState) {
         this.mPresentationState = presentationState;
+        mCurrentPath = new CustomPath();
         float dx = this.mLeftCorner[0];
         float dy = this.mLeftCorner[1];
         mCustomPaths = new ArrayList<CustomPath>();
@@ -462,7 +463,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 if (modePointOrPolygon)
                     mCustomPaths.get(mCustomPaths.size() - 1).text = input.getText().toString();
                 else {
-//                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
                     DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMTextObject t = new DICOMTextObject();
                     t.setText(input.getText().toString());
