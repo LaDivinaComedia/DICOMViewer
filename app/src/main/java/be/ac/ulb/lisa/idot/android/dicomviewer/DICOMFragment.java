@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Pair;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,6 +59,14 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     public static final String FILE_INDEX = "FILE_INDEX";
     public static final String CURRENT_TOOL = "CURRENT_TOOL";
     public static final String SCALE_FACTOR = "SCALE_FACTOR";
+
+    public void save() {
+        try {
+            mPresentationState.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Tools available on the fragment.
@@ -266,6 +275,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         mScaleFactor = mImageView.getScaleFactor();
     }
 
+
+
     /**
      * @param visibility Sets the visibility of the metadata list according to this variable.
      */
@@ -287,13 +298,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
      * @param tool
      */
     public void setTool(int tool) {
-        if (mCurrentTool == Tool.ANNOTATIONS && tool != Tool.ANNOTATIONS)
-            try {
-                if (mPresentationState != null)
-                    mPresentationState.save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         if (mCurrentTool == Tool.NONE)
             mScreenOrientation = getActivity().getRequestedOrientation();
         mCurrentTool = tool;
@@ -301,6 +305,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             getActivity().setRequestedOrientation(mScreenOrientation);
         else
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+        if (mCurrentTool == Tool.ANNOTATIONS && tool != Tool.ANNOTATIONS)
+
         mRulerView.setVisibility(View.GONE);
         mProtractorView.setVisibility(View.GONE);
         mAreaView.setVisibility(View.GONE);
@@ -345,7 +351,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
     public int getTool() {
         return mCurrentTool;
     }
-
 
     /**
      * Set the current image.
@@ -517,6 +522,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
@@ -558,6 +568,11 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
         // If it is busy, do nothing
         if (mBusy)
             return;
+        try {
+            mPresentationState.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // It is busy now
         mBusy = true;
         // Wait until the loading thread die
