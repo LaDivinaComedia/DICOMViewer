@@ -133,12 +133,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                     mCurrentPath.mPath.lineTo(mCurrentPath.mStart.x, mCurrentPath.mStart.y);
 
                     this.mCustomPaths.add(this.mCurrentPath);
-                    DICOMAnnotation diann = mPresentationState.getAnnotations().get(0);
+                    DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMGraphicObject diobj = new DICOMGraphicObject();
                     diobj.setGraphicType(DICOMGraphicObject.GraphicTypes.POLYLINE);
                     diobj.setNumberOfGraphicPoints(mCurrentPath.paths.size());
                     diobj.setPoints(changingPoints(mCurrentPath.paths));
-                    diann.getGraphicObjects().add(diobj);
+                    newAnnotation.getGraphicObjects().add(diobj);
+                    mPresentationState.getAnnotations().add(newAnnotation);
                     askForAnnotationText(true);
                     this.invalidate();
                     init();
@@ -205,15 +206,17 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 canvas.drawPath(this.mCustomPaths.get(i).mPath, mPaints.get(i));
             }
         }
+        int count=0;
         if (this.mPresentationState != null) {
             for (int i = 0; i < mPresentationState.getAnnotations().size(); i++) {
                 DICOMAnnotation ann = mPresentationState.getAnnotations().get(i);
                 for (int j = 0; j < ann.getTextObjects().size(); j++) {
                     DICOMTextObject dtext = ann.getTextObjects().get(j);
-                    canvas.drawCircle(this.mLeftCorner[0] + dtext.getTextAnchor().x, this.mLeftCorner[1] + dtext.getTextAnchor().y, RADIUS * mScaleFactor / 2, mPaintsText.get(i + j));
+                    canvas.drawCircle(this.mLeftCorner[0] + dtext.getTextAnchor().x, this.mLeftCorner[1] + dtext.getTextAnchor().y, RADIUS * mScaleFactor / 2, mPaintsText.get(count));
                     canvas.drawText(
                             dtext.getText().substring(0, dtext.getText().length() >= 20 ? 20 : dtext.getText().length()),
-                            this.mLeftCorner[0] + dtext.getTextAnchor().x + RADIUS * mScaleFactor / 2, this.mLeftCorner[1] + dtext.getTextAnchor().y + RADIUS * mScaleFactor / 2, mPaintsText.get(i + j));
+                            this.mLeftCorner[0] + dtext.getTextAnchor().x + RADIUS * mScaleFactor / 2, this.mLeftCorner[1] + dtext.getTextAnchor().y + RADIUS * mScaleFactor / 2, mPaintsText.get(count));
+                    count++;
                 }
             }
         }
@@ -443,7 +446,6 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
 
     private void askForAnnotationText(final boolean modePointOrPolygon) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-
         builder.setTitle(modePointOrPolygon ?
                 getResources().getString(R.string.title_for_asking_aler_dialog)
                 :
@@ -459,11 +461,13 @@ public class AnnotationView extends ToolView implements View.OnTouchListener {
                 if (modePointOrPolygon)
                     mCustomPaths.get(mCustomPaths.size() - 1).text = input.getText().toString();
                 else {
-                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
+//                    DICOMAnnotation dicomAnnotation = mPresentationState.getAnnotations().get(0);
+                    DICOMAnnotation newAnnotation = new DICOMAnnotation();
                     DICOMTextObject t = new DICOMTextObject();
                     t.setText(input.getText().toString());
                     t.setTextAnchor(pointToSaveTextAnnotation);
-                    dicomAnnotation.getTextObjects().add(t);
+                    newAnnotation.getTextObjects().add(t);
+                    mPresentationState.getAnnotations().add(newAnnotation);
                     mPaintsText.add(initPaintText());
                     drawIt();
                 }
