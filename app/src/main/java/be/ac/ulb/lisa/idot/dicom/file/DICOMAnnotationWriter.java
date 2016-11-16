@@ -50,7 +50,7 @@ public class DICOMAnnotationWriter {
         }
 
         byte[] preamble = getPreamble();
-        byte[] body = convertAnnotations(preprocess(state));
+        byte[] body = convertAnnotations(preprocessor(state));
 
         byte[] bytesToWrite = ByteBuffer.allocate(preamble.length + body.length)
                 .put(preamble)
@@ -62,7 +62,7 @@ public class DICOMAnnotationWriter {
         f.close();
     }
 
-    private DICOMPresentationState preprocess(DICOMPresentationState state) {
+    private DICOMPresentationState preprocessor(DICOMPresentationState state) {
         int i = 0;
         for (DICOMAnnotation a : state.getAnnotations()) {
             if (a.getLayerOrder() >= 0) {
@@ -72,6 +72,9 @@ public class DICOMAnnotationWriter {
             a.setLayerOrder(++i);
             a.setLayerName("LAYER" + i);
         }
+
+        state.getMetaInformation().setTransferSyntaxUID("1.2.840.10008.1.2");
+
         return state;
     }
 

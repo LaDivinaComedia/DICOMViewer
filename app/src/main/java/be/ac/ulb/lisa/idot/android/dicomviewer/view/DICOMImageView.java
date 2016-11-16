@@ -727,7 +727,7 @@ public class DICOMImageView extends ImageView implements OnTouchListener {
             pixelGrayLevel = (pixelGrayLevel > 255) ? 255 :
                     ((pixelGrayLevel < 0) ? 0 : pixelGrayLevel);
 
-            outputPixels[i] = (0xFF << 24) | // alpha
+                    outputPixels[i] = (0xFF << 24) | // alpha
                     (pixelGrayLevel << 16) | // red
                     (pixelGrayLevel << 8) | // green
                     pixelGrayLevel; // blue
