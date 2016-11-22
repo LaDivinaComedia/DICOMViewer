@@ -298,6 +298,8 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
      * @param tool
      */
     public void setTool(int tool) {
+        if (mCurrentTool == Tool.NONE)
+            mScreenOrientation = getActivity().getRequestedOrientation();
         if (mCurrentTool == Tool.ANNOTATIONS && tool != Tool.ANNOTATIONS)
             try {
                 if (mPresentationState != null)
@@ -305,8 +307,6 @@ public class DICOMFragment extends Fragment implements View.OnTouchListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        if (mCurrentTool == Tool.NONE)
-            mScreenOrientation = getActivity().getRequestedOrientation();
         mCurrentTool = tool;
         if (mCurrentTool == Tool.NONE)
             getActivity().setRequestedOrientation(mScreenOrientation);

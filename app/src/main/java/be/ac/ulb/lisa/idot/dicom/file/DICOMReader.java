@@ -416,11 +416,16 @@ public class DICOMReader extends DICOMBufferedInputStream {
                     } else if (vr.equals("OB") || vr.equals("OF")
                             || vr.equals("OW")) {
                         String valueString = "";
-                        for (int i = 0; i < valueLength; i++) {
-                            valueString += (i == 0) ? "" : "\\";
-                            valueString += String.valueOf(read());
-                            mByteOffset++;
-                        }
+
+                        byte[] data = new byte[(int) valueLength];
+                        read(data);
+                        valueString = new String(data);
+                        mByteOffset += valueLength;
+//                        for (int i = 0; i < valueLength; i++) {
+//                            valueString += (i == 0) ? "" : "\\";
+//                            valueString += String.valueOf(read());
+//                            mByteOffset++;
+//                        }
                         value = valueString;
                     } else if (vr.equals("FL")) {
                         value = readFL(valueLength);
