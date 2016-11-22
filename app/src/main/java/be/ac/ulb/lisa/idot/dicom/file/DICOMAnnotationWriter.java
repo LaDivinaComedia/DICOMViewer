@@ -63,6 +63,14 @@ public class DICOMAnnotationWriter {
     }
 
     private DICOMPresentationState preprocessor(DICOMPresentationState state) {
+        ArrayList<DICOMAnnotation> emptyAnnotatations = new ArrayList<>();
+        for (DICOMAnnotation a : state.getAnnotations()) {
+            if (a.getGraphicObjects().size() == 0 && a.getTextObjects().size() == 0) {
+                emptyAnnotatations.add(a);
+            }
+        }
+        state.getAnnotations().removeAll(emptyAnnotatations);
+
         int i = 0;
         for (DICOMAnnotation a : state.getAnnotations()) {
             if (a.getLayerOrder() >= 0) {
@@ -219,7 +227,7 @@ public class DICOMAnnotationWriter {
 
     protected byte[] annotationToByteArray(DICOMAnnotation a) {
         // 0x00700002 Graphic Layer DRAW
-        byte[] grLayer = createStringTag(GraphicLayer, "DRAW");
+        byte[] grLayer = createStringTag(GraphicLayer, a.getLayerName());
         // 0x00700008 Texts objects sequence
         byte[] texts = createTextObjects(a.getTextObjects());
         byte[] graphics = createGraphicObjects(a.getGraphicObjects());
